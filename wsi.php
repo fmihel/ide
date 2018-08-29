@@ -1,5 +1,9 @@
 <?php
+<<<<<<< HEAD
 define('WSI_DEV_VERSION','270818_4');
+=======
+define('WSI_DEV_VERSION','270818_5');
+>>>>>>> cf2f304c4bd608af1390216594496055e3bce4bb
 /*
 https://ws-framework-fmihel.c9users.io/ide/wsi.php
 */
