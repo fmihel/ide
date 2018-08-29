@@ -1,0 +1,47 @@
+.func_block{
+    overflow:hidden;
+    cursor:pointer;
+    white-space: nowrap;
+    font-size:11px;
+    height:20px;
+    line-height:20px;
+    color:$font;
+}
+
+.func_block_hover{
+    background-color:$item_hover2;
+    color:$font_active;
+    
+}
+
+.func_block_select{
+    background-color:$item_active2;
+    color:$font_active;
+}
+
+
+.func_block_class{
+    font-weight:bold;
+    text-indent:23px;
+    $_icon_left:url($icon_class);
+    background-position-x:5px;
+    
+        
+}
+
+.func_block_func{
+    text-indent:38px;
+    background-position-x:20px;
+    $_icon_left:url($icon_func);
+    
+}
+
+
+
+
+.func_block_up{
+    $_icon_center:url($icon_upward);
+}
+.func_block_down{
+    $_icon_center:url($icon_downward);
+}

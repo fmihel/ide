@@ -1,0 +1,8 @@
+.jgallery_common{
+    border:1px dotted silver;
+    
+}
+.jgallery_current{
+    border:1px solid blue;
+    
+}

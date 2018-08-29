@@ -1,0 +1,161 @@
+$dcss={
+    styles:{
+        size:[compact,normal], 
+        color:[light,dark]
+    }    
+};
+
+
+$top_height        =    {size:{compact:29px,normal:36px}};
+$top_menu_height   =    {size:{compact:29px,normal:38px}};
+$fone              =    {color:{dark:#272822,light:#FFFFFF}};
+$panel             =    {color:{dark:#434343,light:#E8E8E8}};
+$panel2            =    {color:{dark:#343532,light:#DEDEDE}};
+$jt_panel          =    {color:{dark:#272822,light:#E8E8E8}};
+$border            =    {color:{dark:#333333,light:#CCCCCC}};
+$top               =    {color:{dark:#2F3129,light:#F1F1F1}};
+
+$splitter          =    {color:{dark:#2F3129,light:#E8E8E8}};
+$splitter_width      ={size:{compact:2,normal:3}};
+
+$font={color:{dark:#A7A7A7,light:#000000}};
+$font_hover={color:{dark:#D4D4D4,light:#000000}};
+$font_active={color:{dark:#D4D4D4,light:#000000}};
+$size={size:{compact:11.5px,normal:12px}};
+
+$item={color:{dark:#434343,light:#CCCCCC}};
+$item_hover={color:{dark:none,light:#DDDDDD}};
+$item_hover2={color:{dark:none,light:#F5F5F5}};
+$item_active={color:{dark:#4E4E4E,light:#FFFFFF}};
+$item_active2={color:{dark:#4E4E4E,light:#EDEDED}};
+
+
+$menu_width={size:{compact:50px,normal:70px}};
+$menu_height={size:{compact:24px,normal:32px}};
+$menu_item={color:{dark:#606060,light:#F1F1F1}};
+$menu_btn_width={size:{compact:26px,normal:40px}};
+$menu_btn_height={size:{compact:20px,normal:26px}};
+$menu_background={color:{dark:#434343,light:#FAFAFA}};
+$menu_hover={color:{dark:#2D7AF2,light:#63ACFF}};
+$menu_font_hover={color:{dark:white,light:white}};
+
+$context_filetree_font={color:{dark:#FFFFFF,light:#000000}};
+$context_filetree_hover={color:{dark:#999999,light:#E8EFF7}};
+
+$input_height={size:{compact:18px,normal:24px}};
+$input={color:{dark:#606060,light:#F0EFEF}};
+$input_color={color:{dark:#C6C6C6,light:#000000}};
+$input_size={size:{compact:12px,normal:13px}};
+
+/*tree ------------------------------------------------------------*/
+$tree_font={color:{dark:#9D9782,light:black}};
+
+$tree_font_hover={color:{dark:#272822,light:black}};
+$tree_bg_hover={color:{dark:#31322C,light:#F5F5F5}};
+
+$tree_font_active={color:{dark:white,light:black}};
+$tree_bg_active={color:{dark:#3F403A,light:#DFDFDF}};
+
+
+/*bottom panel ------------------------------------------------------------*/
+$bp_height={size:{compact:24,normal:32}};
+
+$bp_fone={color:{dark:#272822,light:white}};
+$bp_panel={color:{dark:#434343,light:#E8E8E8}};
+$bp_hover={color:{dark:#505050,light:#F5F5F5}};
+$bp_active={color:{dark:#505050,light:#F5F5F5}};
+
+$bp_font={color:{dark:#A7A7A7,light:black}};
+$bp_font_hover={color:{dark:#D4D4D4,light:black}};
+$bp_font_active={color:{dark:#D4D4D4,light:black}};
+/*find result -------------------------------------------------------------*/
+
+$fr_font={color:{dark:#A7A7A7,light:black}};
+$fr_match={color:{dark:#A4E02D,light:blue}};
+$fr_input={color:{dark:#A4E02D,light:blue}};
+
+$fr_file={color:{dark:#B265AD,light:#DF0002}};
+$fr_file_hover={color:{dark:#B265AD,light:#DF0002}};
+$fr_file_fone={color:{dark:"",light:""}};
+$fr_file_fone_hover={color:{dark:"",light:""}};
+
+$fr_item_hover={color:{dark:#3B3C37,light:#EDEDED}};
+
+/*log-------------------------------------------------------------*/
+$log_font_on={color:{dark:#02B803,light:#37C338}};
+$log_font_off={color:{dark:#737373,light:silver}};
+
+$log_msg={color:{dark:#999999,light:#636363}};
+$log_msg_info={color:{dark:#494A46,light:#91ADD1}};
+
+/* component inspector*/
+$cm_background={color:{dark:#2D2D2D,light:#FAFAFA}};
+$cm_border={color:{dark:#4e4e4e,light:#AFAFAF}};
+$cm_color={color:{dark:silver,light:#313131}};
+
+
+$cm_header_color={color:{dark:#C37500,light:""}};
+$cm_var_color={color:{dark:#898989,light:#333333}};
+$cm_mean={color:{dark:#2D2D2D,light:#FAFAFA}};
+$cm_mean_color={color:{dark:#A5A5A5,light:black}};
+$cm_mean_placeholder={color:{dark:#616161,light:#D2D2D2}};
+$cm_mean_border={color:{dark:#191919,light:#AFAFAF}};
+
+$cm_btn_color={color:{dark:#A5A5A5,light:""}};
+$cm_btn_background={color:{dark:#2D2D2D,light:""}};
+$cm_btn_border={color:{dark:#4E4E4E,light:#AFAFAF}};
+$cm_btn_hover_color={color:{dark:white,light:#2C44C9}};
+$cm_btn_hover_background={color:{dark:#2D2D2D,light:""}};
+$cm_btn_hover_border={color:{dark:#4E4E4E,light:#AFAFAF}};
+/* jdialog*/
+
+$jd_background={color:{dark:#3C3C3C,light:white}};
+$jd_strip_background={color:{dark:#3C3C3C,light:white}};
+$jd_header_background={color:{dark:#2E2E2E,light:#E8E8E8}};
+
+$jd_border={color:{dark:#4E4E4E,light:#B6B4B6}};
+$jd_btn_border={color:{dark:#4D4D4D,light:#B6B4B6}};
+
+$jd_font_color={color:{dark:#FEFEFE,light:#2841C8}};
+$jd_font_color_header={color:{dark:#D88200,light:#414141}};
+
+$jd_btn={color:{dark:#979797,light:#414141}};
+$jd_btn_hover={color:{dark:white,light:#2841C8}};
+$jd_size={size:{compact:14px,normal:15px}};
+
+/* code_complit*/
+
+$cc_background={color:{dark:#2F3129,light:#FFFBEB}};
+$cc_border={color:{dark:#717171,light:#CCCCCC}};
+$cc_color={color:{dark:#8E8976,light:black}};
+$cc_item_height={size:{compact:18px,normal:18px}};
+$cc_select_background={color:{dark:#272822,light:#63ACFF}};
+$cc_select_color={color:{dark:lime,light:white}};
+$cc_size={size:{compact:12px,normal:12px}};
+
+$cc_obj={color:{dark:#8E8976,light:black}};
+$cc_func={color:{dark:#4A8C96,light:#450084}};
+$cc_var={color:{dark:#565654,light:black}};
+
+$cc_img_obj={color:{dark:"", light:""}};
+$cc_img_func={color:{dark:"", light:""}};
+$cc_img_var={color:{dark:"", light:""}};
+
+/*popup -------------------------------------------------------------*/
+
+$popup_size={size:{compact:12px,normal:13px}};
+$popup_msg_background={color:{dark:#12790F,light:#C0E7B9}};
+$popup_msg_border={color:{dark:#505050,light:#C0E7B9}};
+$popup_msg_color={color:{dark:white,light:black}};
+
+$popup_alert_background={color:{dark:#FB5D5D,light:#FB5D5D}};
+$popup_alert_border={color:{dark:white,light:#FB5D5D}};
+$popup_alert_color={color:{dark:white,light:white}};
+
+
+
+
+
+
+
+

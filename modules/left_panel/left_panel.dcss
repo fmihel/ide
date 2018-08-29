@@ -1,0 +1,47 @@
+#explorer_header{
+    
+    font-size:$size;
+    color:$font;
+    
+}
+
+.problem_header{
+    font-size:$size;
+    color:$font;
+}
+#problem{
+    height:400px;
+    font-size:$size;
+    overflow-x:hidden;overflow-y:auto;
+}    
+.ph_com{
+    position:absolute;
+    height:28px;
+    line-height:28px;
+}
+
+.ph_btn{
+    opacity:0.5;
+    background-position:center center;background-repeat:no-repeat;
+    min-width:24px;
+}
+
+.ph_btn:hover{
+    opacity:1;
+    cursor:pointer;
+}
+
+.ph_oc_d{
+    background-image:url($icon_drop_down);
+}
+
+.ph_oc_u{
+    background-image:url($icon_drop_up);
+}
+
+#ph_add{
+    background-image:url($icon_workplace_add);
+}
+#ph_collapse{
+    background-image:url($icon_workplace_collapse);
+}

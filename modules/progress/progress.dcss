@@ -1,0 +1,25 @@
+$prgs_h={size:{compact:18,normal:24}};
+$prgs_w={size:{compact:120,normal:140}};
+$prgs_indikator={color:{dark:#D88200,light:#C0E7B9}};
+
+$prgs_line_height = {size:{compact:16,normal:22}};
+
+.prgs_frame{
+    border:1px solid $border;
+    font-size:$size;
+    width:$prgs_w|px;
+    height:$prgs_h|px;
+}
+
+.prgs_indikator{
+    background-color:$prgs_indikator;
+}
+
+.prgs_caption{
+    white-space:nowrap;
+    overflow:hidden;
+    text-align:center;
+    line-height:$prgs_line_height|px;
+    
+    
+}

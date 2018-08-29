@@ -1,0 +1,25 @@
+.com_block{
+    overflow:hidden;
+    cursor:pointer;
+    white-space: nowrap;
+    font-size:11px;
+    height:20px;
+    line-height:20px;
+    color:$font;
+    text-indent:23px;
+    background-position-x:5px;
+    
+}
+
+.com_block:hover{
+    background-color:$item_hover2;
+    color:$font_active;
+}
+
+.com_block_select{
+    background-color:$item_active2;
+    color:$font_active;
+}
+
+
+

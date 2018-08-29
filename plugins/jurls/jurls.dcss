@@ -1,0 +1,45 @@
+$ju_item_hover_back = {color:{dark:#494949,light:#DDDDDD}};
+
+.ju_frame{
+    border:1px solid $border;
+    overflow:hidden;
+    background-color:$input;
+    font-size:$size;
+    color:$font;
+}
+
+.ju_list{
+    overflow-x:hidden;
+    overflow-y:auto;
+    position:absolute;
+    
+}
+
+.ju_item{
+    cursor:pointer;
+    height:32px;
+    line-height:32px;
+    border-bottom:1px solid $border;
+    
+}    
+
+.ju_item:hover{
+    background-color:$ju_item_hover_back;
+    color:$font_hover;
+}    
+
+.ju_item_move{
+    border-top:1px solid $border;
+}    
+
+.ju_num{
+    text-align:center;    
+}
+.ju_url{
+    white-space: nowrap;
+    overflow:hidden;
+}
+.ju_clear{
+    
+}
+

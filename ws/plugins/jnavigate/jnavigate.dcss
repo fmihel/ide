@@ -1,0 +1,35 @@
+
+$jnPanel = 60;
+$jnSize  = 32;
+$jnBorder = silver;
+
+.jnavigate_panel{
+    width:$jnPanel|px;    
+}
+.jnavigate_up{
+    width:$jnSize|px;
+    height:$jnSize|px;    
+}    
+.jnavigate_down{
+    width:$jnSize|px;    
+    height:$jnSize|px;    
+}
+.jnavigate_node{
+    width:$jnSize|px;    
+    height:$jnSize|px;
+    line-height:$jnSize|px;    
+    text-align:center;
+    border-radius:$jnSize|px;    
+    border:1px solid $jnBorder;
+    cursor:pointer;
+}
+.jnavigate_hover{
+    background-color:silver;
+}    
+.jnavigate_active{
+    background-color:#3E82F7;
+    color:white;
+}
+.jnavigate_disable{
+    
+}

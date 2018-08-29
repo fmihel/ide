@@ -1,0 +1,68 @@
+$tm_height = 32px;
+$tm_font = $font;
+$tm_bcolor1 = $panel;
+$tm_bcolor2 = $panel2;
+$tm_border = $border;
+$tm_hover = $border;
+
+.tmpl_block{
+    font-size:12px;
+    color:$tm_font;
+}    
+.tmpl_chapter{
+    text-indent:10px;
+    cursor:pointer;
+    border-bottom:1px solid $tm_border;
+    height:$tm_height;
+    line-height:$tm_height;
+    overflow:hidden;
+    background-color:$tm_bcolor1;
+    background: linear-gradient(to bottom,  $tm_bcolor1 0%,$tm_bcolor2 100%); 
+}
+.tmpl_chapter_close,.tmpl_chapter_open{
+    min-width:$tm_height;
+    width:$tm_height;
+    height:$tm_height;
+    min-height:$tm_height;
+}
+.tmpl_chapter_close{
+    $_icon_center:url($icon_drop_down);
+}    
+.tmpl_chapter_open{
+    $_icon_center:url($icon_drop_up);
+}
+
+.tmpl_chapter_select{
+    
+}
+
+.tmpl_chapter_short{
+    text-align:left;    
+    min-width:70px;
+    font-size:0.9em;
+    font-style: italic;
+    opacity:0.6;
+}
+
+.tmpl_group{
+    border-bottom:1px solid $border;
+    
+}
+
+.tmpl_item{
+    text-indent:20px;
+    cursor:pointer;
+    height:24px;
+    line-height:24px;
+    overflow:hidden;
+    
+    
+
+}
+
+
+.tmpl_item:hover{
+    color:$font_hover;
+    background-color:$item_hover2;
+    
+}

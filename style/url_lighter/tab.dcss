@@ -1,0 +1,48 @@
+$uli_background = $jt_panel;
+
+.uli_frame{
+    overflow:hidden;
+    font-family: $uli_font;
+    font-size: $uli_size;
+    background-color:$uli_background;
+}
+.uli_edit{
+    outline:0px;
+    border:0px;
+    
+    font-family: $uli_font;
+    font-size: $uli_size;
+    height:$uli_height|px;
+    line-height:$uli_height|px;
+    color:$uli_color;
+    background-color:$uli_background;
+}
+
+.uli_protocol,.uli_domen,.uli_path,.uli_file,.uli_params,.uli_placeholder{
+    height:$uli_height|px;
+    line-height:$uli_height|px;
+    /*word-wrap: normal;*/
+    white-space:  nowrap;
+}
+
+.uli_protocol{
+    color:$uli_http;   
+    text-align:right;
+}
+.uli_domen{
+    color:$uli_domen;
+}
+.uli_path{
+    color:$uli_path;
+}
+.uli_file{
+    color:$uli_file;
+}
+.uli_params{
+    text-align:left;
+    color:$uli_params;
+}
+.uli_placeholder{
+    text-align:left;
+    color:$uli_placeholder;
+}

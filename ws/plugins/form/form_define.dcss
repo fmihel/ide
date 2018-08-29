@@ -1,0 +1,13 @@
+$mfr_border         =   black;
+$mfr_border_fat     =   1;
+$mfr_fone           =   #DBE1E9;
+$mfr_header_fone    =   white;
+$mfr_footer_fone    =   white;
+
+$mfr_close_btn_size =   36;
+$mfr_radius         =   2;
+$mfr_close_radius   =   24;
+$mfr_resize         =   12;
+$mfr_border_resize  = $mfr_border;
+$mfr_btn_height     = 32;
+$mfr_btn_width     = 110;

@@ -1,0 +1,18 @@
+#tree1 .jwp_folder,#tree2 .jwp_folder,.jwp_folder{
+    background-image:url("https://cdn2.iconfinder.com/data/icons/bitsies/128/Folder-16.png");
+    background-position: center center;
+    width:24px;
+    height:24px;
+
+}
+#tree1 .jwp_file,#tree2 .jwp_file{
+    background-image:url("https://cdn2.iconfinder.com/data/icons/bitsies/128/Document-16.png");
+    background-position: center center;
+    width:24px;
+    height:24px;
+    
+}
+#tree1 .jwp_func,#tree2 .jwp_func{
+    background-color: blue;
+}
+

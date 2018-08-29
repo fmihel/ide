@@ -1,0 +1,64 @@
+.cc_frame{
+    background-color:$cc_background;
+    border:1px solid $cc_border;
+    color:$cc_color;
+    
+    
+    max-height:200px;
+    
+    min-width:150px;
+    min-height:64px;
+    
+    overflow-x:hidden; 
+    overflow-y:auto;
+    
+    font-family: Consolas, monospace;
+    font-size:$cc_size;
+    
+}
+
+.cc_obj,.cc_func,.cc_var{
+    //text-indent:10px;
+}
+.cc_obj{
+    color:$cc_obj;
+    $_icon_left:url($icon_class);
+    
+}
+.cc_func{
+    color:$cc_func;
+    
+    $_icon_left:url($icon_func);
+}
+.cc_var{
+    color:$cc_var;
+    $_icon_left:url($cc_img_var);
+}
+.cc_item{
+    
+    padding-left:20px;
+    padding-right:5px;
+    
+    height:$cc_item_height;
+    max-height:$cc_item_height;
+    line-height:$cc_item_height;
+    
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+.cc_file{
+    
+    display:inline;
+    text-align:right;
+    float:right;
+    
+}
+.cc_item:hover{
+    background-color:$cc_select_background;
+}
+.cc_select{
+    color:$cc_select_color;
+    background-color:$cc_select_background;
+}
+

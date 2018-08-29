@@ -1,0 +1,45 @@
+$fh_height = 32px;
+$fh_btn = 24px;
+$fh_inheight = $fh_btn;
+$fh_linheight = 23px;
+$fh_show_in_last = $fh_btn;
+
+.fh_frame{
+    border-top:1px solid rgba(0,0,0,0);
+    border-bottom:1px solid $border;
+    border-left:1px solid $border;
+    border-bottom-left-radius: 12px;
+    
+    background-color:$fone;
+    width:400px;
+    height:$fh_height;
+    font-size:12px;
+    color:$font;
+}
+.fh_msg{
+    
+    height:$fh_inheight;
+    line-height:$fh_linheight;
+    overflow-x:auto;
+    overflow-y:hidden;
+    white-space: nowrap;
+    
+}
+
+.fh_show_in_last{
+    height:$fh_inheight;
+    width:$fh_show_in_last;
+    background-image:url($icon_show);
+    background-position:center center;background-repeat:no-repeat;    
+}
+.fh_no_show_in_last{
+    background-image:url($icon_not_show);
+}
+
+.fh_btn{
+    height:$fh_btn;
+    width:$fh_btn;
+    background-image:url($icon_x);
+    background-position:center center;background-repeat:no-repeat;    
+    text-align:center;
+}

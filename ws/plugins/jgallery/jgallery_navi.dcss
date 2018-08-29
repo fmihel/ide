@@ -1,0 +1,37 @@
+$jgnW = 42;
+
+.jgn_item{
+    height:$jgnW|px;
+    line-height:$jgnW|px;
+    width:$jgnW|px;
+    text-align:center;
+    border-radius:$jgnW|px;
+    border:1px solid silver;
+    margin-bottom:5px;
+    font-size:1.2em;
+}
+.jgn_hover{
+    background-color:silver;
+}    
+
+.jgn_active{
+    background-color:#7BAAF7;
+    color:white;
+    
+}
+
+.jgn_down{
+    height:84px;
+}
+.jgn_prev,.jgn_next{
+    height:$jgnW|px;
+    line-height:$jgnW|px;
+    width:$jgnW|px;
+    text-align:center;
+    background-color:green;
+            
+}
+.jgn_next{
+    background-color:blue;
+            
+}

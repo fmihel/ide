@@ -1,0 +1,26 @@
+#problem .jwp_folder{
+    background-image:url($icon_folder);
+    background-position: center center;
+    width:16px;
+    height:18px;
+
+}
+
+#problem .jwp_file{
+    background-image:url("https://cdn2.iconfinder.com/data/icons/bitsies/128/Document-16.png");
+    background-position: center center;
+    width:24px;
+    height:24px;
+}
+#problem .jwp_func{
+    background-color: blue;
+}
+#tree .folder { background:url($icon_folder) center center no-repeat; }
+#problem .file-php,#problem .file-js,#problem .file-css,#problem .file-dcss{
+    background-position:center center;
+    background-repeat: no-repeat;
+}
+#problem .file-php { background:url($icon_php) center center no-repeat;}
+#problem .file-js { background:url($icon_js)  center center no-repeat;}
+#problem .file-css,#problem .file-dcss { background:url($icon_css) center center no-repeat;}
+#problem  .file-txt,#problem  .file-htm, #problem  .file-html, #problem  .file-xml, #problem  .file-xsl { background:url($icon_file) center center no-repeat; }

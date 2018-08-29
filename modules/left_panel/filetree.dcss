@@ -1,0 +1,90 @@
+
+/*background hover*/
+#problem .jstree-wholerow-hovered,#tree .jstree-wholerow-hovered{
+    background: $tree_bg_hover;
+}
+/*clicked fone*/
+#problem .jstree-wholerow-clicked,#tree .jstree-wholerow-clicked{
+    background: $tree_bg_active;
+}
+
+/*common font*/
+#problem .jstree-anchor,#tree .jstree-anchor{
+    color:$tree_font;
+}
+
+/*font color on clicked*/
+#problem .jstree-clicked,#tree .jstree-clicked{
+    color:$tree_font_active;
+}
+
+/*fone color*/
+#problem .jstree-wholerow{
+    /*background-color:green;*/
+} 
+
+
+
+
+#container { min-width:320px; margin:0px auto 0 auto; background:white; border-radius:0px; padding:0px; overflow:hidden; }
+#tree {  min-width:319px; border:0px; overflow:auto; padding:0px 0;font-size:$size }
+#data { margin-left:320px; }
+#data textarea { margin:0; padding:0; height:100%; width:100%; border:0; background:white; display:block; line-height:18px; resize:none; }
+#data, #code { font: normal normal normal 12px/18px 'Consolas', monospace !important; }
+    
+#tree .folder { background:url($icon_folder) center center no-repeat; }
+#tree .file{ background:url($icon_file) center center no-repeat; }
+#tree .file-pdf { background-position: -32px 0 }
+#tree .file-as { background-position: -36px 0 }
+#tree .file-c { background-position: -72px -0px }
+#tree .file-iso { background-position: -108px -0px }
+/*#tree .file-htm, #tree .file-html, #tree .file-xml, #tree .file-xsl { background-position: -126px -0px }*/
+#tree .file-htm, #tree .file-html, #tree .file-xml, #tree .file-xsl { background:url($icon_file) center center no-repeat; }
+
+#tree .file-cf { background-position: -162px -0px }
+#tree .file-cpp { background-position: -216px -0px }
+#tree .file-cs { background-position: -236px -0px }
+#tree .file-sql { background-position: -272px -0px }
+#tree .file-xls, #tree .file-xlsx { background-position: -362px -0px }
+#tree .file-h { background-position: -488px -0px }
+#tree .file-crt, #tree .file-pem, #tree .file-cer { background-position: -452px -18px }
+#tree .file-php { background:url($icon_php);}
+#tree .file-jpg, #tree .file-jpeg, #tree .file-png, #tree .file-gif, #tree .file-bmp { background-position: -126px -18px }
+#tree .file-ppt, #tree .file-pptx { background-position: -144px -18px }
+#tree .file-rb { background-position: -180px -18px }
+#tree .file-text, #tree .file-md, #tree .file-htaccess { background-position: -254px -18px }
+#tree .file-doc, #tree .file-docx { background-position: -362px -18px }
+#tree .file-zip, #tree .file-gz, #tree .file-tar, #tree .file-rar { background-position: -416px -18px }
+#tree .file-js { background:url($icon_js); }
+#tree .file-jsx { background:url($icon_jsx); }
+
+#tree .file-css,#tree .file-dcss { background:url($icon_css);}
+#tree .file-fla { background-position: -398px -0px }        
+
+.vakata-context,.vakata-context ul{
+    background:$menu_item;
+    font-size:$size;
+    z-index:1000;
+    box-shadow:         0px 0px 0px 0px rgba(50, 50, 50, 0.75);
+    text-shadow: 0px 0px 0px rgba(150, 150, 150, 1);
+    border:0px solid $border;
+    color:$context_filetree_font;
+}
+.vakata-context li > a{
+    text-shadow: 0px 0px 0px rgba(150, 150, 150, 1);
+    color:$context_filetree_font;
+}
+.vakata-context li > a:hover{
+    color:$context_filetree_font;
+    background:$context_filetree_hover;
+    border:0px ;
+    box-shadow:         0px 0px 0px 0px rgba(50, 50, 50, 0.75);
+}
+.vakata-context li > a .vakata-contextmenu-sep{
+    background:none;
+    border-left:1px solid $border;
+}
+.vakata-context .vakata-context-separator > a, .vakata-context .vakata-context-separator > a:hover{
+    background:none;
+    border-top:1px solid $border;
+}

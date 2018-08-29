@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<body>
+    <header>
+        <info>no modify block</info>
+    </header>
+    <template><![CDATA[<{rem:/*
+use the <{rem: :rem}> :rem}> <{rem: block 
+for set NO modify block in CDATA section of template  
+*/:rem}>
+
+]]>
+</template>
+</body>

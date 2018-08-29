@@ -1,0 +1,56 @@
+
+.jd_frame{
+    border:1px solid $jd_border;
+    background-color: $jd_background;
+    color:$jd_font_color;
+    
+    font-size:$jd_size;
+}
+.jd_strip{
+    background-color: $jd_strip_background;
+}    
+.jd_header{
+    color:$jd_font_color_header;
+    background-color:$jd_header_background;
+}
+.jd_header_strip{
+    color:$jd_font_color_header;
+    
+}
+
+.jd_center{
+   
+}
+
+.jd_msg{
+   
+}
+.jd_footer{
+}
+
+.jd_caption{
+    
+}
+
+.jd_close_btn{
+    opacity:0.7;
+    cursor:pointer;
+    $_icon_center:url($icon_x);
+}
+.jd_close_btn_hover{
+    opacity:1;
+}
+
+.jd_button_item{
+    
+    border:1px solid $jd_btn_border;
+    text-align:center;
+    color:$jd_btn;
+    
+}
+.jd_button_hover{
+    
+    cursor:pointer;
+    color:$jd_btn_hover;
+}
+

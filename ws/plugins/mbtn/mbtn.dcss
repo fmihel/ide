@@ -1,0 +1,17 @@
+$mbtn_hover  = #E5E5E5;
+$mbtn_active = #4285F4;
+
+$mbtn_disable_opacity = 0.5;
+
+.mb_hover{
+    background-color:$mbtn_hover;
+}
+
+.mb_active{
+    background-color:$mbtn_active;
+    color:white;
+}
+
+.mb_disable{
+    opacity:$mbtn_disable_opacity;    
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<body>
+    <header>
+        <info>template</info>
+        <vars>
+            <item name="Name" notes="empty"></item>
+        </vars>  
+        
+    </header>
+    <template><![CDATA[<{rem:<?xml version="1.0" encoding="utf-8" ?>
+<body>
+    <header>
+        <info>:rem}><{Name}><{rem:</info>
+        <short></short>        
+        <vars>
+            <item name="VarName" notes="empty"></item>
+        </vars>  
+    </header>
+    <template>
+<![CDATA[
+
+$<{VarName}> = 10;    
+:rem}>
+<{$cursor}>
+<{rem:]:rem}><{rem:]:rem}><{rem:>
+    </template>
+</body>
+:rem}>]]>
+    </template>
+</body>

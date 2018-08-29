@@ -1,0 +1,23 @@
+.ui-dialog .ui-dialog-content{
+    overflow:hidden;
+}
+.ui-accordion-header{
+    outline:0px;
+}
+.options{
+    background-color:white;
+    border:1px solid gray;
+    padding:0px;
+    display:none;
+    overflow:hidden;
+}
+.opt_frame{
+    padding:5px;
+    margin:0px
+        
+}
+.opt{
+    height:150px;
+    padding:0px;
+    margin:0px
+}

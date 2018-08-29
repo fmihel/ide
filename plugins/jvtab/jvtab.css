@@ -1,0 +1,42 @@
+body{
+    overflow-x:hidden;
+    overflow-y:hidden;
+    -webkit-font-smoothing:antialiased;
+    -webkit-user-select: none;
+    color: #000000;
+    font-family: Roboto, sans-serif;
+    text-overflow: ellipsis;
+    margin:0px;
+    padding:0px;
+    background-color: #303130;
+}
+
+.jvt_left{
+    border:1px solid #4D4E4D;    
+    border-left:1px solid white;    
+    
+}
+
+.jvt_right{
+    border:1px solid #4D4E4D;
+    font-size:10px;
+    background-color:#303130;
+    
+}
+.jvt_btn{
+    color:#9C9C9C;
+}
+.jvt_btn:hover{
+    color:white;
+    cursor: pointer;
+    
+}
+.jvt_btn_select{
+    background-color:#4D4E4D;
+}
+.jvt_btn_text{
+    transform: rotate(90deg);
+}
+.jvt_panel{
+    background-color:#4D4E4D;
+}

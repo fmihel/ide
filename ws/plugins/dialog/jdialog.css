@@ -1,0 +1,40 @@
+
+.jd_frame{
+    border:1px solid gray;
+    background-color: white;
+}
+.jd_strip{
+    background-color: #F6F6F6;
+}    
+.jd_header{
+    border-bottom:1px solid gray;
+}
+.jd_center{
+   
+}
+
+.jd_msg{
+   
+}
+.jd_footer{
+    border-top:1px solid gray;
+    
+}
+.jd_caption{
+    
+}
+.jd_close_btn{
+    
+}
+.jd_close_btn_hover{
+    
+}
+
+.jd_button_item{
+    border:1px solid silver;
+    
+}
+.jd_button_hover{
+    border:1px solid black;
+}
+

@@ -1,0 +1,60 @@
+.find_panel{
+    overflow:auto;
+    padding:30px;
+    padding-top:0px;
+    padding-bottom:0px;
+    white-space: nowrap;
+    /*font-family: Roboto,source-code-pro,  monospace;*/
+    font-family: Consolas,  monospace;
+    font-size:$size;
+    color:$fr_font;
+
+}
+.find_input{
+    color:$fr_input;
+}
+.find_file{
+    color:$fr_file;    
+    background-color:$fr_file_fone;
+    font-weight:bold;    
+}
+.find_file:hover{
+    color:$fr_file_hover;    
+    background-color:$fr_file_fone_hover;
+}
+
+.find_list{
+    padding-left:20px;
+}
+.find_str{
+    height:18px;
+    line-height:18px;
+    overflow:hidden;
+    cursor:pointer;
+}
+.find_str:hover{
+    background-color:$fr_item_hover;
+}
+.find_match{
+    font-weight:bold;
+    color:$fr_match;
+}
+
+.find_process_frame{
+    border:1px solid $border;
+}
+.find_process{
+    border:0px;
+    background-color:$item;
+}
+
+.find_btn{
+    cursor:pointer;
+    $_icon_center;
+    background-image:url($icon_find);
+    opacity:0.7;
+}
+
+.find_btn:hover{
+    opacity:1;
+}    

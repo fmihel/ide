@@ -1,0 +1,48 @@
+$uli_background = $input;
+$uli_height = 32;
+
+.uli3_frame{
+    overflow:hidden;
+    font-family: $uli_font;
+    font-size: $uli_size;
+}
+.uli3_edit{
+    outline:0px;
+    border:0px;
+    
+    font-family: $uli_font;
+    font-size: $uli_size;
+    height:$uli_height|px;
+    line-height:$uli_height|px;
+    color:$uli_color;
+    background-color:$uli_background;
+}
+
+.uli3_protocol,.uli3_domen,.uli3_path,.uli3_file,.uli3_params,.uli3_placeholder{
+    height:$uli_height|px;
+    line-height:$uli_height|px;
+    /*word-wrap: normal;*/
+    white-space:  nowrap;
+}
+
+.uli3_protocol{
+    color:$uli_http;   
+    text-align:right;
+}
+.uli3_domen{
+    color:$uli_domen;
+}
+.uli3_path{
+    color:$uli_path;
+}
+.uli3_file{
+    color:$uli_file;
+}
+.uli3_params{
+    text-align:left;
+    color:$uli_params;
+}
+.uli3_placeholder{
+    text-align:left;
+    color:$uli_placeholder;
+}

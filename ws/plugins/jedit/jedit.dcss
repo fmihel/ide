@@ -1,0 +1,152 @@
+$rgb0 = rgba(0,0,0,0);
+
+$jeColorCaption = gray;
+$jeColorText    = gray;
+$jeColorEdit    = navy;
+$jeColorChanged  = blue;
+
+$jeBorder       = silver;
+
+$jeFone = $rgb0;
+$jeFoneCombo    = #FFF8E5;
+$jeFoneEdit     = #F3F3F3;
+$jeFoneText     = white;
+
+$jeWidthCaption = 100;
+$jeWidthEdit    = 100;
+$jeHeight       = 23;
+$jeBtnSize      = $jeHeight;
+$jeFontSize     = 13;
+$jeIndent = 5;
+$jeDimW     = 20;
+
+.je_label{
+    height:$jeHeight|px;
+    line-height:$jeHeight|px;
+    overflow:hidden;
+    width:$jeWidthCaption|px;
+    color:$jeColorCaption;
+    font-size:$jeFontSize|px;
+    text-indent:$jeIndent|px;
+    
+}
+
+.je_field{
+    height:$jeHeight|px;
+    border:1px solid $rgb0;
+}
+
+.je_input,.je_text,.je_btn,.je_checkbox,.je_dim{
+    height:$jeHeight|px;
+    border:1px solid $rgb0;
+    background-color:$rgb0;
+    font-size:$jeFontSize|px;
+    text-indent:$jeIndent|px;
+}
+
+.je_checkbox{
+    border:1px solid gray;
+    height:10px;
+    width:10px;
+}    
+.je_checkbox_checked{
+    background-color:blue;
+}    
+
+.je_input_fone{
+    border:1px solid $jeBorder;
+    background-color:$jeFoneEdit;
+}
+.je_input{
+    padding:0px;
+    margin:0px;
+    color:$jeColorEdit;
+    outline:0;
+}
+.je_changed{
+    color:$jeColorChanged;
+}    
+.je_text_fone{
+    border-bottom:1px solid $jeBorder;
+    
+}
+
+.je_text{
+    line-height:$jeHeight|px;
+    color:$jeColorText;
+    margin:0px;
+}
+
+.je_btn_fone{
+    border:1px solid $jeBorder;
+}
+.je_btn{
+    line-height:$jeHeight|px;
+    
+}
+
+.je_btn_combo{
+    width:$jeBtnSize|px;
+    height:$jeBtnSize|px;
+    border:1px solid $rgb0;
+}
+
+.je_btn_add{
+    width:$jeBtnSize|px;
+    height:$jeBtnSize|px;
+    border:1px solid $rgb0;
+}
+.je_dim{
+    line-height:$jeHeight|px;
+    color:$jeColorText;
+    margin:0px;
+    width:$jeDimW|px;
+    text-align:left;
+}
+
+.je_combo{
+    background-color:$jeFoneCombo;
+    height:200px;
+}
+.je_memo{
+    border:1px solid $jeBorder;
+}
+
+.je_disable{
+    opacity:0.5;    
+}
+
+
+
+.je_tip{
+    
+}
+.je_tipShadow,.je_tipBorder{
+   // box-shadow: 0px 0px 5px 0px rgba(50, 50, 50, 0.75);    
+}
+.je_tipBtn{
+    width:16px;
+    height:16px;
+    line-height:16px;
+    text-align:center;
+    
+    cursor:pointer;
+}    
+
+.je_tipArrow{
+    border:1px solid silver;
+    background:#F9ECC5;    
+}
+.je_tipBorder{
+    border:1px solid silver;
+    background:#F9ECC5;
+    border-radius:0px;    
+}
+.je_tipUp{
+    border:0px solid rgba(0,0,0,0);
+    background:#F9ECC5;
+    border-radius:0px;    
+}
+.je_tipText{
+    overflow:auto;
+}

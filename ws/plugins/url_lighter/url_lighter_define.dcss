@@ -1,0 +1,10 @@
+$uli_font = "verdana, sans-serif";
+$uli_size = 12;
+$uli_height = 24;
+$uli_color = black;
+$uli_http  = #0B8043;
+$uli_domen  = blue;
+$uli_path   = #DC4601;
+$uli_file   = $uli_color;
+$uli_params = silver;
+$uli_placeholder = #D4E8F0;

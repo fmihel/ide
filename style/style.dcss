@@ -1,0 +1,219 @@
+
+$path_ddd = {scheme:{light:"favicon.ico",dark:"favicon.ico"}};
+
+.DD{
+    background-image:url($path_ddd|$_cache_);
+}    
+
+body{
+    overflow-x:hidden;
+    overflow-y:hidden;
+    -webkit-font-smoothing:antialiased;
+    -webkit-user-select: none;
+    color: #000000;
+    font-family: Roboto, sans-serif;
+    text-overflow: ellipsis;
+    margin:0px;
+    padding:0px;
+    background-color:$fone;
+    
+}
+
+.layer{
+    position:absolute;
+    background-color: $fone;
+    border:0px solid $border;
+    overflow:hidden;
+}
+
+.top{
+    border-bottom:1px solid $border;
+    background-color:$panel;
+    height:$top_height;
+}
+.left{
+    /*border-right:1px solid $border;*/
+}
+.right{
+    border-left:1px solid $border;
+}
+.bottom{
+    border-top:1px solid $border;
+}
+
+.splitter-right,.splitter-left,.splitter-vert{
+    border:1px solid $border;
+    background-color: $splitter;
+}
+.splitter-left{
+    border-right:0px;
+    border-left:0px;
+}
+.splitter-right{
+    border-left:0px;
+}
+.splitter-vert{
+    border-left:0px;
+    border-right:0px;
+    border-bottom:0px solid $splitter;
+}
+
+.splitter-left:hover,.splitter-right:hover,.splitter-vert:hover{
+    background-color:$item_hover;
+}
+
+
+$vhover = $item;
+$vtrack = $fone;
+$vthumb = $panel;            
+
+.ws_scrollbar::-webkit-scrollbar-track{
+    background-color: $vtrack;
+    border-right:1px solid $vtrack;
+}
+
+.ws_scrollbar::-webkit-scrollbar{
+    width: 12px;
+    height: 13px;
+    background-color: $vtrack;
+}
+
+.ws_scrollbar::-webkit-scrollbar-thumb{
+    background-color: $vthumb;
+    border:1px solid $vthumb
+    
+}
+.ws_scrollbar::-webkit-scrollbar-thumb:hover{
+    background-color: $vhover;    
+    border:1px solid $vhover;
+}
+
+
+.ace_scrollbar-v::-webkit-scrollbar,.ace_scrollbar-h::-webkit-scrollbar{
+    width: 12px;
+    height: 13px;
+    background-color: $vtrack;
+}
+
+.ace_scrollbar-v::-webkit-scrollbar-thumb,.ace_scrollbar-h::-webkit-scrollbar-thumb{
+    background-color: $vthumb;
+    border:1px solid $vthumb
+    
+}
+.ace_scrollbar-v::-webkit-scrollbar-thumb:hover,.ace_scrollbar-h::-webkit-scrollbar-thumb:hover{
+    background-color: $vhover;    
+    border:1px solid $vhover;
+}
+
+.menu,.menu_btn{
+    color:$font;
+    width:$menu_width;
+    min-width:$menu_width;
+    position:absolute;
+    cursor:pointer;
+    text-align:center;
+    height:$top_menu_height;
+    line-height:$top_menu_height;
+    font-size:$size;
+}
+.menu_btn{
+    color:$font;
+    width:$menu_btn_width;
+    min-width:$menu_btn_width;
+    border:1px solid $border;
+    max-height:$menu_btn_height;
+    min-height:$menu_btn_height;
+    height:$menu_btn_height;
+    line-height:$menu_btn_height;
+
+}
+.menu:hover,.menu_btn:hover{
+    color:$font_hover;
+    background-color:$item_hover;
+}
+
+.menu_item{
+    min-height:$menu_height;
+    line-height:$menu_height;
+//    background-color:$menu_item;
+}
+
+
+.url_left{
+    background-image:url('$icon_run');
+    background-repeat:no-repeat;
+    background-position-y:center;
+    background-position-x:center;
+    background-color:$input;
+    border-right:0px;
+    width:70px;
+}
+.url_center{
+    color:$font;
+    width:$menu_btn_width;
+    min-width:$menu_btn_width;
+    border:1px solid $border;
+    max-height:$menu_btn_height;
+    min-height:$menu_btn_height;
+    height:$menu_btn_height;
+    line-height:$menu_btn_height;
+}
+.url_right{
+    background-image:url('$icon_drop_down');
+    background-repeat:no-repeat;
+    background-position-y:center;
+    background-position-x:center;
+    background-color:$input;
+    border-left:0px;
+    width:70px;
+}
+
+/*убирает рамку у tab*/
+.ui-widget.ui-widget-content{
+    border:0px;
+}
+
+.jt_panel{
+    background-color:$jt_panel;
+    z-index:2px;
+    border-top:1px solid $border;
+    border-bottom:1px solid $border;
+    border-left:0px solid $border;
+}
+.ui-widget.ui-widget-content{
+    border:0px;
+}
+
+.ui-widget-mline{
+    min-height:1px;
+    background-color:$border;
+    border:0px;
+}
+.edit,.labeled_edit{
+    background-color : $input; 
+    outline:0;
+    border:1px solid $border;
+    min-height:$input_height;
+    text-indent:5px;
+    color:$input_color;
+    font-size:$input_size;
+}
+
+.labeled{
+    
+    
+    min-width:100px;
+    width:30%;
+    min-height:$input_height;
+    line-height:$input_height;
+    float:left;
+    
+
+}
+.labeled_edit{
+    
+    float:left;
+    width:65%
+    
+}
+

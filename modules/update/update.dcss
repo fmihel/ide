@@ -1,0 +1,56 @@
+$upW1 = 240;
+$upW2 = 100;
+$upW3 = $upW1+$upW2;
+$upH = 32;
+$upH3 = 100;
+$upBorder = $border;
+$upH4 = 24;
+$upStop={color:{light:green,dark:#A6E22E}};
+
+.up_label,.up_txt,.up_btn{
+    height:$upH|px;
+    line-height:$upH|px;
+}
+
+.up_label{
+    width:$upW1|px;    
+}
+.up_txt{
+    width:$upW2|px;   
+    text-align:center;
+}
+
+.up_btn{
+    width:$upW2|px;    
+    border:1px solid $upBorder;
+    text-align:center;
+    cursor:pointer;
+    background:#4285F4;
+    color:white;
+    font-weight:bold;
+}
+.up_btn:hover{
+    
+}    
+.up_btn_disable{
+    opacity:0;    
+}
+
+.up_process{
+    width:$upW3|px;
+    height:$upH3|px;
+    overflow:hidden;
+}
+.up_process_block,.up_process_block_error,.up_process_block_stop{
+    text-indent:20px;
+    height:$upH4|px;
+    line-height:$upH4|px;
+    color:#4285F4;
+}
+
+.up_process_block_error{
+    color:red;
+}    
+.up_process_block_stop{
+    color:$upStop;
+}    

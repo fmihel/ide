@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<body>
+    <header>
+        <info>predefined var</info>
+    </header>
+    <template><![CDATA[<{rem:/*
+    Use the next predefined vars for set folder or filename in template
+    
+    <{$root}>                   - root path on hosting (usually /public_html)
+    <{$user_path}>              - root of user path ( set in users data) 
+    <{$user_path_from_root}>    - path to user path from root
+    <{$filename}>               - name of  current opened file
+    <{$filename_from_root}>     - name of current opened file from root
+    <{$filename_short}>         - name of  current opened file (short)
+    <{$filename_short_wext}>    - name of  current opened file (short) without ext
+    <{$module}>                 - synonym of filename_short_wext
+    <{$filename_from_user}>     - name of current opened file from user
+    <{$path}>                   - path to current opened file
+    <{$path_from_root}>         - path current opened file from root
+    <{$path_to_root}>           - relative path to root from path of current opened file
+    <{$path_to_ws}>             - relative path to ws core lib
+    <{$cursor}>                 - after the template insert, the cursor will be placed instead of a variable 
+*/
+:rem}>
+
+$root               = "<{$root}>";
+$user_path          = "<{$user_path}>";
+$user_path_from_root= "<{$user_path_from_root}>";
+$filename           = "<{$filename}>";
+$filename_from_root = "<{$filename_from_root}>";
+$filename_short     = "<{$filename_short}>";
+$filename_short_wext= "<{$filename_short_wext}>";
+$module             = "<{$module}>";
+$filename_from_user = "<{$filename_from_user}>";
+$path               = "<{$path}>";
+$path_from_root     = "<{$path_from_root}>";
+$path_to_root       = "<{$path_to_root}>";
+$path_to_ws         = "<{$path_to_ws}>";
+
+
+    ]]>
+    </template>
+</body>

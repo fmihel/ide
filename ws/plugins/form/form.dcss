@@ -1,0 +1,87 @@
+$mfr_border         =   silver;
+$mfr_border_fat     =   1;
+$mfr_fone           =   #EAFFE4;
+$mfr_header_fone    =   white;
+$mfr_footer_fone    =   white;
+
+$mfr_close_btn_size =   36;
+$mfr_radius         =   0;
+$mfr_close_radius   =   24;
+$mfr_resize         =   12;
+$mfr_border_resize  = $mfr_border;
+$mfr_btn_height     = 32;
+$mfr_btn_width     = 110;
+
+.mfr_frame,.mfr_close_frame{
+    border:$mfr_border_fat|px solid $mfr_border;
+    background-color:$mfr_fone;
+    border-radius: $mfr_radius|px;
+    box-shadow:         0px 0px 26px 0px rgba(50, 50, 50, 0.4);
+}
+
+.mfr_header{
+    height:50px;
+    background-color:$mfr_header_fone;
+    border:1px solid rgba(0,0,0,0);
+    border-top-left-radius: $mfr_radius|px;
+    border-top-right-radius: $mfr_radius|px;    
+    border-bottom:1px solid $mfr_border;
+    cursor:move;
+}
+
+.mfr_content{
+    
+}
+
+.mfr_footer{
+    height:50px;
+    border-top:1px solid $mfr_border;
+    background-color:$mfr_footer_fone;
+    border-bottom-right-radius: $mfr_radius|px;
+    border-bottom-left-radius: $mfr_radius|px;    
+}
+
+.mfr_caption{
+    height:24px;
+    line-height:24px;
+}
+
+.mfr_close_frame{
+
+    background-color:$mfr_header_fone;
+    border-radius: $mfr_close_radius|px;
+}
+
+
+
+.mfr_close{
+    height:$mfr_close_btn_size|px;
+    width:$mfr_close_btn_size|px;    
+    border:0px;
+    background-color:rgba(0,0,0,0);
+    background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARElEQVR4nGNgGDTgbL8JSWqxqifGEIJqFi5c+J8cOYIKidaMTQPJmpE1EtLMRJbJxNqOjU2yZpINoSgaKUpIpCblwQMAYCw2b6U0YC8AAAAASUVORK5CYII=");
+    background-repeat: no-repeat;
+    background-position: center center;
+    cursor:pointer;
+}
+
+.mfr_btn{
+    height:$mfr_btn_height|px;
+    width:$mfr_btn_width|px;    
+    line-height:$mfr_btn_height|px;
+    text-align:center;
+    border:1px solid $mfr_border;
+    cursor:pointer;
+}
+.mfr_btn_disable{
+    opacity:0.3;
+    cursor:default;
+}
+
+.mfr_resize{
+    width:$mfr_resize|px;
+    height:$mfr_resize|px;
+    border-bottom:2px double $mfr_border_resize;
+    border-right:2px double $mfr_border_resize;
+    cursor:move;
+}

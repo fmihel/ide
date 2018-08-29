@@ -1,0 +1,112 @@
+$grid_size = 32;
+$grid_border = #DCDCDC;
+
+$grid_border_vert_color = $grid_border;
+$grid_border_horiz_color = $grid_border;
+
+
+$grid_fone = white;
+$grid_header_fone = #EBEBEB;
+$grid_hover_fone = #EFEFEF;
+$grid_select_fone = #3879D9;
+$grid_select_color = white;
+
+
+$grid_group_fone1 = #FDDC9A;
+$grid_group_fone2 = #FDDC9A;
+$grid_group_close_fone1 = #F8D691;
+$grid_group_close_fone2 = #EFCC87;
+
+$grid_group_down_h = 1;
+$grid_group_down_fone1 = #FDDC9A;
+$grid_group_down_fone2 = #FDDC9A;
+
+
+$grid_header_h = $grid_size;
+$grid_header_border = #8C9AA7;
+
+
+$grid_header_border_left = $grid_header_border;
+$grid_header_border_top = $grid_header_border;
+$grid_header_border_right = $grid_header_border;
+$grid_header_border_bottom = $grid_header_border;
+$grid_header_border_sep    = $grid_header_border;
+
+
+
+$grid_cells_border_size = 1;
+$grid_cells_border = $grid_border;
+
+
+.grid_parity{
+    background-color:#EDF0F3;
+}
+
+
+.grid_header{
+    height:$grid_header_h|px;
+    background-color:$grid_header_fone;
+}
+
+.grid_cells_frame{
+    border:$grid_cells_border_size|px solid $grid_cells_border;    
+
+}
+.grid_cells{
+    
+}
+
+.grid_header_tr{
+}
+
+.grid_header_td{
+    border-left:1px solid $grid_header_border_sep;
+    text-align:center;
+}
+
+
+.grid_header_frame_left{
+    border-left:1px solid $grid_header_border_left;
+}
+.grid_header_frame_right{
+    border-left:1px solid $grid_header_border_right;
+}
+.grid_header_frame_top{
+    border-top:1px solid $grid_header_border_top;
+}
+.grid_header_frame_bottom{
+    border-bottom:1px solid $grid_header_border_bottom;
+}
+
+.grid_group{
+    background: linear-gradient(to bottom, $grid_group_fone1 0%,$grid_group_fone2 100%);
+    line-height:$grid_size|px;
+}
+.grid_close{
+    background: linear-gradient(to bottom, $grid_group_close_fone1 0%,$grid_group_close_fone2 100%);
+}
+.grid_group_up{
+    height:$grid_size|px;
+}
+.grid_group_down{
+    height:$grid_group_down_h|px;
+    background: linear-gradient(to bottom, $grid_group_down_fone1 0%,$grid_group_down_fone2 100%);
+}
+.grid_tr{
+    height:$grid_size|px;
+}
+.grid_td{
+    border-left:1px solid $grid_border_vert_color;
+    border-bottom:1px solid $grid_border_horiz_color;
+    overflow:hidden;
+}
+
+.grid_tr_hover{
+    background-color:$grid_hover_fone;
+    
+}
+.grid_tr_select{
+    background-color:$grid_select_fone;
+    color:$grid_select_color;
+    
+}

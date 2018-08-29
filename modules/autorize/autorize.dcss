@@ -1,0 +1,50 @@
+$h = 24px;
+/*
+body,.workplace{
+        
+    font-size:14px;
+    font-family: Arial;
+                
+    background: #f22f2f2;
+    background: linear-gradient(to bottom,  #f2f2f2 0%,#f5f5f5 100%);
+
+}
+*/
+
+input[type=text],input[type=password]{
+
+    font-size:$input_size;
+    font-family: Arial;
+    outline:0px;
+    border:1px solid $border;
+    height:$h;
+    line-height:$h;
+    text-indent:5px;
+    background-color:$input;
+            
+}
+
+.form{
+    border:1px solid $border;
+    width:220px;
+    height:190px;
+    
+}
+
+
+.enter{
+    
+    left:20px;
+    top:130px;
+    width:175px;
+    line-height:32px;
+    height:32px;
+    text-align:center;
+    border:1px solid $border;
+    border-radius:2px;
+    cursor:pointer;
+            
+    color:#F9F9F9;
+    overflow:hidden;
+    background: #B4B0B0;
+}

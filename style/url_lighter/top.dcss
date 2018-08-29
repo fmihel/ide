@@ -1,0 +1,50 @@
+$uli_background = $input;
+
+.uli2_frame{
+    overflow:hidden;
+    font-family: $uli_font;
+    font-size: $uli_size;
+    background-color:$uli_background;
+    border-top:1px solid $border;
+    border-bottom:1px solid $border;
+}
+.uli2_edit{
+    outline:0px;
+    border:0px;
+    
+    font-family: $uli_font;
+    font-size: $uli_size;
+    height:$uli_height|px;
+    line-height:$uli_height|px;
+    color:$uli_color;
+    background-color:$uli_background;
+}
+
+.uli2_protocol,.uli2_domen,.uli2_path,.uli2_file,.uli2_params,.uli2_placeholder{
+    height:$uli_height|px;
+    line-height:$uli_height|px;
+    /*word-wrap: normal;*/
+    white-space:  nowrap;
+}
+
+.uli2_protocol{
+    color:$uli_http;   
+    text-align:right;
+}
+.uli2_domen{
+    color:$uli_domen;
+}
+.uli2_path{
+    color:$uli_path;
+}
+.uli2_file{
+    color:$uli_file;
+}
+.uli2_params{
+    text-align:left;
+    color:$uli_params;
+}
+.uli2_placeholder{
+    text-align:left;
+    color:$uli_placeholder;
+}

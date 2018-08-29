@@ -1,0 +1,44 @@
+.jm_frame{
+    border:1px solid $border;
+    
+    background-color: $menu_background;
+    padding:2px;
+    box-shadow:         1px 1px 5px 0px rgba(50, 50, 50, 0.75);
+    
+    white-space: nowrap;
+    font-size:$size;
+}
+.jm_item{
+    //height:$menu_height; 
+    line-height:$menu_height; 
+    text-indent:5px;
+    cursor:pointer;
+    color:$font;
+}
+
+.jm_item_separator{
+    height:1px; 
+    max-height:1px;
+    background-color:$border;
+}
+
+.jm_item_sub{
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAASUlEQVR4nGNgGL7gbL8JZQZYW1v/J8YQJnySeWvYCRqC1wBiDCFoACFDiDIAHyDKgEkhPxmNC8+QZwA+zXgBsdGIE1CckIYOAABaiBtdJ1HnPgAAAABJRU5ErkJggg==");
+    background-position: center right;
+    background-repeat: no-repeat;
+}
+
+.jm_item_hover{
+    background-color:$menu_hover;
+    color:$menu_font_hover;
+}
+
+.jm_item_select{
+    background-color:$menu_hover;
+    color:$menu_font_hover;
+}
+
+.jm_item_disable{
+    color:gray;
+    opacity:0.7;
+}

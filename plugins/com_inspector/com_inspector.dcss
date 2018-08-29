@@ -1,0 +1,103 @@
+
+$cm_height_header = 5px;
+$cm_height = 32px;
+$cm_edit_height = 22px;
+
+.cm_frame{
+    border:1px solid $cm_border;    
+    width:250px;
+    background-color:$cm_background; 
+    font-size:$size;
+    color:$cm_color;
+}
+
+.cm_title{
+color:$cm_header_color;
+ 
+}
+
+.cm_btn_close{
+    opacity:0.5;    
+}
+.cm_btn_close:hover{
+    opacity:1;    
+}
+
+.cm_btn_set{
+    border:1px solid $cm_btn_border;
+    background-color:$cm_btn_background;
+    color:$cm_btn_color;
+    text-align:center;
+    cursor:pointer;
+    
+}
+.cm_btn_set:hover{
+    border:1px solid $cm_btn_hover_border;
+    background-color:$cm_btn_hover_background;
+    color:$cm_btn_hover_color;
+}
+
+.cm_header td{
+    
+    color:$cm_header_color;
+    height:$cm_height_header;
+    text-indent:10px;
+    
+}
+.cm_row{
+    height:$cm_height;
+    color:$cm_color;
+}    
+.cm_row td{
+    border-bottom:1px solid $cm_border;
+    text-indent:10px;
+    color:$cm_var_color;
+}
+
+.cm_edit{
+    height:$cm_edit_height;
+    border-bottom:1px solid $cm_mean_border;
+    border:none;
+    
+    outline:none;
+    
+    width:85%;
+    text-indent:5px;
+    background-color:$cm_mean;
+    color:$cm_mean_color;
+}
+
+.cm_edit:focus{
+    
+    outline:none;
+}
+.cm_edit::-webkit-input-placeholder {color:$cm_mean_placeholder;}
+.cm_edit::-moz-placeholder          {color:$cm_mean_placeholder;}/* Firefox 19+ */
+.cm_edit:-moz-placeholder           {color:$cm_mean_placeholder;}/* Firefox 18- */
+.cm_edit:-ms-input-placeholder      {color:$cm_mean_placeholder;}
+
+.cm_table_frame{
+    
+}
+.cm_table_frame::-webkit-scrollbar-track
+{
+    
+    background-color: $vtrack;
+    border-right:1px solid $vtrack;
+    background-color:$cm_background; 
+}
+
+.cm_table_frame::-webkit-scrollbar
+{
+    width: 5px;
+    height: 13px;
+    background-color: $vtrack;
+    
+}
+
+.cm_table_frame::-webkit-scrollbar-thumb
+{
+    background-color: $vthumb;
+    border:1px solid $vthumb
+    
+}

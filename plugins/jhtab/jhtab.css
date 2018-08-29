@@ -1,0 +1,38 @@
+body{
+    overflow-x:hidden;
+    overflow-y:hidden;
+    -webkit-font-smoothing:antialiased;
+    -webkit-user-select: none;
+    color: #000000;
+    font-family: Roboto, sans-serif;
+    text-overflow: ellipsis;
+    margin:0px;
+    padding:0px;
+    background-color: #F1F1F1;
+}
+
+.jht_top{
+    border:1px solid gray;    
+}
+
+.jht_bottom{
+    border:1px solid gray;
+
+}
+.jht_btn{
+    color:gray;
+}
+.jht_btn:hover{
+    color:blue;
+    cursor: pointer;
+    
+}
+.jht_btn_select{
+    color:blue;
+}
+.jht_btn_text{
+    
+}
+.jht_panel{
+    background-color:silver;
+}

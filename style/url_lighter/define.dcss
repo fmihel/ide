@@ -1,0 +1,12 @@
+$uli_font = "Arial";
+$uli_size = 12px;
+
+$uli_height = {color:{dark:16,light:18}};
+$uli_color = $font;
+$uli_http  = {color:{dark:#02B803,light:#0B8043}};
+$uli_domen  = $uli_color;
+$uli_path   = {color:{dark:#F6A428,light:#E45455}};
+$uli_file   = {color:{dark:#84B1D6,light:#2841c8}};
+$uli_params = {color:{dark:silver,light:silver}};
+$uli_placeholder = {color:{dark:silver,light:silver}};
+

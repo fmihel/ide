@@ -1,0 +1,47 @@
+.jht_top{
+    border:0px;
+    border-top:1px solid $border;  
+    border-bottom:1px solid $border;  
+    
+    font-size:$size;
+    background-color:$bp_panel;
+}
+
+.jht_bottom{
+    border-top:1px solid $border;  
+    background-color:$bp_fone;
+}
+.jht_btn{
+    color:$bp_font;
+    text-indent:10px;
+    line-height:$bp_height|px;
+}
+.jht_btn:hover{
+    color:$bp_font_hover;
+    background-color:$bp_hover;
+    cursor: pointer;
+}
+.jht_btn_select{
+    color:$bp_font_active;
+    background-color:$bp_active;
+}
+.jht_btn_panel{
+    background-color:$bp_active;
+    height:$bp_height|px;
+}
+
+.jht_panel{
+    background-color:$bp_fone;
+}
+
+.jht_btn_close{
+    cursor: pointer;
+    background-image:url($icon_drop_down);
+    background-position:center center;background-repeat:no-repeat;
+    width:$bp_height|px;
+    height:$bp_height|px;;
+    opacity:0.5;
+}
+.jht_btn_close:hover{
+    opacity:1;
+}

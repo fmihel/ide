@@ -1,0 +1,45 @@
+.jconsole_string,.jconsole_number,.jconsole_boolean,.jconsole_function,.jconsole_array,.jconsole_object,.jconsole_undefined{
+    cursor:default;   
+    border-top:1px dashed #F0F0F0;
+}
+.jconsole_string{
+    color:#C61816;
+}
+.jconsole_number{
+    color:blue;
+}
+.jconsole_boolean{
+    color:#007500;
+}
+.jconsole_function{
+    font-style: italic;
+}
+.jconsole_array{
+}
+.jconsole_object{
+}
+
+.jconsole_undefined{
+    
+}
+.jconsole_array_len{
+    
+}
+.jconsole_array_len2{
+    color:silver;
+    font-size:0.8em;
+}
+
+.jconsole_array_len:hover,.jconsole_object_name:hover{
+    color:red
+}
+
+
+.jconsole_object_prop{
+   color:#B85C9E; 
+   font-style: normal; 
+}
+.jconsole_array_index{
+    font-size:0.8em;
+    color:silver;
+}

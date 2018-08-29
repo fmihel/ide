@@ -1,0 +1,24 @@
+.popup_frame{
+    -webkit-font-smoothing:antialiased;
+    -webkit-user-select: none;
+    font-family: Roboto, sans-serif;
+    text-overflow: ellipsis;
+    font-size:$popup_size;
+}
+
+.popup_msg,.popup_alert{
+    overflow:hidden;
+    text-align:center;
+}
+.popup_msg{
+    
+    border:1px solid $popup_msg_border;
+    background: $popup_msg_background;
+    color:$popup_msg_color;
+    
+}
+.popup_alert{
+     border:2px solid $popup_alert_border;
+    background: $popup_alert_background;
+    color:$popup_alert_color;
+}

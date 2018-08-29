@@ -1,0 +1,32 @@
+.jvt_left{
+    
+}
+.jvt_right{
+    border-left:1px solid $border;
+    background-color:$panel;
+}
+.jvt_btn{
+    color:$font;
+}
+.jvt_btn:hover{
+    cursor: pointer;
+    background-color:$item_hover;
+    color:$font_hover;
+}
+
+.jvt_btn_select{
+    background-color:$item_active;
+    color:$font_active;
+}
+.jvt_btn_select:hover{
+    background-color:$item_active;
+    color:$font_active;
+}
+
+.jvt_btn_text{
+    font-size:12px;
+    transform: rotate(90deg);
+}
+.jvt_panel{
+    background-color:$fone;
+}

@@ -1,0 +1,49 @@
+.jm_frame{
+    border:1px solid gray;
+    border-radius:3px;
+    background-color: #F2F2F2;
+    padding:2px;
+    box-shadow:         1px 1px 5px 0px rgba(50, 50, 50, 0.75);
+    
+    white-space: nowrap;
+}
+
+.jm_item{
+    line-height:24px; 
+    text-indent:5px;
+    cursor:pointer;
+    text-overflow: ellipsis;
+    
+}
+.jm_item_separator{
+    max-height:2px;
+    background-color:gray;
+    border-radius:5px; 
+
+background: rgb(238,238,238); /* Old browsers */
+background: linear-gradient(to top,  rgba(238,238,238,1) 0%,rgba(204,204,204,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+
+    
+}
+
+.jm_item_sub{
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAASUlEQVR4nGNgGL7gbL8JZQZYW1v/J8YQJnySeWvYCRqC1wBiDCFoACFDiDIAHyDKgEkhPxmNC8+QZwA+zXgBsdGIE1CckIYOAABaiBtdJ1HnPgAAAABJRU5ErkJggg==");
+    background-position: center right;
+    background-repeat: no-repeat;
+}
+
+.jm_item_hover{
+    background-color: #3879D9;
+    color:white;
+}
+
+.jm_item_select{
+    background-color: #3879D9;
+    color:white;
+    
+}
+
+.jm_item_disable{
+    color:gray;
+    opacity:0.7;
+}

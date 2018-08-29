@@ -1,0 +1,43 @@
+$ppH = 48;
+$ppW = 320;
+$ppBtnH = 32;
+$ppBtnW = 100;
+$ppFone = #373737;
+$ppFont = #F4F4F4;
+
+$ppBorder = gray;
+$ppBtnFone = #535353;
+$ppBtnBorder = $ppBtnFone;
+$ppBtnHoverFone = #676767;
+
+
+.popup_frame,.popup_frame_ex{
+    width:$ppW|px;
+    height:$ppH|px;
+    line-height:$ppH|px;
+    border:1px solid $ppBorder;
+    background-color:$ppFone;
+    color:$ppFont;
+    opacity:0.9;
+}
+
+.popup_msg{
+    
+}
+.popup_btn{
+    border:1px solid $ppBtnBorder;
+    background-color:$ppBtnFone;
+    width:$ppBtnW|px;
+    height:$ppBtnH|px;
+    line-height:$ppBtnH|px;
+    text-align:center;
+    cursor:pointer;
+}
+.popup_btn:hover{
+    background-color:$ppBtnHoverFone;
+}    
+
+.popup_frame_ex{
+    background-color:#DD8677;
+    color:white;
+}

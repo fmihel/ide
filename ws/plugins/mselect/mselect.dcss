@@ -1,0 +1,20 @@
+$msFone = white;
+$msFoneHover = #F8FBFF;
+$msBorder = gray;
+$msBorderHover = gray;
+$msOptionFone = #FFFBEB;
+
+.mselect{
+    outline:none;
+    border:1px solid $msBorder;
+    background-color:$msFone;
+}
+.mselect:hover{
+    border:1px solid $msBorderHover;
+    background-color:$msFoneHover;
+}
+
+.mselect option{
+    background-color:$msOptionFone;
+
+}

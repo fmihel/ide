@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<body>
+    <header>
+        <info>predefined in var</info>
+        <vars>
+            <item name="FileName" notes="empty">$filename</item>
+            <item name="Path" notes="empty">$path</item>
+        </vars>
+    </header>
+    <template><![CDATA[
+out: <{FileName}>    
+for using predefined var in vars section, remove leader breakets from 
+predefined consts
+Ex:
+<item name="Name" notes="empty">$filename</item>
+
+    ]]>
+    </template>
+</body>
