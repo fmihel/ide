@@ -1257,52 +1257,6 @@ _int:function(f){
     return Math.round(f);
     /*return f;*/
 },
-
-_poss:function(d){ 
-    /*координаты относитьельно родительского DOM 
-    d - DOM
-    param2 - {x,y,w,h} - установка нового размера
-    */
-    if (arguments.length>1)
-    {
-        var c = arguments[1];
-        if (c!==undefined){
-            var b =JX._border(JX._parent(d));
-            var bs = JX._border(d);
-            var s = d.style,v;
-
-            if(c.x!==undefined)s.left=(c.x-b.l)+'px';
-            if(c.y!==undefined)s.top = (c.y-b.t)+'px';
-            if(c.w!==undefined){
-                v=(c.w-bs.l-bs.r);
-                v=(v<0?0:v)+'px';
-                s.width = v;
-            };
-            if(c.h!==undefined){
-                v=(c.h-bs.t-bs.b);
-                v=(v<0?0:v)+'px';
-                s.height = v;
-            };
-            
-            var v = (c.x-b.l)+'px';
-            if((c.x!==undefined)&&(s.left!==v))s.left=v;
-
-            v = (c.y-b.t)+'px';
-            if((c.y!==undefined)&&(s.top!==v))s.top = v;
-
-            v = (c.w-bs.l-bs.r);v=(v<0?0:v)+'px';
-            if((c.w!==undefined)&&(s.width!==v))s.width = v;
-
-            v = (c.h-bs.t-bs.b);v=(v<0?0:v)+'px';
-            if((c.h!==undefined)&&(s.height!==v))s.height = v;
-        }
-    };
-    var w =     JX._abs(d);
-    var p =     JX._abs(d.parentNode);
-    var sx =    d.parentNode.scrollLeft,sy = d.parentNode.scrollTop;
-    return {x:w.x-p.x+sx,y:w.y-p.y+sy,w:w.w,h:w.h};
-},
-
 /**
  * координаты относитьельно родительского DOM 
  * d - DOM
