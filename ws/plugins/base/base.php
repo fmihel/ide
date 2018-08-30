@@ -38,7 +38,7 @@ class baseSetup{
     public static $CR="\n";
     public static $die = true;
     public static $debug = false;
-    public static $removeEscape = false;
+    public static $removeEscape = true;
     
     public static function debug($bool='get'){
         if ($bool==='get')
