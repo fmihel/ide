@@ -107,6 +107,7 @@ mform.prototype.init = function(o){
         padding:10,/*внутренние отсутпы */
         modal:true,/*форма будет модальной */
         draggable:true,/*форму можно перемещать*/
+        dragOnAllForm:false,/* если true - то для перемещения формы используется вся форма, false- только заголовок */
         resizable:true,/*можно изменять размеры формы */
         
         stretch:"custom",/* указывает как будет отрисовываться окно "custom" "horiz"  "fullscreen"  */
@@ -334,6 +335,14 @@ mform.prototype.attr = function(n/*v*/){
             p.margin = JX.margin(v);
     }
     
+    /*-----------------------------------*/
+    
+    if (n==='dragOnAllForm'){
+        if (r) 
+            return p.dragOnAllForm;
+        else    
+            p.dragOnAllForm=v;
+    }
     /*-----------------------------------*/
     if (n==='showHeader'){
         if (r) 
@@ -657,90 +666,19 @@ mform.prototype._align=function(){
     if (p.onAlign) p.onAlign({sender:t});
 };
 
-mform.prototype._align_old=function(){
-    
-    var t=this,p=t.param,pos=p.position;
-    if (!t.attr('visible')) return;
-    
-    if (p.fullscreen){
-        JX.stretch_scr(p.jq.frame);
-    }
-    
-    var brdr = JX._border(p.jq.frame[0]).t;
-    
-    if (p._resizable===undefined){
-        
-        if (((pos.keep)||(pos._keeping==undefined))&&(!p.fullscreen)){
-            
-            pos._keeping=true;
-            if (pos.type=='custom')
-                JX.abs(p.jq.frame,pos);
-            else{
-                pos.align.by = JX.abs(p.jq.workplace);
-                JX.place(p.jq.frame,pos.align);
-            }
-        }    
-    }
-    var f = JX.abs(p.jq.frame),r;
-
-    JX.visible(p.jq.header,p.showHeader);
-    
-    JX.visible(p.jq.footer,p.showFooter);
-    
-    JX.arrange([p.jq.header,p.jq.content,p.jq.footer],{direct:"vert",type:"stretch",align:"stretch",margin:brdr,stretch:p.jq.content});
-    
-    JX.stretch(p.jq.own,{margin:p.padding});
-    
-    JX.visible(p.jq.close,p.needCloseBtn&&p.showHeader);
-    
-    if (p.showHeader&&p.placeCloseOnTopRight&&p.needCloseBtn&&(!p.fullscreen)){
-        
-        JX.visible(p.jq.close_frame,true);
-
-        r = JX.pos(p.jq.close);
-        var d = r.w/(p.bumpClose=='max'?r.w:p.bumpClose);
-        
-        r.x = f.x+f.w-r.w/2-d;
-        r.y = f.y-r.h/2+d;
-
-        JX.abs(p.jq.close,{x:r.x,y:r.y});
-        JX.abs(p.jq.close_frame,r);
-
-        JX.arrange([p.jq.caption],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:{left:p.padding.left,right:p.padding.right}});
-
-    }else{
-        
-        JX.visible(p.jq.close_frame,false);
-        JX.arrange([p.jq.caption,p.jq.close],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:{left:p.padding.left,right:p.padding.right}});
-
-    }    
-    
-    if (p.showFooter)
-        JX.arrange(p.jq.footer.children(),{direct:"horiz",type:p.buttonPlace,align:"center",gap:5,margin:{left:p.padding.left,right:p.padding.right}});
-
-    JX.visible(p.jq.resize,((p.resizable)&&(!p.fullscreen)));
-    
-    if ((p.resizable)&&(!p.fullscreen)){
-        r = JX.pos(p.jq.resize);
-        JX.pos(p.jq.resize,{x:f.w-r.w/2,y:f.h-r.h/2});
-    }
-    
-    if (p.onAlign) p.onAlign({sender:t});
-};
 
 mform.prototype._create=function(){
     var t=this,p=t.param,css=p.css,c='';
     
     p.id={
-            frame:ut.id('frame'),
-            header:ut.id('hdr'),
-            footer:ut.id('ftr'),
-            content:ut.id('cnt'),
-            caption:ut.id('cpt'),
-            close:ut.id('cls'),
-            close_frame:ut.id('clf'),
-            resize:ut.id('rs')
-        
+        frame:ut.id('frame'),
+        header:ut.id('hdr'),
+        footer:ut.id('ftr'),
+        content:ut.id('cnt'),
+        caption:ut.id('cpt'),
+        close:ut.id('cls'),
+        close_frame:ut.id('clf'),
+        resize:ut.id('rs')
     };
     
     c+=ut.tag('<',{id:p.id.frame,css:css.frame,style:'position:absolute'});
@@ -755,7 +693,6 @@ mform.prototype._create=function(){
     c+=ut.tag('>');
 
     c+=ut.tag({id:p.id.footer,css:css.footer,style:'position:absolute'});
-    
 
 
     c+=ut.tag({id:p.id.resize,css:css.resize,style:'position:absolute'});
@@ -800,6 +737,13 @@ mform.prototype._event=function(){
  
     p.jq.header.on('mousedown',function(){
         if ((p.draggable)&&(p.stretch==='custom'))        
+            p._draggable = {
+                mouse:JX.mouse()
+            };
+    });
+    
+    p.jq.content.on('mousedown',function(){
+        if ((p.draggable)&&(p.stretch==='custom')&&(p.dragOnAllForm))        
             p._draggable = {
                 mouse:JX.mouse()
             };

@@ -335,6 +335,32 @@ class TWS extends WS{
             {$}.mbtn({active:{$plugin}.mform("draggable")});
             '
         );        
+        /*c:dragOnAllForm */
+        $this->item(
+            'dragOnAllForm',
+            /*------------caption---------------*/
+            'dragOnAllForm',                  
+            /*------------code------------------*/
+            '
+            //--------------------------------------
+            // перетаскиваем за всю форму
+            //--------------------------------------
+            
+            {$plugin}.mform({dragOnAllForm:true});
+
+            ',
+            /*------------event-----------------*/
+            '
+            
+            var m = {$plugin}.mform("dragOnAllForm");
+            {$plugin}.mform({dragOnAllForm:!m});
+            {$}.mbtn({active:!m});
+            
+            ',
+            '
+            {$}.mbtn({active:{$plugin}.mform("dragOnAllForm")});
+            '
+        );        
 
         
         
@@ -1060,6 +1086,7 @@ class TWS extends WS{
             +p("modal",true)
             +p("resizable",true)
             +p("draggable",true)
+            +p("dragOnAllForm",false)
             +p("needCloseBtn",true)
             +p("placeCloseOnTopRight",false)
             +p("shadowAsClose",true)
