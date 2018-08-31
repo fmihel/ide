@@ -325,19 +325,22 @@ class FRAMET{
     public static function RENDER($template,$own,$group='',$toAll){
         
         // загружаем переменные ( переменные хранятся в упорядоченном массиве self::$vars = array("var_name"=>"mean",....)
+
         self::_vars($template);
 
+        if (count(self::$vars)>0)
+            $template = self::_varsToStr($template);
+        
         //------------------------------------------------------------------
         $template = str_replace(array("`",'\|'),array('"','&#124;'),$template);
         $template = str_replace(array("\r\n", "\n", "\r","\t"),' ',$template);
-        
-        
+
         
         self::$len = strlen($template);
         
-        $i=0;
         self::$struct = self::_get_struct($template,$i);
         
+    
         //------------------------------------------------------------------
         
         self::$root = false;
@@ -380,8 +383,9 @@ class FRAMET{
     private static function _vars(&$template){
         self::$vars=array();
         $have = strpos($template,self::$var_pref);
+
         if ($have!==false){
-            $re = '/\\'.self::$var_pref.'([\S]+)\s*\=([\w"\';\s\-\+\*\/\$\%\.\!\@\#\?\,\:\&\^\(\)\[\]\{\}\<\>]+);\s*$/m';
+            $re = '/\\'.self::$var_pref.'([\S]+)\s*\=([\w"\';\s\-\+\*\/\$\%\.\!\@\#\?\,\:\&\^\(\)\[\]\{\}\<\>\~]+);\s*$/m';
             preg_match_all($re, $template, $matches, PREG_SET_ORDER, 0);            
             
             for($i=0;$i<count($matches);$i++){
@@ -389,7 +393,7 @@ class FRAMET{
                 $all    =   $matches[$i][0];
                 $k      =   $matches[$i][1];
                 $m      =   $matches[$i][2];
-                
+
                 self::_eval($k,$m);
                 krsort(self::$vars,SORT_STRING);
                 
@@ -492,12 +496,14 @@ class FRAMET{
                 
 
                 //----------------------------------------
-                if (count(self::$vars)>0)
-                foreach($tag as $k=>$v){
-                    if (($k!=='id')&&($k!=='tag')){
-                        $tag[$k] = self::_varsToStr($v);
-                    }
-                }
+                // обработку переменных вынес в RENDER сразу после построениея списка переменных
+                // это дает возможность более широко использовать переменные
+                //if (count(self::$vars)>0)
+                //foreach($tag as $k=>$v){
+                //    if (($k!=='id')&&($k!=='tag')){
+                //        $tag[$k] = self::_varsToStr($v);
+                //    }
+                //}
                 //----------------------------------------
                 
                 array_push($out,$tag);

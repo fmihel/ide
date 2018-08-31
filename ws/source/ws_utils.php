@@ -32,6 +32,20 @@ class WS_UTILS{
         $story_to = '{<'.STR::random(7).'>}';
         $res = str_replace($story_from,$story_to,$res);
 
+        //** вставка переменных Dcss 
+        if (mb_strpos($res,'{$Dcss.')!==false){
+            preg_match_all('/{\$Dcss\.[a-z,A-Z,0-9,_]*}/', $res, $matches, PREG_SET_ORDER, 0);
+
+    
+            for($i=0;$i<count($matches);$i++){
+                $from = $matches[$i][0];
+                $var = str_replace(array('{$Dcss.','}'),'',$from);
+                
+                $to = 'Dcss.vars.'.$var;
+                $res =  str_replace($from,$to,$res);  
+            }
+        }         
+
         //** обработка переменных, типа {$name} name данная переменная будет заменена 
         if (mb_strpos($res,'{$')!==false){
             preg_match_all('/{\$[a-z,A-Z,0-9,_,:]*}/', $res, $matches, PREG_SET_ORDER, 0);
