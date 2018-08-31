@@ -1,0 +1,22 @@
+.com_block_class{
+    font-weight:bold;
+    background-position-x:5px;
+
+    $_icon_left:url($icon_class);
+}
+
+.com_block_func{
+    /*text-indent:38px;
+    background-position-x:20px;
+    */
+    font-weight:bold;
+    background-position-x:5px;
+    
+    $_icon_left:url($icon_func);
+}
+
+.com_block_com{
+    text-indent:38px;
+    background-position-x:20px;
+    $_icon_left:url($icon_com);
+}
