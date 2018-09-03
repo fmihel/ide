@@ -627,7 +627,8 @@ class FRAMET{
         
         $f = $align;
         $funcs = array();
-        
+        _LOGF($align,'align',__FILE__,__LINE__);
+    
         // создадим спсиок ф-ций с именами и параметрами
         for($i=0;$i<count($f);$i++){
             $skob = strpos($f[$i],'(');
@@ -646,41 +647,41 @@ class FRAMET{
             $funcs[] = array('name'=>$name,'param'=>$param);
 
             
-            if ($name ==='vert'){
+            if ($name ==='vert'){  /* | */
                 
                 $p  = GJX::arrangeParam($param,'direct:vert,type:stretch,align:stretch,stretch:all');
                 $out.=GJX::arrange($p);
                 
-            }elseif ($name ==='vertTop'){
+            }elseif ($name ==='vertTop'){ /* /\ */  
                 $p  = GJX::arrangeParam($param,'direct:vert,type:top,align:stretch');
                 $out.=GJX::arrange($p);
-            }elseif ($name ==='vertBottom'){
+            }elseif ($name ==='vertBottom'){ /*  \/  */
                 $p  = GJX::arrangeParam($param,'direct:vert,type:bottom,align:stretch');
                 $out.=GJX::arrange($p);    
-            }elseif ($name ==='horiz'){
+            }elseif ($name ==='horiz'){   /* - */
                 $p  = GJX::arrangeParam($param,'direct:horiz,type:stretch,align:stretch,stretch:all');
                 $out.=GJX::arrange($p);
-            }elseif ($name ==='horizLeft'){
+            }elseif ($name ==='horizLeft'){  /* < */
                 $p  = GJX::arrangeParam($param,'direct:horiz,type:left,align:stretch');
                 $out.=GJX::arrange($p);                
-            }elseif ($name ==='horizRight'){
+            }elseif ($name ==='horizRight'){  /* > */
                 $p  = GJX::arrangeParam($param,'direct:horiz,type:left,align:stretch');
                 $out.=GJX::arrange($p);                
-            }elseif ($name==='stretch'){
+            }elseif ($name==='stretch'){      /* <> */
                 $p  = GJX::stretchParam($param);
                 $out.=GJX::stretch($p);
 
-            }elseif ($name==='arrange'){
+            }elseif ($name==='arrange'){  /* + */
                 
                 $p  = GJX::arrangeParam($param);
                 $out.=GJX::arrange($p);
 
-            }elseif ($name==='cling'){
+            }elseif ($name==='cling'){  /* ^ */
                 
                 $p  = GJX::clingParam($param);
                 $out.=GJX::cling($p);
 
-            }elseif ($name==='clingBottom'){
+            }elseif ($name==='clingBottom'){  
                 $p  = GJX::clingParam($param,'side:{a:center,b:center},pivot:{a:bottom,b:top}');
                 $out.=GJX::cling($p);
             }elseif ($name==='clingTop'){
