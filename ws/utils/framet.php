@@ -652,10 +652,10 @@ class FRAMET{
                 $p  = GJX::arrangeParam($param,'direct:vert,type:stretch,align:stretch,stretch:all');
                 $out.=GJX::arrange($p);
                 
-            }elseif ($name ==='vertTop'){ /* /\ */  
+            }elseif ($name ==='vertTop'){ /* ^ */  
                 $p  = GJX::arrangeParam($param,'direct:vert,type:top,align:stretch');
                 $out.=GJX::arrange($p);
-            }elseif ($name ==='vertBottom'){ /*  \/  */
+            }elseif ($name ==='vertBottom'){ /*  v  */
                 $p  = GJX::arrangeParam($param,'direct:vert,type:bottom,align:stretch');
                 $out.=GJX::arrange($p);    
             }elseif ($name ==='horiz'){   /* - */
@@ -676,21 +676,21 @@ class FRAMET{
                 $p  = GJX::arrangeParam($param);
                 $out.=GJX::arrange($p);
 
-            }elseif ($name==='cling'){  /* ^ */
+            }elseif ($name==='cling'){  /* & */
                 
                 $p  = GJX::clingParam($param);
                 $out.=GJX::cling($p);
 
-            }elseif ($name==='clingBottom'){  
+            }elseif ($name==='clingBottom'){  /*  &v*/
                 $p  = GJX::clingParam($param,'side:{a:center,b:center},pivot:{a:bottom,b:top}');
                 $out.=GJX::cling($p);
-            }elseif ($name==='clingTop'){
+            }elseif ($name==='clingTop'){  /*  &^  */
                 $p  = GJX::clingParam($param,'side:{a:center,b:center},pivot:{a:top,b:bottom}');
                 $out.=GJX::cling($p);
-            }elseif ($name==='clingLeft'){
+            }elseif ($name==='clingLeft'){ /* <& */
                 $p  = GJX::clingParam($param,'side:{a:left,b:right},pivot:{a:center,b:center}');
                 $out.=GJX::cling($p);
-            }elseif ($name==='clingRight'){
+            }elseif ($name==='clingRight'){  /* &> */
                 $p  = GJX::clingParam($param,'side:{a:right,b:left},pivot:{a:center,b:center}');
                 $out.=GJX::cling($p);
             }elseif ($name==='workplace'){
