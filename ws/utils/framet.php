@@ -627,7 +627,7 @@ class FRAMET{
         
         $f = $align;
         $funcs = array();
-        _LOGF($align,'align',__FILE__,__LINE__);
+        //_LOGF($align,'align',__FILE__,__LINE__);
     
         // создадим спсиок ф-ций с именами и параметрами
         for($i=0;$i<count($f);$i++){
