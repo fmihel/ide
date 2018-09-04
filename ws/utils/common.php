@@ -453,6 +453,13 @@ class STR{
         }
         return true;    
     } 
+    
+    public static function to_utf($str){
+        return mb_convert_encoding($str, 'utf-8', 'windows-1251');
+    }
+    public static function to_win($str){
+        return mb_convert_encoding($str, 'windows-1251','utf-8');
+    }
 
 };
 
