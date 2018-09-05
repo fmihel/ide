@@ -38,6 +38,7 @@ init:function(o){
             btn_clear:'lp_btn_clear',
             btn_close:'lp_btn_close',
             btn_update:'lp_btn_update',
+            auto:'lp_auto',
             log_name:'lp_log_name',
             log_msg_info:'lp_msg_info',
             log_msg:'lp_msg',
@@ -93,6 +94,12 @@ init:function(o){
         t.faster();
     });
 
+    id = ut.id('bar');
+    p.bottom.btn_panel.append(ut.tag({id:id,css:p.css.auto,style:'position:absolute'}));        
+    p.auto = p.bottom.btn_panel.find('#'+id);
+    
+    p.auto.mselect({data:['manual','2 sec','5 sec','10 sec']});
+    
 
     p.bottom.btn_panel.append(ut.tag({style:'position:absolute;width:20px'}));        
 

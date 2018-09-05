@@ -18,6 +18,10 @@ current:function(type){
 },
 type:function(node){
 	return (node?explorer.tree().get_type(node):false);	
+},
+refresh:function(){
+    var t=explorer,tree=t.tree();
+    tree.refresh();
 }
 
 };
@@ -56,6 +60,8 @@ Qs.expContextmenu = new jmenu({
 		 '-',
 		 {caption:"New folder",id:"new_folder"},
 		 {caption:"New file",id:"new_file"},
+		 '-',
+		 {caption:"Refresh tree",id:"refresh"},
 
 		 ],
 		
@@ -65,6 +71,12 @@ Qs.expContextmenu = new jmenu({
 		var type = explorer.type(node);
 		
         switch(o.id){
+        case "refresh":{
+  			//Qs.tree.jstree("refresh");
+            explorer.refresh();
+  			
+            break;
+	    }
 
         case "new_folder":{
   			if ((type!=='folder')&&(type!=='default'))

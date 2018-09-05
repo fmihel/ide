@@ -11,6 +11,7 @@ $Application->LOG_TO_ERROR_LOG = false;
 RESOURCE('style/dcss.dcss');
 RESOURCE('style/icons.dcss');
 RESOURCE('style/style.dcss');
+RESOURCE('style/mselect.dcss');
 
 require_once UNIT('utils','dir.php');
 require_once UNIT('utils','ctime.php');

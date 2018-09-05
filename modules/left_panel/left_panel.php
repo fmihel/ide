@@ -34,6 +34,8 @@ class LEFT_PANEL extends WS_MODULE{
         ->STYLE('height:'.$hc.'px');
         
         FRAME('ex_label',$explorer_header)->CLASSES('ph_com')->VALUE('Explorer');
+        FRAME('ex_refresh',$explorer_header)->CLASSES('ph_com ph_btn')
+        ->EVENT('click','explorer.refresh()');            
 
         FRAME('ex_stretch',$explorer_header)->CLASSES('ph_com');
             

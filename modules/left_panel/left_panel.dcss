@@ -14,6 +14,10 @@
     font-size:$size;
     overflow-x:hidden;overflow-y:auto;
 }    
+#ex_refresh{
+    background-image:url($icon_refresh);
+}
+
 .ph_com{
     position:absolute;
     height:28px;

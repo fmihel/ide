@@ -71,7 +71,10 @@
     color:$font;
 }
 
-
+.lp_auto{
+    width:80px;
+    height:20px;
+}
 .lp_btn_on,.lp_btn_off,.lp_btn_close,.lp_btn_clear{
     width:24px;
     height:18px;

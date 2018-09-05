@@ -56,6 +56,8 @@ $_icon_center="background-position:center center;background-repeat:no-repeat;bac
 $_icon_left="background-position-y:center;background-repeat:no-repeat;background-image";
 $_icon_right="background-position-y:center;background-position-x:right;background-repeat:no-repeat;background-image";
 
+$icon_refresh={color:{ dark:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAjUlEQVR4nN2SyQ2EMAxFH1MT1xyQpolURQWUkQa40wcUAeHy2Waw4Yh4UhR5+ZbtBJ5IABIwAll3kh/5Vj4/4gi0QA98gUJ3L3/GISghGvG8O6ckoLkhNguMQHVDbBZw51vo6pKuLld7v8TJ6OAg9vB2sDAo75SrV4iKByN+SGrYxqlke8X/OvF+4tuYAYcqMYC7lWh5AAAAAElFTkSuQmCC", 
+    light:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABBklEQVR4nN1RMU7EMBAcApXLTENnKfeFdNdeQckfYskdNR0/4BqkfIMHnBQ30HBX8YC7ggIJWYjKRZQsBeYUh7vQIqbxrndnvN4B/hxIapI1yS1JiWdNUgOAtVaG/dmIPAewBvAKYOG9PwGwiPnaGCPOucmX36LID1RVJUVRiNY6meBsEF8DuPPeP4zJxhhpmgZt20Ik4ScCF3HcBNZacc6h6zr0fY8sy8Yt+y/I4UqKzbLEZlnu86HcjuTsN/JRRKtupgTyPH8iWR8TmHSB5DzW9fD+9DsIIXwopR4B3KsvvIQQ3knOlFJXAG4BXHrvn4cCyUqjhSWAcwCruNhVzMtDFv8DfAJkZlzYQPLApwAAAABJRU5ErkJggg=="}};
 
 $icon_workplace_add={color:{ dark:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAPUlEQVR4nGNgGN5AWFj4v7Cw8H98apgotWTgDWBE5hDyLwy8ffsWrg/ugrP9JkTbSrTaERILeAEpATtwAABUgQ2gJfBihAAAAABJRU5ErkJggg==", 
     light:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAPUlEQVR4nGNgGN5AWFj4v7Cw8H98apgotWTgDWBE5hDyLwy8ffsWrg/ugrP9JkTbSrTaERILeAEpATtwAABUgQ2gJfBihAAAAABJRU5ErkJggg=="}};

@@ -57,7 +57,7 @@ align:function(o){
     var a=$.extend(true,{idx:1},o);
     JX.arrange(Qs.left.children(),{direct:"vert",stretch:[{idx:(JX.pos(Qs.explorer).h<2?3:1)}]});
     JX.arrange(Qs.problem_header.children(),{direct:"horiz",type:"stretch",align:"stretch",stretch:[{idx:3}],gap:2});
-    JX.arrange(Qs.explorer_header.children(),{direct:"horiz",type:"stretch",align:"stretch",stretch:[{idx:1}],gap:2});
+    JX.arrange(Qs.explorer_header.children(),{direct:"horiz",type:"stretch",align:"stretch",stretch:[{idx:2}],gap:2});
             
     var cb = JX.pos(Qs.problem).h<2;
     Qs.ph_open_close.removeClass((cb?"ph_oc_d":"ph_oc_u")).addClass((cb?"ph_oc_u":"ph_oc_d"));
