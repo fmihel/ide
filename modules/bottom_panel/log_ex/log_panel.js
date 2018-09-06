@@ -98,7 +98,17 @@ init:function(o){
     p.bottom.btn_panel.append(ut.tag({id:id,css:p.css.auto,style:'position:absolute'}));        
     p.auto = p.bottom.btn_panel.find('#'+id);
     
-    p.auto.mselect({data:['manual','2 sec','5 sec','10 sec']});
+    p.auto.mselect({data:[
+        {value:'manual',id:0},
+        {value:'2 sec',id:2},
+        {value:'5 sec',id:5},
+        {value:'10 sec',id:10}
+        ],
+        onSelect(o){
+            var data = p.auto.mselect('data','selected');
+            console.log('select',data);
+
+    }});
     
 
     p.bottom.btn_panel.append(ut.tag({style:'position:absolute;width:20px'}));        

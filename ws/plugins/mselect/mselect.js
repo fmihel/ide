@@ -110,13 +110,21 @@ put:function(param){
 get:function(name){
     return m.obj(this).attr(name);
 },
-/** устанавливает или получает данные в список */
-data:function(/*param*/){
+/** устанавливает или получает данные в список 
+ * если указать param === 'selected' то вернет данные свзанные с выделенным пунктом
+ * 
+*/
+data:function(param){
     var o = m.obj(this),data = arguments[0];
-    if (data)
-        o.setData(data);
-    else
-        return o.getData();
+    
+    if (data === 'selected'){
+        return o.toData(o.selected());    
+    }else{
+        if (data)
+            o.setData(data);
+        else
+            return o.getData();
+    }        
     return this;
 },
 /** возвращает массив значений (только)*/
