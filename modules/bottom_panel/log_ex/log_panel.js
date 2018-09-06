@@ -11,12 +11,7 @@ init:function(o){
         change:undefined,
         lock_change:0,
         lock_update:false,
-        faster_timer:false,
-        delay:{
-            common:60,
-            faster:0.2
-            
-        },
+        updateTimer:undefined,
         css:{
             btn_add:'lp_btn_add',
             btn_run:'lp_btn_run',
@@ -54,10 +49,10 @@ init:function(o){
     p.frame = p.own.find('#'+p.id);
 
     p.frame.sortable({
-        start:function (){
+        start(){
             p.lock_update = true;  
         },
-        stop:function(){
+        stop(){
             t.align();
             t.change();
             p.lock_update = false;
@@ -91,7 +86,8 @@ init:function(o){
     p.bottom.btn_panel.append(ut.tag({id:id,css:p.css.btn_update,style:'position:absolute'}));        
     p.btn_update = p.bottom.btn_panel.find('#'+id);
     p.btn_update.on("click",function(){
-        t.faster();
+        //t.faster();
+        t._update();
     });
 
     id = ut.id('bar');
@@ -106,8 +102,18 @@ init:function(o){
         ],
         onSelect(o){
             var data = p.auto.mselect('data','selected');
-            console.log('select',data);
-
+            if (t.timerUpdate!==undefined)
+                clearInterval(t.timerUpdate);
+            if (data.id>0){
+                t.timerUpdate = setInterval(function(){
+                    try{
+                        t._update();
+                    }catch(e){
+                        
+                    }   
+                },data.id*1000);
+            }else    
+                t.timerUpdate = undefined;
     }});
     
 
@@ -123,7 +129,7 @@ init:function(o){
     /*--------------------------------------*/
     
     t.align();
-    Ws.align({func:function(){t.align();}});
+    Ws.align({func(){t.align();}});
     /*--------------------------------------*/
     Qs.body.on('mousemove',function(e){
         p.cursor = {x:e.pageX,y:e.pageY};
@@ -143,12 +149,12 @@ init:function(o){
             p.splitter = undefined;
     });
     /*--------------------------------------*/
-    TIMER.INIT({name:'log_panel',single:false,delay:p.delay.common,enable:true});
+    //TIMER.INIT({name:'log_panel',single:false,delay:p.delay.common,enable:true});
     
-    setInterval(function(){
-        if (TIMER.CHECK('log_panel'))
-            t._update();
-    },100);
+    //setInterval(function(){
+    //    if (TIMER.CHECK('log_panel'))
+    //        t._update();
+    //},100);
 },
 begin_change:function(){
     var t=log_panel,p=t.param;
@@ -311,13 +317,16 @@ _event:function(a){
             p.splitter_pos = {x:p.cursor.x,y:p.cursor.y};
             p.splitter_left = p.splitter.parent();
             p.splitter_right = p.splitter_left.next();
-            
+            let f = t.frame();
+            if (f.iframe) f.iframe.hide();
         }
 
     });
     a.splitter.on('mouseup',function(){
         p.splitter = undefined;
         t.change('width');
+        let f = t.frame();
+        if (f.iframe) f.iframe.show();
     });
     
     a.btn_close.on("click",function(){
@@ -345,7 +354,7 @@ _event:function(a){
 },
 _clear:function(data){
     var t=log_panel,a = data;/*$.data(item[0],'data');*/
-    a.line = 0;
+    a.line = -1;
     Ws.ajax({id:"log_clear",value:{
         filename:a.log_name.val()
     }});
@@ -482,61 +491,77 @@ _log:function(log,to){
     }
     
 },
-
-faster:function(){
-    
-    var t=log_panel,p=t.param;
-    
-    if (!p.faster_time) clearTimeout(p.faster_time);
-    
-    TIMER.DELAY('log_panel',p.delay.faster);
-        
-    p.faster_time = setTimeout(function(){
-        TIMER.DELAY('log_panel',p.delay.common);
-        p.faster_time = false;
-    },2000);
-    
+update:function(){
+    var t=log_panel,
+        p=t.param;
+    if (t.timerUpdate==undefined)
+        setTimeout(function(){ t._update();},100);
     
 },
-
 _update:function(){
-    var t=log_panel,p=t.param,i,items=t.items(),    
-    faster = false,
-    len = items.length;
+    var t=log_panel,
+        p=t.param,
+        i,
+        items=t.items(),
+        len = items.length;
 
     if ((len>0)&&(!p.lock_update)){
-    
-        
         for(i=0;i<len;i++){
+            
             var it=items[i];
+            t._updateItem(it); 
         
-            if ((it.type=='log')&&(t.enable(it.btn_on))){
-                Ws.ajax({
-                    context:it,
-                    id:'log_refresh',
-                    value:{
-                        line:it.line,
-                        filename:it.log_name.val()
-                    },
-                    error:function(){
-                        
-                    },
-                    done:function(data,id,context){
-                        if (data.res==1){
-                            if (context.line!=data.line){
-                                context.line=data.line;
-                                t._log(data.log,context.content)
-                                
-                                if (data.log.length>0)
-                                    t.faster();    
-                            }
-                        }else
-                            console.info(data.msg);
-                    }
-                    
-                })    
-            }
         }
+    }
+},
+_updateItem:function(it){
+    var t=log_panel,p=t.param,fname;
+
+    if ((!p.lock_update)&&(it.type=='log')&&(t.enable(it.btn_on))&&(it._lockUpdate!==true)){
+        
+        it._lockUpdate = true;
+        fname = it.log_name.val();
+        if (fname!==it.prevFile)
+            it.full = false;    
+        
+        it.prevFile = fname;
+        
+        Ws.ajax({
+            context:it,
+            id:'log_refresh',
+            value:{
+                line:(it.line===undefined?-1:it.line),
+                filename:fname,
+                full:it.full===undefined?0:it.full,
+            },
+            error(){
+                it._lockUpdate = false;        
+            },
+            done(data,id,context){
+                if (data.res==1){
+                    if (context.line!=data.line){
+                        
+                        context.line =data.line;
+                        context.count = data.count;
+                        context.full = 1;
+                        
+                        t._log(data.log,context.content)
+                        context._lockUpdate = false;
+                        
+                        if ((data.line!==-1)&&(data.line!==data.count-1)){
+                            t._updateItem(context);
+                        }
+                    }else{
+                        if (context.count > data.count){
+                            context.line  = data.count-1;
+                            context.count = data.count;
+                        }
+                    }
+                }else
+                    console.info(data.msg);
+                context._lockUpdate = false;                
+            }
+        })    
     }
 },
 

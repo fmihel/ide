@@ -21,7 +21,7 @@ menu_action.run=function(){
         else
             window.open(url,"run");
         
-        if (log_panel) log_panel.faster();    
+        if (log_panel) log_panel.update();    
     }else
         popup({msg:'input URL for run',type:'alert'});
 }; 
@@ -36,7 +36,7 @@ menu_action.run_opened=function(){
     else
         window.open(url,"run");
         
-    if (log_panel) log_panel.faster();    
+    if (log_panel) log_panel.update();    
 };
 
 menu_action.run_from_tree=function(filename){
