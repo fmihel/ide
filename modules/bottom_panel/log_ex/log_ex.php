@@ -116,35 +116,27 @@ class log_ex extends WSI_BOTTOM_PANEL{
             $all   = count($data);
             $count = $all;
             
+
             if (($line==-1) && (!$full) && ($count>$limit)) 
                 $line = $count-$limit;  // начинаем от конца 
             
-            //if ($count-$line>$limit) 
-            //    $count=$line+$limit;
-            
-            //if ($count<$line) 
-            //    $line = $count-1; 
             $current = $line+1;
             for($i=$line+1;($i<$count)&&($i<$line+$limit);$i++){
                 if (trim($data[$i])!==''){
                        $log[]=$data[$i];
-                       $current++;
-                }       
+                }
+                if (($i<$count-1)||(trim($data[$i])!==''))
+                    $current++;
                 
             };
-            if (($all===1)&&(trim($data[0])==='')){ $all = 0; $current = 0;};
+            
+            if (($all===1)&&(trim($data[0])==='')){ 
+                $all = 0; 
+                $current = 0;
+            };
+            
             return array('res'=>1,'log'=>$log,'line'=>$current-1,'count'=>$all);
             
-            //if($count!=$line)
-            //    for($i=$line+1;$i<$count;$i++){
-            //        if (trim($data[$i])!=='')
-            //           $log[]=$data[$i];
-            //       else 
-            //            if ($i==$count-1) $count--;
-            //    }
-            
-            
-            //return array('res'=>1,'log'=>$log,'line'=>($count-1),'count'=>$all);
         }else
             return array('res'=>0,'msg'=>'file not exists['.$filename.']');
 

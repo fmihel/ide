@@ -541,9 +541,9 @@ _updateItem:function(it){
                 if (data.res==1){
                     if (context.line!=data.line){
                         
-                        context.line =data.line;
+                        context.line  = data.line;
                         context.count = data.count;
-                        context.full = 1;
+                        context.full  = 1;
                         
                         t._log(data.log,context.content)
                         context._lockUpdate = false;

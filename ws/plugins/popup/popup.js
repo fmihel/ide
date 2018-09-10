@@ -293,7 +293,7 @@ Tpopup.prototype.show=function(o){
 Tpopup.prototype._show=function(o){
     var t=this,p=o,css=p.css,c='',id=ut.id('pp');
     var cancel = o.onButton,ok = o.onDelayClose,context  = o.context;
-
+    
     c = ut.tag('<',{id:id,css:css.frame,style:'position:absolute'});
     c+= ut.tag({css:css.msg,style:'position:absolute',value:o.caption});
     if (o.enableButton)
@@ -303,6 +303,9 @@ Tpopup.prototype._show=function(o){
     o.plugin.append(c);
     c = o.plugin.find('#'+id);
     
+    var par = o.plugin.parent();
+    o.plugin.detach().appendTo(par);
+
     JX.arrange(c.children(),o.alignChild);
     
     var handler = setTimeout(function(){
