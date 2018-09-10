@@ -20,7 +20,8 @@ init:function(o){
             input:'find_input',
             match:'find_match',
             process_frame:'find_process_frame',
-            process:'find_process'
+            process:'find_process',
+            select:'find_select'
             
         }
     },o);
@@ -131,10 +132,12 @@ _findi:function(){
             file:p._files[p._i].path
         },
         context:p._files[p._i],
-        error:function(){
+        error:
+        function(){
             
         },
-        done:function(data,id,context){
+        done:
+        function(data,id,context){
             
             if (data.res==1)
                 t._out_find_result({file:context,list:data.finds});
@@ -177,10 +180,12 @@ _go:function(){
                 ext:p.exts.val(),
                 key:p._key
             },
-            error:function(e){
+            error:
+            function(e){
                 popup({type:'alert',msg:'Error in regular expression:  "'+p._key+'"'});
             },
-            done:function(data){
+            done:
+            function(data){
                 if (data.res==1){
                     if (data.files.length>0)
                         t._find(data.files);
@@ -209,10 +214,15 @@ _event:function(){
         
         if (obj){
             
+            var list = p.item.panel.find('.'+css.list);
+            list.find('.'+css.str).removeClass(css.select);
+            obj.addClass(css.select);
+            
             var dat = $.data(obj[0],'dat');
             
             //var node=[{id:dat.filename}]
-            editors.add({filename:dat.filename,done:function(o){
+            editors.add({filename:dat.filename,done:
+            function(o){
                 if (o.was_open)
                     o.item.editor.gotoLine(dat.line+1,dat.pos);
                 else

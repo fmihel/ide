@@ -80,6 +80,7 @@ $fr_file_fone={color:{dark:"",light:""}};
 $fr_file_fone_hover={color:{dark:"",light:""}};
 
 $fr_item_hover={color:{dark:#3B3C37,light:#EDEDED}};
+$fr_item_select={color:{dark:#2d1c12,light:#c5dcbc}};
 
 /*log-------------------------------------------------------------*/
 $log_font_on={color:{dark:#02B803,light:#37C338}};

@@ -13,6 +13,10 @@
 .find_input{
     color:$fr_input;
 }
+.find_select{
+    background-color:$fr_item_select !important;
+}
+
 .find_file{
     color:$fr_file;    
     background-color:$fr_file_fone;
@@ -26,6 +30,7 @@
 .find_list{
     padding-left:20px;
 }
+
 .find_str{
     height:18px;
     line-height:18px;
@@ -57,4 +62,4 @@
 
 .find_btn:hover{
     opacity:1;
-}    
+}
