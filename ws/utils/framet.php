@@ -43,7 +43,7 @@ if(!isset($Application)){
     define('FRAMET_DEBUG','FRAMET_DEBUG');
 };
 
-function FRAMET($template,$own,$group='',$toAll = array('style'=>"position:absolute") ){
+function FRAMET($template,$own='',$group='',$toAll = array('style'=>"position:absolute") ){
     return FRAMET::RENDER($template,$own,$group,$toAll);
 };
 
@@ -343,7 +343,7 @@ class FRAMET{
     
     //-------------------------------------------------------------------------------
         
-    public static function RENDER($template,$own,$group='',$toAll){
+    public static function RENDER($template,$own,$group,$toAll){
         
         // загружаем переменные ( переменные хранятся в упорядоченном массиве self::$vars = array("var_name"=>"mean",....)
 
@@ -516,6 +516,13 @@ class FRAMET{
                 $tag['tag'] = trim($tg);
                 
 
+                $parent = strpos($tag['id'],'^');
+                if ($parent!==false){
+                    $tag['parent'] = substr($tag['id'],$parent+1,strlen($tag['id']));
+                    $tag['id']     = substr($tag['id'],0,$parent);
+                }else
+                    $tag['parent']=false;
+
                 //----------------------------------------
                 // обработку переменных вынес в RENDER сразу после построениея списка переменных
                 // это дает возможность более широко использовать переменные
@@ -578,52 +585,59 @@ class FRAMET{
     }
 
     /** преобразование структуры в объекты FRAME */
-    private static function _render($struct,$own,$group,$toAll){
-        
+    private static function _render($struct,$own='',$group='',$toAll){
+
+        if ((gettype($own)==='string')&&($own!==''))
+            $own = FRAME($own); 
+
         for($i=0;$i<count($struct);$i++){
             
             $item = $struct[$i];
-            $tag = $item['tag'];
-            
-            $frame = FRAME($item['id'],$own)
-                ->TAG_NAME($item['tag'])
-                ->GROUP($group)
-                ->CLASSES($item['class']);
+            //_LOGF($item['id'],'id',__FILE__,__LINE__);
+    
+            if (($item['id']!=='')&&($item['id']!==false)){
+                $tag = $item['tag'];    
+                //_LOGF(array($item['id'],$group),'group',__FILE__,__LINE__);
+    
+                $frame = FRAME($item['id'],($item['parent']!==false?FRAME($item['parent']):$own))
+                    ->TAG_NAME($item['tag'])
+                    ->GROUP($group)
+                    ->CLASSES($item['class']);
+                    
+                if ($item['tag']==='input')
+                    $frame->ATTR('value',$item['value']);
+                else
+                    $frame->VALUE($item['value']);
                 
-            if ($item['tag']==='input')
-                $frame->ATTR('value',$item['value']);
-            else
-                $frame->VALUE($item['value']);
-            
-            self::_attr($frame,$item['attr']);    
-            
-            $style = isset($toAll['style'])?$toAll['style']:'';
-            
-            if (($tag==='tr')||($tag==='td'))
-                $style = str_replace('position:absolute','',$style);
-            
-            $frame->STYLE($style);
-            $frame->STYLE($item['style']);
-            
-            if (isset($toAll['class']))
-                $frame->CLASSES($toAll['class']);
-
-            if (isset($toAll['value']))
-                $frame->CLASSES($toAll['value']);
-            
-            if (isset($toAll['attr'])){
+                self::_attr($frame,$item['attr']);    
+                
+                $style = isset($toAll['style'])?$toAll['style']:'';
+                
+                if (($tag==='tr')||($tag==='td'))
+                    $style = str_replace('position:absolute','',$style);
+                
+                $frame->STYLE($style);
+                $frame->STYLE($item['style']);
+                
+                if (isset($toAll['class']))
+                    $frame->CLASSES($toAll['class']);
+    
+                if (isset($toAll['value']))
+                    $frame->CLASSES($toAll['value']);
+                
+                if (isset($toAll['attr'])){
                 foreach($toAll['attr'] as $k=>$v)
                     $frame->ATTR($k,$v);
             }    
+                    
+                    
+                if (self::$root===false)
+                    self::$root = $frame;
                 
+                if ((isset($item['child']))&&(count($item['child'])>0))
+                    self::_render($item['child'],$frame,$group,$toAll);
                 
-            if (self::$root===false)
-                self::$root = $frame;
-            
-            if ((isset($item['child']))&&(count($item['child'])>0))
-                self::_render($item['child'],$frame,$group,$toAll);
-            
-            if ((isset($item['align']))&&(strlen($item['align'])>0)){
+                if ((isset($item['align']))&&(strlen($item['align'])>0)){
                 
                 $funcs = explode(self::$space['~'],$item['align']);
                 $frame->ALIGN(self::_align($funcs));
@@ -634,10 +648,17 @@ class FRAMET{
                 if (array_search('only',$funcs)!==false)
                     $frame->ONLY(true);
             }
+        
+            }else{
+                 
+                if ((isset($item['child']))&&(count($item['child'])>0)){
+                    $frame = FRAME($item['parent']);
+                    self::_render($item['child'],$frame,$group,$toAll);
+                }    
+                
+            }
     
-
-
-        }
+        }    
         
     }
     
@@ -731,7 +752,9 @@ class FRAMET{
 if($Application->is_main(__FILE__)){
   
 echo '<xmp>';
-$c = '<i:textarea {position:static} --wp >
+$c = '<^center
+            
+>
 
 ';
 
