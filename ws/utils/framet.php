@@ -50,6 +50,82 @@ function FRAMET($template,$own,$group='',$toAll = array('style'=>"position:absol
 class GJX{
     public static $enableBuffer = true;
     public static $ref = array();
+    /** ----------------------------------------------------------
+     * -accom-    
+     * -accom()-
+     * -accom(direct:vert,stretch:2)-
+     * -accom([a,b,c],{direct:vert,stretch:2})-
+    */
+    public static function accomParam($str,$extend=false){
+        
+        try{
+            if (($str==='')&&($extend===false)) return array('','');    
+            self::_jqInit();
+            $str = self::_jqLock($str);
+            
+            if ($str !== ''){
+                if ($str[0]==='['){ //[a,b,c],{direct:vert,stretch:2}
+                    $str = '['.$str.']';
+                }else{ // {direct:vert,stretch:2}  || direct:vert,stretch:2
+                    if ($str[0]!=='{')
+                        $str = '{'.$str.'}';
+                    $str = '[[],'.$str.']';    
+                }    
+            };    
+            //_LOGF($str,'str',__FILE__,__LINE__);
+            
+    
+            if ($extend===false)
+                $params = ARR::extend('[[],{}]',$str);
+            else
+                $params = ARR::extend('[[],{'.self::_jqLock($extend).'}]',$str);
+            
+            $buffer = (isset($params[1]['buffer'])?TYPE::toBool($params[1]['buffer']):'global');
+            
+            
+            $out = array();
+            self::_jqFlip();
+            for($i=0;$i<count($params);$i++)
+                $out[] = self::_jqUnLock(ARR::to_json($params[$i]));
+            
+            $out[]=$buffer;
+            
+            return $out;
+            
+        }catch(Exception $e){
+            _LOGF($e->getMessage(),'Exception',__FILE__,__LINE__);
+        }
+        return array('','','global');
+    }
+
+    public static function accom($param,$enableBuffer = 'global'){
+        $out = 'JX.accom(';
+
+        $enableBuffer = ($enableBuffer==='global'?self::$enableBuffer:($enableBuffer?true:false));
+    
+        if ((count($param2)>2)&&($param[2]!=='global'))
+            $enableBuffer = $param[2];
+
+        if (self::isEmptyArr($param[0])){
+            
+            $code = '{$}.children()';
+            
+            if ($enableBuffer){
+                
+    
+                $buffer = self::buffer($code);
+                $out=$buffer['code'].$out.$buffer['var'];
+            }else
+                $out.=$code;    
+        }else
+            $out.=$param[0];
+        
+        if(!self::isEmptyArr($param[1]))
+            $out.=','.$param[1];
+
+        $out.=');';
+        return $out;
+    }
 
     /** ----------------------------------------------------------
      * -arrange-    
@@ -104,7 +180,7 @@ class GJX{
         
         $enableBuffer = ($enableBuffer==='global'?self::$enableBuffer:($enableBuffer?true:false));
     
-        if ($param[2]!=='global')
+        if ((count($param2)>2)&&($param[2]!=='global'))
             $enableBuffer = $param[2];
         
         if (self::isEmptyArr($param[0])){
@@ -695,6 +771,10 @@ class FRAMET{
                 
                 $p  = GJX::arrangeParam($param);
                 $out.=GJX::arrange($p);
+            }elseif ($name==='accom'){  /* + */
+                
+                $p  = GJX::accomParam($param);
+                $out.=GJX::accom($p);
 
             }elseif ($name==='cling'){  /* & */
                 
