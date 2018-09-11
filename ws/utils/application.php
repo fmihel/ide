@@ -104,6 +104,23 @@ function _LOGF($msg,$name='',$file='',$line='',$param=array()){
     
     if (gettype($param)==='string')
         $param = APP::extParam($param);    
+    //-----------------------------------------------------------------------
+    // использование коротких имен
+    $short = array('str'=>'strLimit','ass'=>'assLimit','arr'=>'arrLimit');
+    foreach($short as $k=>$v){
+        if (isset($param[$k])){
+            $param[$v] = $param[$k];
+            unset($param[$k]);
+        }    
+    };
+    // использование настройки сразу всем
+    if (isset($param['all'])){
+        foreach($short as $k=>$v)
+            $param[$v] = $param['all'];
+    };
+    
+    
+    //-----------------------------------------------------------------------
     
     $return = false;
     
