@@ -225,12 +225,12 @@ zAction.do=function(o){
     var t=zAction,
         p=t.param,
         g=t._get(o.name),
-        res=undefined;
+        res;
     
     if (g){ 
         try{ 
             if(g.action){
-                 res = g.action(o.param);
+                 res = g.action(o.param,g.prevState);
                  if (res===undefined)
                     res = o.param;
             }
@@ -241,7 +241,7 @@ zAction.do=function(o){
         g.on.action.forEach(function(v){
             if (v.func)
             try{
-                v.func(res);
+                v.func(res,g.prevState);
             }catch(e){
                 console.error(e,v);    
             }
