@@ -187,11 +187,11 @@ zAction.update=function(name){
         a.forEach(function(v){
             if (((name===undefined)||(v.name===name))&&(v.state)){
                 
-                newState =v.state();
+                newState =v.state(v.prevState);
                 v._firstCallState = true;
                 
                 if (!t._eq(newState,v.prevState)){
-                    v.prevState = newState;
+                    v.prevState = (typeof newState === "object")?$.extend(false,newState,{}):newState;
                     v.on.state.forEach(function(vv){
                         if (vv.func) try{ vv.func(newState);}catch(e){}    
                     });
@@ -222,13 +222,29 @@ zAction.getState=function(name){
 /** вызов action
 */
 zAction.do=function(o){
-    var t=zAction,p=t.param,g=t._get(o.name);
+    var t=zAction,
+        p=t.param,
+        g=t._get(o.name),
+        res=undefined;
     
     if (g){ 
-        try{ g.action?g.action(o.param):0 ;}catch(e){}
+        try{ 
+            if(g.action){
+                 res = g.action(o.param);
+                 if (res===undefined)
+                    res = o.param;
+            }
+        }catch(e){
+            console.error(e);
+        }
+        
         g.on.action.forEach(function(v){
             if (v.func)
-                try{ v.func();}catch(e){}
+            try{
+                v.func(res);
+            }catch(e){
+                console.error(e,v);    
+            }
         });
         
     }
