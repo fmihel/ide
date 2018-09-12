@@ -48,12 +48,15 @@ class WS_UTILS{
 
         //** обработка переменных, типа {$name} name данная переменная будет заменена 
         if (mb_strpos($res,'{$')!==false){
-            preg_match_all('/{\$[a-z,A-Z,0-9,_,:]*}/', $res, $matches, PREG_SET_ORDER, 0);
-        
+            
+    
+            preg_match_all('/{\$[a-z,A-Z,0-9,_,(:|\\\\)]*}/', $res, $matches, PREG_SET_ORDER, 0);
+    
             for($i=0;$i<count($matches);$i++){
                 $from = $matches[$i][0];
                 $id = str_replace(array('{$','}'),'',$from);
                 $var = self::extGroupAndId($id);
+    
                 if ($var['group']==''){
                     $var['group'] = $frame->group;
                     $var['.'] = ($var['group']!==''?'.':'');
@@ -77,7 +80,13 @@ class WS_UTILS{
         if ($have_group!==false){
             $_group  =   trim(substr($id,0,$have_group));
             $_id     =   trim(substr($id,$have_group+1)); 
-        }
+        }else{
+            $have_group = mb_strpos($id,"\\");
+            if ($have_group!==false){
+                $_group  =   trim(substr($id,0,$have_group));
+                $_id     =   trim(substr($id,$have_group+1)); 
+            }    
+        };
         return array('group'=>$_group,'id'=>$_id,'.'=>($_group!==''?'.':''),'_'=>($_group!==''?'_':''));
     }
     

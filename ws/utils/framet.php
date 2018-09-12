@@ -662,10 +662,15 @@ class FRAMET{
 
     /** преобразование структуры в объекты FRAME */
     private static function _render($struct,$own='',$group='',$toAll){
-
+        
+    
         if ((gettype($own)==='string')&&($own!==''))
-            $own = FRAME($own); 
+            $own = FRAME($own);
 
+        //if (($group=='')||($group==null))
+        //    $group = $own->group;
+        //if ($group==null) $group = '';    
+            
         for($i=0;$i<count($struct);$i++){
             
             $item = $struct[$i];
@@ -673,13 +678,16 @@ class FRAMET{
     
             if (($item['id']!=='')&&($item['id']!==false)){
                 $tag = $item['tag'];    
-                //_LOGF(array($item['id'],$group),'group',__FILE__,__LINE__);
-    
+
                 $frame = FRAME($item['id'],($item['parent']!==false?FRAME($item['parent']):$own))
                     ->TAG_NAME($item['tag'])
-                    ->GROUP($group)
                     ->CLASSES($item['class']);
-                    
+                
+                if ((strpos($item['id'],"\\")===false)){ // группа НЕ Указана явно    
+                    if ($group!=='')
+                        $frame->GROUP($group); // группа идет дополнительно
+                }        
+
                 if ($item['tag']==='input')
                     $frame->ATTR('value',$item['value']);
                 else
@@ -832,7 +840,7 @@ class FRAMET{
 if($Application->is_main(__FILE__)){
   
 echo '<xmp>';
-$c = '<^center
+$c = '<text^g\center
             
 >
 

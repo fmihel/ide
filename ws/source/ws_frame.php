@@ -22,20 +22,32 @@ if(!isset($Application))
  * 
 */ 
 function FRAME(/*one or two params, one params - get frame,two - create frame*/){
+    $len = func_num_args();
 
-    $id=(func_num_args()>0 ? func_get_arg(0) : 'body');
+    $args=array();
+    $args[]  =($len>0 ?   func_get_arg(0) : 'body');
+    if ($len>1) $args[] = func_get_arg(1);
+    if ($len>2) $args[] = func_get_arg(2);
+    $args[0] = str_replace("\\",':',$args[0]);
     
-    if (func_num_args()<2)
+    $id = $args[0]; 
+    
+    if ($len<2)
         return FRAME::GET($id);
-    else if ((func_num_args()===2)&&(gettype(func_get_arg(1))==='string')){
-        $group = trim(func_get_arg(1));
+    else if (($len===2)&&(gettype($args[1])==='string')){
+        $group = trim($args[1]);
         if ($group!=='') $group.=':';
         return FRAME::GET($group.$id);
     }
-    else if (func_num_args()===2) 
-        return FRAME::ADD($id,func_get_arg(1));
-    else if (func_num_args()===3)
-        return FRAME::ADD($id,func_get_arg(1),func_get_arg(2));        
+    else if ($len===2){ 
+        if (strpos($id,':')!==false) // внутри указана группа 
+            return FRAME::ADD($id,$args[1]);
+        else    
+            return FRAME::ADD($id,$args[1],($args[1]!==null?$args[1]->group:''));
+            
+    }else if ($len===3){
+        return FRAME::ADD($id,$args[1],$args[2]);        
+    }    
 };
 
 class FRAME{
@@ -121,7 +133,7 @@ class WS_FRAME extends WS_COMMON{
         $this->value    = '';
         $this->lineHeight = false;
         $this->alignAsFunc = false;
-        
+        $this->group = '';
     }
     
     public function ADD($child){
