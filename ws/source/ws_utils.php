@@ -49,19 +49,13 @@ class WS_UTILS{
         //** обработка переменных, типа {$name} name данная переменная будет заменена 
         if (mb_strpos($res,'{$')!==false){
             
-            _LOGF($res,'input',__FILE__,__LINE__);
-    
             preg_match_all('/{\$[a-z,A-Z,0-9,_,(:|\\\\)]*}/', $res, $matches, PREG_SET_ORDER, 0);
-            _LOGF($matches,'matches',__FILE__,__LINE__);
-    
-    
+
             for($i=0;$i<count($matches);$i++){
                 $from = $matches[$i][0];
                 $id = str_replace(array('{$','}'),'',$from);
                 $var = self::extGroupAndId($id);
-                _LOGF($var,'var',__FILE__,__LINE__);
-    
-    
+
                 if ($var['group']===''){
                     $var['group'] = $frame->group;
                     $var['.'] = ($var['group']!==''?'.':'');
@@ -71,8 +65,7 @@ class WS_UTILS{
                     $to = 'Qs.'.$var['group'].$var['.'].$var['id'];
                 else
                     $to = 'Qs.'.$var['id'];
-                _LOGF($to,'to',__FILE__,__LINE__);
-        
+
                 $res =  str_replace($from,$to,$res);  
             }
         }
