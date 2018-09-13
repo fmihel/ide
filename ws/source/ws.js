@@ -3,40 +3,6 @@
 
 var Ws = {};
 
-Ws.ajax2=function(o){
-    var p=$.extend({
-        id:-1,
-        value:'',
-        url:this.url,
-        timeout:10000,
-        done:Ws.done,
-        error:Ws.error,
-        before:Ws.before_ajax,        
-    },o);
-    
-    var dat = {AJAX:1,ID:p.id,VALUE:p.value,SHARE:this.share};
-
-    var request = $.ajax({url:p.url,method: "POST",timeout:p.timeout,data:dat});
-    if (!("context" in p)) p.context = request;
-    
-    request.done(function(_data){
-        var data = Ws.ajax_response(_data); 
-        if(data!==null){
-            
-            /*include session module if session_mod is require*/
-            if ((typeof(session)!=="undefined")&&(Ws.share.session!==undefined)&&(session._fromAjax))
-                session._fromAjax(Ws.share.session,data[0].ID);
-            /*--------------------------------------------------*/
-            
-            p.done(data[0].DATA,data[0].ID,p.context);
-            
-        }else
-            p.error(null,"parse data ["+_data+"]",p.context);
-                    
-    });
-    request.fail(function(jqXHR, textStatus){p.error(jqXHR,textStatus,p.context);});    
-};
-
 Ws.ajax=function(o){
     var 
     p=$.extend(false,{

@@ -277,7 +277,7 @@ class GJX{
         return $out;
     }
     
-    /** ----------------------------------------------------------
+    /** ----------------------------------------------------------4
      * -stretch-    
      * -stretch()-
      * -stretch(by:obj)-
@@ -710,9 +710,9 @@ class FRAMET{
                     $frame->CLASSES($toAll['value']);
                 
                 if (isset($toAll['attr'])){
-                foreach($toAll['attr'] as $k=>$v)
-                    $frame->ATTR($k,$v);
-            }    
+                    foreach($toAll['attr'] as $k=>$v)
+                        $frame->ATTR($k,$v);
+                }    
                     
                     
                 if (self::$root===false)
@@ -840,7 +840,7 @@ class FRAMET{
 if($Application->is_main(__FILE__)){
   
 echo '<xmp>';
-$c = '<text^g\center
+$c = '<aa\text^g\center
             
 >
 
