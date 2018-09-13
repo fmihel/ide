@@ -29,6 +29,11 @@ obj:function(t/*set*/){
     }    
     return $.data(t[0],m.name);
 },
+/** возвращает отображаемое значение jedit */
+text:function(){
+    var o = m.obj(this);
+    return o.attr('text');
+},
 value:function(mean,lockChange){
     var o = m.obj(this);
     
@@ -274,7 +279,12 @@ Tjedit.prototype.init = function(o){
         
         lock:new jlock(),
         handler:new jhandler(),
-        
+        /** 
+         * при использовании свойства text логическое значение будет преобразовано исходя из правила в
+         * boolAsText.
+         * boolAsText<>[,] то преобразования не будет
+        */
+        boolAsText:["нет","да"],
         tip:{
             msg     :"",
             place   :"right",
@@ -873,6 +883,13 @@ Tjedit.prototype.attr = function(n/*v*/){
         }   
     }
     /*-----------------------------------*/
+    if (n==='boolAsText'){
+        if (r) 
+            return p.boolAsText;
+        else    
+           p.boolAsText = ((Array.isArray(v))&&(v.length>1)?v:false);
+    }
+    /*-----------------------------------*/
     if (n==='changeOnKeyEnter'){
         if (r) 
             return p.changeOnKeyEnter;
@@ -999,12 +1016,29 @@ Tjedit.prototype.attr = function(n/*v*/){
                 
             }else
                 t.attr('checked',v?true:false);
-            
-            
-            
-            
         }    
     }
+    /*-----------------------------------*/
+    if (n==='text'){
+        if (r){
+            if (p.type==="memo")
+                return jq.memo.val();
+            if (p.type==="edit")
+                return jq.input.val();
+            if (p.type==="text")
+                return jq.text.text();
+            if (p.type==="button")
+                return jq.btn.text();
+            if (p.type==="checkbox"){
+                let res = t.attr('checked');
+                if (p.boolAsText!==false)
+                    return res?p.boolAsText[1]:p.boolAsText[0];
+                else
+                    return res;
+            }    
+        };    
+    }
+    
     /*-----------------------------------*/
     if (n==='caption'){
         if (r) 

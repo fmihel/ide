@@ -454,6 +454,25 @@ class TWS extends WS{
             
             '
         );        
+        
+        /*c:get as text */
+        $this->item(
+            'getAsText',
+            /*------------caption---------------*/
+            'text displayed',                  
+            /*------------code------------------*/
+            '
+            //возвращает отображаемое значение jedit
+            var s = {$plugin}.jedit("text");
+            
+            ',
+            /*------------event-----------------*/
+            '
+            var s = {$plugin}.jedit("text");
+            jconsole(s);
+            
+            '
+        );        
 
 
         /*c:checked */
