@@ -313,6 +313,41 @@ class GJX{
         return $out;
     }
 
+    /** ----------------------------------------------------------4
+     * -place-    
+     * -place()-
+     * -place(by:obj,vert:top,horiz:left)-
+     * -place({by:obj,vert:top,horiz:left})-
+    */
+    public static function placeParam($str){
+        
+        try{
+            if ($str==='') return array('{$}','');    
+            self::_jqInit();
+            $str = self::_jqLock($str);
+            
+            if ($str[0]!=='{')
+                $str = '{'.$str.'}';
+
+            $param = ARR::extend('{}',$str);
+            
+            self::_jqFlip();
+            return array('{$}',self::_jqUnLock(ARR::to_json($param)));
+
+        }catch(Exception $e){
+            _LOGF($e->getMessage(),'Exception',__FILE__,__LINE__);
+        }
+        return array('','');
+    }
+
+    public static function place($param,$enableBuffer = 'global'){
+        $out = 'JX.place(';
+        
+        $out.=$param[0].(strlen($param[1])>0?','.$param[1]:'');
+
+        $out.=');';
+        return $out;
+    }
 
     
     private static function buffer($code){
@@ -795,7 +830,9 @@ class FRAMET{
             }elseif ($name==='stretch'){      /* <> */
                 $p  = GJX::stretchParam($param);
                 $out.=GJX::stretch($p);
-
+            }elseif ($name==='place'){      /* <> */
+                $p  = GJX::placeParam($param);
+                $out.=GJX::place($p);
             }elseif ($name==='arrange'){  /* + */
                 
                 $p  = GJX::arrangeParam($param);

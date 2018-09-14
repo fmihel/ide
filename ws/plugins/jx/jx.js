@@ -182,25 +182,22 @@ placer:function(o,i/*param*/){
     
 },
 
-place:function(jq){
-    var prm=arguments.length>1 ? arguments[1] : {};
-    var p =
-    {
+place:function(jq,o){
+    var 
+    p =$.extend(true,{
         by:null,/*rect */
         vert:"center",
         horiz:"center",
-        margin:{left:0,top:0,right:0,bottom:0}
-    };
-    $.extend(true,p,prm);
-    
-    
-    var d = JX._dom(jq),pr=null,pd=null;
+    },o),
+    d = JX._dom(jq),
+    pr=null,
+    pd=null;
+    p.margin = JX.margin(p.margin);
     
     if (p.by===null){
         pr = JX._pos(JX._parent(d));
         pd = JX._pos(d);
     }else{
-
         pr = p.by;
         pd = JX._abs(d);
     };
@@ -454,10 +451,9 @@ stretch_scr:function(o){
     JX.abs(d,r);
 },
 
-stretch:function(o){
-    var arg = arguments[1];
-    var p = $.extend(true,{by:null},arg);
-        p.margin = (arg&&arg.margin?JX.margin(arg.margin):JX.margin());
+stretch:function(o,a){
+    var p = $.extend(true,{by:null},a);
+        p.margin = JX.margin(p.margin);
     
     
     var d = JX._dom(o);
@@ -589,10 +585,10 @@ margin:function(m){
     if (typeof m ==='number') return {left:m,right:m,top:m,bottom:m};
 
     return {
-            left:(m.left===undefined?0:m.left),
-            right:(m.right===undefined?0:m.right),
-            top:(m.top===undefined?0:m.top),
-            bottom:(m.bottom===undefined?0:m.bottom),
+        left:(m.left===undefined?0:m.left),
+        right:(m.right===undefined?0:m.right),
+        top:(m.top===undefined?0:m.top),
+        bottom:(m.bottom===undefined?0:m.bottom),
     };
 },
 
