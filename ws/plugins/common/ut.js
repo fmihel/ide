@@ -69,12 +69,37 @@ os:function(){
  * b.a = ut.emb(field1,"test",field2,"test");
  * 
 */
-
 emb:function(){
     var a=arguments,c=a.length/2,i,r={};
     for(i=0;i<c;i++)
         r[a[i*2]]=a[i*2+1];
     return r;    
+},
+/** список атрибутов dom */
+attrs:function(o,prm){
+    let d,jq,
+    p=$.extend(true,{
+        exclude:[] //exclude tag
+    },prm);
+    
+    if (JX.is_jquery(o)){
+        d = o[0];
+        jq = o;
+    }else{
+        d = o;
+        jq = $(d);
+    }
+    var res = {};
+    jq.each(function(){
+        $.each(this.attributes, function() {
+            if(this.specified){ 
+                if (p.exclude.indexOf(this.name)==-1)
+                    res[this.name] = this.value;
+            }    
+        });
+    });    
+    
+    return res;
 },
 mobile:function(){
     var os=ut.os();

@@ -293,7 +293,16 @@ class TWS extends WS{
                 jconsole({name:"onSelect",obj:o});   
             }
             
-        })');
+        })')
+        ->VALUE('
+
+            <div id=item1 t="10" y="g">Item1</div>
+            <div id=item2 >Item2</div>
+            <div id=item3 >Item3</div>
+
+        ');
+        
+        
         
             
         

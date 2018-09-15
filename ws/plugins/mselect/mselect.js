@@ -248,7 +248,21 @@ Tmselect.prototype.init = function(o){
 
     var c='',p=t.param;
     c=ut.tag({id:p.id,tag:'select',css:p.css.select,style:"width:100%;height:100%"});    
-    p.plugin.append(c);
+    //---------------------------
+    
+    $.each(p.plugin.children(),function(i,dd){
+        let d=$(dd),at = ut.attrs(d,{exclude:"id"});
+        if (Object.keys(at).length===0) at = undefined;
+        if (p.data===undefined) p.data=[];
+        if (dd.id)
+            p.data.push({id:dd.id,value:d.text(),data:at});
+        else
+            p.data.push({value:dd.text(),data:at});
+           
+    });
+    //---------------------------
+    p.plugin.html(c);
+    //---------------------------
     p.select = p.plugin.find('#'+p.id);
     p.select.on('change',function(){
         if (p.onSelect)
