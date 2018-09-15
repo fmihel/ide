@@ -75,6 +75,8 @@ class MENU extends WS_MODULE{
                 {caption:"Save all",id:"save_all"},
                 {caption:"Save current",id:"save_current"},
                 "-",
+                {caption:"Reopen (synchronize)",id:"reopen"},
+                "-",
                 {caption:"Run",id:"run"},
                 {caption:"Run current",id:"run_current"},
                 "-",
@@ -85,6 +87,7 @@ class MENU extends WS_MODULE{
             ],
             onClick:function(o){
             
+                if (o.id=="reopen") menu_action.reOpen()
                 if (o.id=="options") menu_action.options()
                 if (o.id=="exit") menu_action.exit()
                 if (o.id=="save_all") menu_action.save()

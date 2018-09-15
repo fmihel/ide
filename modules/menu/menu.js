@@ -79,6 +79,13 @@ menu_action.check_update=function(){
 menu_action.close_all=function(){
     editors.close_all();
 };
+menu_action.reOpen=function(){
+    editors.reOpen({
+    closeDeleted:true,
+    done(o){
+        console.info(o);
+    }});
+};
 
 
 function run_url()

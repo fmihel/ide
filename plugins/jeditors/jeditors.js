@@ -1,4 +1,4 @@
-/*global $,ace,ut,Ws,jtab,global,popup,JX,nil,menu_action,Templates,code_complit,JDIALOG,jfunc_hint*/
+/*global $,ace,ut,Ws,jtab,global,popup,JX,nil,menu_action,Templates,code_complit,explorer,JDIALOG,jfunc_hint*/
 function jeditors(o){
 
     var t=this;
@@ -69,6 +69,17 @@ function jeditors(o){
     
     
     setInterval(function(){t.action();},1000);
+    /* заготовка для будущего автоматического обновления
+    setInterval(()=>{
+        t.reOpen({
+            reOpenChanged:false, // перезаписывать измененные
+            closeDeleted:true,  // закрывать вкладки с удаленными (в противном случает файлы попадают в выходной массив conflict)
+            showUpdateResult:false,// выдать информацию о кол-ве обновленных
+            refreshExplorer:false, // обновлять Explorer
+        });
+        
+    },5000);
+    */
 }
 
 jeditors.prototype._update_code_page=function(){
@@ -240,8 +251,99 @@ jeditors.prototype.get_first_changed=function(){
             return item;
     }
     return null;
-};    
+};   
+/** перезашружает все файлы, 
+ *  закрывает вкладки с удаленными,
+ *  обновляет Explorer
+ *  на выходе
+ *  {
+ *    update[] - массив измененных файлов
+ *    conflict[] - массив конфликтных файлов
+ *  }
+ */ 
+jeditors.prototype.reOpen=function(o){
+    var t=this,
+        p=t.param,
+        tabs=p.tabs,
+        i,
+        c=tabs.count(),
+        items=[],
+        conflict = [],
+        update=[],
+        a=$.extend(true,{
+            done:undefined,
+            reOpenChanged:true, // перезаписывать измененные
+            closeDeleted:true,  // закрывать вкладки с удаленными (в противном случает файлы попадают в выходной массив conflict)
+            showUpdateResult:true,// выдать информацию о кол-ве обновленных
+            refreshExplorer:true, // обновлять Explorer
+        },o);
+    
+    if (p._reOpen===true)
+        return;
+    p._reOpen = true;
+    
+    
+    var _put=(cont,text)=>{
+        cont.item.editor.setValue(text);
+        cont.item.changed = false;
+        cont.item.editor.gotoLine(cont.cursor.row+1,cont.cursor.column);
+        update.push(cont.item);
+    };
+    
+    var _reOpen=(item)=>{
+    
+    if (item===undefined){
+        t._update_tab_name();
+        if (a.showUpdateResult)
+            popup({msg:"update [<b> "+update.length+"</b> ] files."});
+        
+        if(a.refreshExplorer)
+            explorer.refresh();
+        
+        if (a.done)
+            a.done({conflict,update});
+        
+        p._reOpen = false;    
+        return;    
+    }
+    
+    
+    Ws.ajax({
+        id:'get_file',
+        context:{item,cursor:item.editor.getCursorPosition()},
+        value:{filename:item.filename},
+        error(e,t,it){
+            console.error(e);
+            conflict.push({item:it,msg:"system error",err:"system"});
+            _reOpen(items.shift());
+        },
+        done(data,ev,context){
+            if (data.res==1){
+                if ((context.item.changed)&&(!a.reOpenChanged))
+                    conflict.push({item:context.item,msg:"file not saved",err:"changed"});
+                else if (context.item.editor.getValue()!==data.content)
+                    _put(context,data.content);
+            }else{
+                if (a.closeDeleted){
+                    p.tabs.del(context.item);
+                    popup({type:'alert',msg:"Deleted: "+ut.extFileName(context.item.filename)});                
+            }else
+                    conflict.push({item:context.item,msg:"file not exist",err:"close"});
+            }
+            _reOpen(items.shift());
+        
+        }
+        });    
+        
+    };
 
+    for(i=0;i<c;i++)
+        items.push(tabs.item(i));
+    
+    _reOpen(items.shift());
+    
+    
+};
 jeditors.prototype.save_all=function(done){
     var t=this,item;
     item = t.get_first_changed();
