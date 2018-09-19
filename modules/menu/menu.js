@@ -81,7 +81,6 @@ menu_action.close_all=function(){
 };
 menu_action.reOpen=function(){
     editors.reOpen({
-    closeDeleted:true,
     done(o){
         console.info(o);
     }});

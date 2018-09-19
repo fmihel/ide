@@ -11,6 +11,7 @@ function jtab(o){
         onBeforeDel:undefined, /*if def need return true!*/
         onAdd:undefined,
         onSortable:undefined,
+        onChanged:undefined,
         panel_height:32,
         css:{
             panel:"jt_panel"
@@ -91,7 +92,7 @@ jtab.prototype.add=function(o){
     var panel = frame.append(ut.tag({css:a.css.panel})).find("."+a.css.panel).css(
         {'position':'absolute','height':(a.panel_height-1)+'px'});
     
-    var item = {id:id,content:$(frame.children().eq(0)),panel:panel,frame:frame,li:p.ul.children().last()};
+    var item = {id:id,content:$(frame.children().eq(0)),panel:panel,frame:frame,li:p.ul.children().last(),changed:false,md5:"-1"};
     
     frame.css({'padding-left':'0px','padding-right':'0px','padding-top':+(a.panel_height)+'px','padding-bottom':'0px'});
     //frame.css({'padding-left':'0px','padding-right':'0px','padding-top':'0px','padding-bottom':'0px'});
@@ -270,4 +271,18 @@ jtab.prototype.current=function(item){
 
 jtab.prototype.assigned=function(){
     return (this.param._id>-1);
+};
+
+jtab.prototype.changed=function(item,bool){
+    var t=this,p=t.param,needDo=false;
+    if (bool===undefined) return item.changed;
+
+    bool    = bool?true:false;
+    needDo  = (item.changed!==bool);
+
+    item.changed = bool;
+    if (bool) item.md5 = "-1";
+        
+    if ((needDo)&&(p.onChanged))
+        p.onChanged({sender:t,item:item,changed:bool});
 };

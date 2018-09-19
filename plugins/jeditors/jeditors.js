@@ -124,6 +124,7 @@ jeditors.prototype.add=function(o){
                         item.filename = a.filename;
                         item.ext = ut.ext(a.filename);
                         item.code_page = data.code_page;
+                        item.md5 = data.md5;
                         
                         if (data.type==='editor'){
 
@@ -134,7 +135,7 @@ jeditors.prototype.add=function(o){
                             item.editor.$blockScrolling = Infinity;
                             t._setmode(item.editor,a.filename);
                             item.editor.insert(data.content);
-                            item.changed = false;
+                            p.tabs.changed(item,false);
 
                             t._key_event(item.editor);
                             
@@ -144,7 +145,7 @@ jeditors.prototype.add=function(o){
                                 
                                 if (p.updating){ 
                                     if (p.onchange){
-                                        item.changed = true;
+                                        p.tabs.changed(item,true);
                                         p.onchange({event:"change",sender:t,item:item});
                                         t._update_tab_name();
                                     };
@@ -210,7 +211,13 @@ jeditors.prototype.add=function(o){
 };
 
 jeditors.prototype.save_item=function(o){
-    var t=this,item=o.item,done=o.done,forced=(o.forced!==undefined?o.forced:false),toUTF8=(o.toUTF8!==undefined?o.toUTF8:0);
+    var t=this,
+        p = t.param,
+        tabs = p.tabs,
+        item=o.item,
+        done=o.done,
+        forced=(o.forced!==undefined?o.forced:false),
+        toUTF8=(o.toUTF8!==undefined?o.toUTF8:0);
     
     if(((item)&&(item.changed))||((item)&&(forced))){
         
@@ -222,7 +229,8 @@ jeditors.prototype.save_item=function(o){
                 
                 if (data.res==1){ 
                     popup({msg:"save: "+ut.extFileName(item.filename)});
-                    item.changed = false;    
+                    tabs.changed(item,false);
+                    item.md5 = data.md5;
                     //console.info(item.filename);
                     if (typeof(code_complit)!=='undefined') code_complit.code_update({filename:item.filename,rel_path:1});
                 }else
@@ -247,12 +255,12 @@ jeditors.prototype.get_first_changed=function(){
     
     for(i=0;i<c;i++){
         item = tabs.item(i);
-        if (item.changed)
+        if (tabs.changed(item))
             return item;
     }
     return null;
 };   
-/** перезашружает все файлы, 
+/** перезагружает все файлы, 
  *  закрывает вкладки с удаленными,
  *  обновляет Explorer
  *  на выходе
@@ -283,60 +291,81 @@ jeditors.prototype.reOpen=function(o){
     p._reOpen = true;
     
     
-    var _put=(cont,text)=>{
-        cont.item.editor.setValue(text);
-        cont.item.changed = false;
+    var _put=(cont,data)=>{
+        cont.item.editor.setValue(data.content);
+        tabs.changed(cont.item,false);
+        cont.item.md5 = data.md5;
         cont.item.editor.gotoLine(cont.cursor.row+1,cont.cursor.column);
         update.push(cont.item);
     };
     
     var _reOpen=(item)=>{
     
-    if (item===undefined){
-        t._update_tab_name();
-        if (a.showUpdateResult)
-            popup({msg:"update [<b> "+update.length+"</b> ] files."});
-        
-        if(a.refreshExplorer)
-            explorer.refresh();
-        
-        if (a.done)
-            a.done({conflict,update});
-        
-        p._reOpen = false;    
-        return;    
-    }
-    
-    
-    Ws.ajax({
-        id:'get_file',
-        context:{item,cursor:item.editor.getCursorPosition()},
-        value:{filename:item.filename},
-        error(e,t,it){
-            console.error(e);
-            conflict.push({item:it,msg:"system error",err:"system"});
-            _reOpen(items.shift());
-        },
-        done(data,ev,context){
-            if (data.res==1){
-                if ((context.item.changed)&&(!a.reOpenChanged))
-                    conflict.push({item:context.item,msg:"file not saved",err:"changed"});
-                else if (context.item.editor.getValue()!==data.content)
-                    _put(context,data.content);
-            }else{
-                if (a.closeDeleted){
-                    p.tabs.del(context.item);
-                    popup({type:'alert',msg:"Deleted: "+ut.extFileName(context.item.filename)});                
-            }else
-                    conflict.push({item:context.item,msg:"file not exist",err:"close"});
-            }
-            _reOpen(items.shift());
-        
+        if (item===undefined){
+            t._update_tab_name();
+            if (a.showUpdateResult)
+                popup({msg:"update [<b> "+update.length+"</b> ] files."});
+            
+            if(a.refreshExplorer)
+                explorer.refresh();
+            
+            if (a.done)
+                a.done({conflict,update});
+            
+            p._reOpen = false;    
+            return;    
         }
+    
+        Ws.ajax({
+            id:'get_md5',
+            context:{item,cursor:item.editor.getCursorPosition()},
+            value:{filename:item.filename},
+            error(e,t,it){
+                console.error(e);
+                conflict.push({item:it,msg:"system error",err:"system"});
+                _reOpen(items.shift());
+            },
+            done(data,ev,context){
+                let callReOpen = true;
+                if (data.res==1){
+    
+                    if (tabs.changed(context.item)&&(!a.reOpenChanged))
+                        conflict.push({item:context.item,msg:"file not saved",err:"changed"});
+                    else if (context.item.md5!=data.md5){
+                        callReOpen = false;
+                        Ws.ajax({
+                            id:'get_file',
+                            context:context,
+                            value:{filename:item.filename},
+                            error(e,t,it){
+                                console.error(e);
+                                conflict.push({item:it,msg:"system error",err:"system"});
+                                _reOpen(items.shift());
+                            },
+                            done(data,ev,context){
+                                if (data.res==1)
+                                    _put(context,data);
+                                _reOpen(items.shift());
+                            }
+                        });    
+                    }
+                        
+    
+                }else{
+                    if (a.closeDeleted){
+                        p.tabs.del(context.item);
+                        popup({type:'alert',msg:"Deleted: "+ut.extFileName(context.item.filename)});                
+                    }else
+                        conflict.push({item:context.item,msg:"file not exist",err:"close"});
+                    
+                }
+                
+                if (callReOpen) _reOpen(items.shift());    
+                
+            }//done
         });    
-        
-    };
-
+    };//_reOpen
+    
     for(i=0;i<c;i++)
         items.push(tabs.item(i));
     
@@ -344,6 +373,7 @@ jeditors.prototype.reOpen=function(o){
     
     
 };
+
 jeditors.prototype.save_all=function(done){
     var t=this,item;
     item = t.get_first_changed();
@@ -552,11 +582,11 @@ jeditors.prototype.align=function(o){
 };
 
 jeditors.prototype._update_tab_name=function(){
-    var t=this,p=t.param,i,c=p.tabs.count(),item,name;
+    var t=this,p=t.param,i,tabs=p.tabs,c=p.tabs.count(),item,name;
     for(i=0;i<c;i++){
         item=p.tabs.item(i);
         name = ut.extFileName(item.filename);
-        p.tabs.tab_text({item:item,caption:name+(item.changed?'<b> *</b>':'')});
+        p.tabs.tab_text({item:item,caption:name+(tabs.changed(item)?'<b> *</b>':'')});
     }
 };
 

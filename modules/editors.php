@@ -101,7 +101,7 @@ class EDITORS extends WS_MODULE{
 
         
         
-        return array('content'=>$content,'code_page'=>$code_page);
+        return array('content'=>$content,'code_page'=>$code_page,'md5'=>md5($content));
     }
     
     private function _saveToFile($filename,$content,$code_page='UTF-8',$toUTF8=false){
@@ -118,14 +118,14 @@ class EDITORS extends WS_MODULE{
         return (file_put_contents($filename,$content)!==false);
         
     }
-    
-    public function AJAX(&$response){
+    // in TWS->AJAX handler use next code:
+    // if ($this->AJAX_get_file($response)) return true;
+    public function AJAX_get_file(&$response){
         global $REQUEST;
         global $Application;
         global $USERS;
         
-        if ($REQUEST->ID=="get_file"){
-            
+        if ($REQUEST->ID=='get_file'){
             
             $path = APP::slash(APP::rel_path($Application->PATH,$Application->ROOT.$USERS->get('workplace','')),false,true);
             $filename = $path.$REQUEST->VALUE['filename'];
@@ -138,19 +138,30 @@ class EDITORS extends WS_MODULE{
                 
                 if ($type==='editor')
                     $content=$this->_loadFromFile($filename);            
-                
+
                 $url = APP::abs_path($Application->PATH,APP::get_path($filename));
                 
                 $url =$Application->DOMEN.substr($url,strlen($Application->ROOT)).APP::get_file($filename);
                 
-                $response = array('res'=>1,'type'=>$type,'content'=>$content['content'],'url'=>$url,'code_page'=>$content['code_page']);
+                $response = array('res'=>1,'type'=>$type,'content'=>$content['content'],'url'=>$url,'code_page'=>$content['code_page'],'md5'=>$content['md5']);
                     
             }else
                 $response = array('res'=>0,'msg'=>'file not exists');            
-                
+
             return true;
-        }else if ($REQUEST->ID=="set_file"){
-            
+        }
+        return false;
+    }
+
+    // in TWS->AJAX handler use next code:
+    // if ($this->AJAX_set_file($response)) return true;
+    public function AJAX_set_file(&$response){
+        global $REQUEST;
+        global $Application;
+        global $USERS;
+        
+        if ($REQUEST->ID=='set_file'){
+
             $path = APP::slash(APP::rel_path($Application->PATH,$Application->ROOT.$USERS->get('workplace','')),false,true);
             $filename = $path.$REQUEST->VALUE['filename'];
             $code_page = $REQUEST->VALUE['code_page'];
@@ -158,14 +169,53 @@ class EDITORS extends WS_MODULE{
             
             $type = $REQUEST->VALUE['type'];     
             $content = $REQUEST->VALUE['content'];            
-            if ($this->_saveToFile($filename,$content,$code_page,$toUTF8)!==false)
-                $response = array('res'=>1);
-            else
+            if ($this->_saveToFile($filename,$content,$code_page,$toUTF8)!==false){
+                $content=$this->_loadFromFile($filename);            
+                
+                $response = array('res'=>1,'md5'=>$content['md5']);
+            }else
                 $response = array('res'=>0);
                     
             return true;
+        }
+        return false;
+    }
+
+    // in TWS->AJAX handler use next code:
+    // if ($this->AJAX_set_file($response)) return true;
+    public function AJAX_get_md5(&$response){
+        global $REQUEST;
+        global $Application;
+        global $USERS;
+        
+        if ($REQUEST->ID=='get_md5'){
+
+            $path = APP::slash(APP::rel_path($Application->PATH,$Application->ROOT.$USERS->get('workplace','')),false,true);
+            $filename = $path.$REQUEST->VALUE['filename'];
             
-        }else if ($REQUEST->ID=="story_opened"){
+
+            if (file_exists($filename)){
+                
+                $content=$this->_loadFromFile($filename);            
+                $response = array('res'=>1,'md5'=>$content['md5']);
+                    
+            }else
+                $response = array('res'=>0,'msg'=>'file not exists');            
+
+            return true;
+
+        }
+        return false;
+    }
+
+    // in TWS->AJAX handler use next code:
+    // if ($this->AJAX_story_opened($response)) return true;
+    public function AJAX_story_opened(&$response){
+        global $REQUEST;
+        global $Application;
+        global $USERS;
+        
+        if ($REQUEST->ID=='story_opened'){
             
             $opened = $REQUEST->VALUE['opened'];
             
@@ -175,11 +225,18 @@ class EDITORS extends WS_MODULE{
             else    
                 $response = array('res'=>0,'msg'=>'error story opened ');
             
-
             return true;
         }
+        return false;
+    }
+    
+    public function AJAX(&$response){
         
-        
+        if ($this->AJAX_get_md5($response)) return true;
+        if ($this->AJAX_get_file($response)) return true;
+        if ($this->AJAX_set_file($response)) return true;
+        if ($this->AJAX_story_opened($response)) return true;
+
         return false;
     }
 };
