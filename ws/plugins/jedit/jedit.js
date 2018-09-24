@@ -548,10 +548,33 @@ Tjedit.prototype._event = function(){
                 return;
             }    
         };
-        
+        /*
+        if(e.which == 8){
+            if (t.eventDefined('keyBackspace')){
+                t.do('keyBackspace');
+                //e.preventDefault();
+                return;
+            }    
+        };
+        */
         t.do('keyDown');
         
     });
+
+
+    jq.input.on('keyup',
+    function(e){
+
+        if(e.which == 8){
+            if (t.eventDefined('keyBackspace')){
+                t.do('keyBackspace');
+                //e.preventDefault();
+                return;
+            }    
+        };
+
+    });
+
 
     jq.label.on('click',function(){
         if (p.type==='checkbox')
@@ -1195,6 +1218,13 @@ Tjedit.prototype.attr = function(n/*v*/){
             return t.on('keyEnter');
         else
             t.on('keyEnter',v);
+    }
+    /*-----------------------------------*/
+    if (n==='onKeyBackspace'){
+        if (r)
+            return t.on('keyBackspace');
+        else
+            t.on('keyBackspace',v);
     }
     /*-----------------------------------*/
     if (n==='onKeyArrowUp'){

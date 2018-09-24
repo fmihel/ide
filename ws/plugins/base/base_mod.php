@@ -67,29 +67,24 @@ class BASE_MOD extends WS_MODULE{
         for($i=0;$i<count($tables);$i++){
             $tab = $tables[$i];
             
-            $c.=$tab::NAME.':function(f,d){'.$CR. 
+            $c.=$tab::NAME.'(f,d){'.$CR. 
                 'var n = "'.$tab::NAME.'",a= "'.$tab::ALIAS.'";'.$CR.
-                '
-                if (typeof f==="string")
-                    return typeof d ==="object"?tb._u(f,d,n,a):tb._f(f,n,a);
-                else
-                    return Array.isArray(f)?tb._a(f,d,n,a):tb._c(f,d,n);
-                
-                /*return (typeof f==="string"?tb._f(f,n,a):(Array.isArray(f)?tb._a(f,d,n,a):tb._c(f,n,a)));*/'.$CR.
-            '},'.$CR;
+                'return (typeof f==="string")?(typeof d ==="object"?tb._u(f,d,n,a):tb._f(f,n,a)):(Array.isArray(f)?tb._a(f,d,n,a):tb._c(f,d,n));},
+                ';
+            /*return (typeof f==="string"?tb._f(f,n,a):(Array.isArray(f)?tb._a(f,d,n,a):tb._c(f,n,a)));*/
             $outer.='tb.'.$tab::NAME.'.ALIAS="'.$tab::ALIAS.'";'.$CR;
             $outer.='tb.'.$tab::NAME.'.INDEX="'.$tab::INDEX.'";'.$CR;
             $outer.='tb.'.$tab::NAME.'.noAlias='.(property_exists($tab,'noAlias')&&count($tab::$noAlias)>0? ARR::to_json($tab::$noAlias):'[]').';'.$CR;
         }
         
         $add = '
-        _u:function(f,d,n,a){
+        _u(f,d,n,a){
             return d[tb._f(f,n,a)];
         },
-        _f:function(f,n,a){
+        _f(f,n,a){
             return (tb[n].noAlias.indexOf(f)>-1?"":(a+"_"))+f;
         },
-        _c:function(d,n,a){
+        _c(d,n,a){
             var o = [],
                 t = Array.isArray(d),
                 v,j,
@@ -108,7 +103,7 @@ class BASE_MOD extends WS_MODULE{
             }
             return o;
         },
-        _a:function(f,d,n,a){
+        _a(f,d,n,a){
             var o = [],
                 t = Array.isArray(d),
                 v,i,j,

@@ -137,7 +137,7 @@ class WS_FRAME extends WS_COMMON{
     }
     
     public function ADD($child){
-        array_push($this->childs,$child);
+        $this->childs[]=$child;
         return $child;
     }
     
