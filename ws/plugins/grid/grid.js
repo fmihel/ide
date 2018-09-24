@@ -1447,9 +1447,10 @@ Tgrid.prototype.last=function(){
 /** возвращает следующую видимую строку */
 Tgrid.prototype.next=function(tr){
     var t=this,p=t.param,out,trs = t.trs();
-    if (tr === undefined)
+
+    if ((tr === undefined)||(tr.length===0))
         return trs.length?trs[0]:undefined;
-        
+    
     out = tr.next()
     while( (out.length>0)&&((!t.not_group(tr))||(!JX.visible(out))) )
         out=out.next();
@@ -1461,8 +1462,8 @@ Tgrid.prototype.next=function(tr){
 /** возвращает предыдущую видимую строку */
 Tgrid.prototype.prev=function(tr){
     var t=this,p=t.param,trs = t.trs();
-
-    if (tr === undefined)
+    
+    if ((tr === undefined)||(tr.length===0))
         return trs.length?trs[0]:undefined;
     
     out = tr.prev();

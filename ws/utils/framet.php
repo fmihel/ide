@@ -877,9 +877,7 @@ class FRAMET{
 if($Application->is_main(__FILE__)){
   
 echo '<xmp>';
-$c = '<aa\text^g\center
-            
->
+$c = '<>
 
 ';
 
