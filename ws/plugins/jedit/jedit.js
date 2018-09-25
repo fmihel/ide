@@ -34,6 +34,10 @@ text:function(){
     var o = m.obj(this);
     return o.attr('text');
 },
+clear:function(){
+    var o = m.obj(this);
+    return o.clear();
+},
 value:function(mean,lockChange){
     var o = m.obj(this);
     
@@ -852,7 +856,10 @@ Tjedit.prototype.getData = function(data){
     
     
 };
-
+Tjedit.prototype.clear = function(){
+    var t=this;
+    t.put({value:""});
+};
 Tjedit.prototype.put = function(o){
     var t=this,p=t.param,l=p.lock;
     

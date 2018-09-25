@@ -204,9 +204,9 @@ scroll:function(param){
     o.scroll(param);
     return this;
 },
-inViewPort:function(tr){
+inViewPort:function(tr,strong=false){
     var o = m.obj(this);
-    return o.inViewPort(tr);
+    return o.inViewPort(tr,strong);
 },
 
 /** блокирует пересчет габаритов таблицы пока не будет вызван end 
@@ -2053,11 +2053,11 @@ Tgrid.prototype.scrollVisible=function(){
     return (JX.pos(jq.frameCells).h<JX.pos(jq.cells).h);
 };
 /** признак того, что строка находится в области видимости */
-Tgrid.prototype.inViewPort=function(tr){
+Tgrid.prototype.inViewPort=function(tr,strong=false){
     var t=this,p=t.param,
     a=JX.abs(p.plugin),b= JX.abs(tr);
-    return JX.iscrossr(a,b);
-
+    
+    return strong?JX.insider(a,b):JX.iscrossr(a,b);
 };
 
 /**
