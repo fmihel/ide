@@ -450,7 +450,7 @@ Tjconsole.prototype._debug=function(val,to,level,add,done){
             var vcn = (val.constructor)&&(val.constructor.name)&&(val.constructor.name!=='Object')?val.constructor.name:'';
 
             value = p.fastInfo.enable?vcn+t._fast_info(val):vcn+'{...}';
-            to.append(ut.tag({css:css.object,value:add+ut.tag({tag:'spane',css:css.objectName,value:value})}));
+            to.append(ut.tag({css:css.object,value:add+ut.tag({tag:'span',css:css.objectName,value:value})}));
 
             div = to.children().last().find('.'+css.objectName);
             $.data(div[0],'data',val);
@@ -519,8 +519,12 @@ Tjconsole.prototype.scroll=function(to){
     }
     
     if (typeof to === 'object'){
+        
+        let top = JX.pos(to);
+        
         p.plugin.scrollTop(0);
-        p.plugin.scrollTop(JX.pos(to).y);
+        p.plugin.scrollTop(top.y+top.h+100);
+        
     }
 };    
     

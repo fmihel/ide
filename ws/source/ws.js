@@ -3,6 +3,8 @@
 
 var Ws = {};
 
+Ws._noAsync = [];
+
 Ws.ajax=function(o){
     var 
     p=$.extend(false,{
@@ -12,24 +14,49 @@ Ws.ajax=function(o){
         timeout:10000,
         done:   Ws.done,
         error:  Ws.error,
+        method: "POST",
         before: Ws.before_ajax,
-        repeat: 2,
+        noAsync:false, /** запрещает выполнять запрос если не обработан запрос с таким же id */
+        repeat: 3,
     },o),
-    
     repeat = p.repeat, 
+    dat = {AJAX:1,ID:p.id,VALUE:p.value,SHARE:this.share};
+
+    var noAsync=function(id,bool){
+        if (bool ===undefined)
+            return (Ws._noAsync.indexOf(id)>=0);
+        
+        if (bool)
+            Ws._noAsync.push(id);
+        else{
+            let idx = Ws._noAsync.indexOf(id);            
+            if (idx>=0)
+                Ws._noAsync.splice(idx,1);
+        }    
+    };
     
-    dat = {AJAX:1,ID:p.id,VALUE:p.value,SHARE:this.share},
+    if (p.noAsync){
+        if (noAsync(p.id)){
+            p.error?p.error('noAsync','id='+p.id+' in process'):0;
+            return;
+        }else
+            noAsync(p.id,true);
+    }    
     
-    _recv=function(){
+    var _recv=function(){
         var request = $.ajax({
             url:p.url,
-            method: "POST",
+            method: p.method,
             timeout:p.timeout,
-            data:dat
+            data:dat,
+            recvId:p.id
         });    
+        
         if (!("context" in p)) p.context = request;
         
         request.done(function(_data){
+            noAsync(this.recvId,false);
+            
             var data = Ws.ajax_response(_data); 
                 
             if(data!==null){
@@ -45,9 +72,10 @@ Ws.ajax=function(o){
         
         request.fail(function(jqXHR, textStatus){
             repeat--;
-            if (repeat<0)
+            if (repeat<0){
+                noAsync(this.recvId,false);
                 p.error(jqXHR,textStatus,p.context);
-            else{
+            }else{
                console.log('repeat['+repeat+']'+p.id);
                _recv();
             } 
