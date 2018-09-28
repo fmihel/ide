@@ -133,7 +133,11 @@ extFileName:function(f){
     return f.replace(/^.*[\\\/]/, '');
 },
 extPath:function(f){
-    return f.substring(0, f.lastIndexOf('/'))+"/";
+    f = f.trim();
+    if (f.substring(f.length-1,1)=='/')
+        return f;
+    else    
+        return f.substring(0, f.lastIndexOf('/'))+"/";
 },
 ext:function(f){
     /*extension*/

@@ -11,7 +11,7 @@ class find extends WSI_BOTTOM_PANEL{
         RESOURCE('modules/bottom_panel/find/find.dcss');
     }   
     public function CONTENT(){
-        $this->panel_width= 500;
+        $this->panel_width= 550;
         parent::CONTENT();
         FRAME('bottom')->READY('Find.init()');
         
@@ -28,21 +28,23 @@ class find extends WSI_BOTTOM_PANEL{
     }
     private function _find($str,$template){
   
-        $lines  = array();
+        $res    = array();
 
-        if (preg_match_all('/\n/',$str,$_lines,PREG_OFFSET_CAPTURE)){
-            for($i=0;$i<count($_lines[0]);$i++)
-                array_push($lines,$_lines[0][$i][1]);
-        }
-  
-        $res = array();
         $template=$this->_slash($template);
         
         if (preg_match_all($template,$str,$find,PREG_OFFSET_CAPTURE)){
+            
+            $lines  = array();
+            if (preg_match_all('/\n/',$str,$_lines,PREG_OFFSET_CAPTURE)){
+                for($i=0;$i<count($_lines[0]);$i++)
+                    $lines[]=$_lines[0][$i][1];
+            }
+
             $find = $find[0];
             $cnt = min(count($find),MAX_FIND_COUNT);
             
             for($i=0;$i<$cnt;$i++){
+                
                 $text = $find[$i][0];
                 $_off = $find[$i][1];
                 
@@ -54,8 +56,7 @@ class find extends WSI_BOTTOM_PANEL{
                 $line_next = $lines[$line];
                 
                 $pos = $_off-$line_pos;
-                
-                
+
                 $left  = htmlspecialchars(substr($str,$line_pos,$pos));
                 $right = htmlspecialchars(substr($str,$line_pos+$pos+strlen($text),$line_next-$line_pos-strlen($text)-$pos));
                 $text = htmlspecialchars($text);
@@ -80,7 +81,7 @@ class find extends WSI_BOTTOM_PANEL{
         
         $template = $this->_slash($key);
         
-        _LOG($template,__FILE__,__LINE__);
+        //_LOG($template,__FILE__,__LINE__);
         
         
         for($i=0;$i<count($files);$i++){
@@ -115,14 +116,26 @@ class find extends WSI_BOTTOM_PANEL{
             
             $ext    = $REQUEST->VALUE['ext'];
             $key    = $REQUEST->VALUE['key'];
-                     
+            $add    = trim($REQUEST->VALUE['path']);
+            
+            $add = (($add == '/')||($add==''))?'':APP::slash($add,true,true);
+            
+            
             $from   = $Application->PATH;
             $to     = $Application->ROOT.$USERS->get('workplace');
             $path   = APP::rel_path($from,$to);
+
+            $dir = DIR::lstruct($path.$add,$ext);
             
-             
-        
-            $response = array('res'=>1,'files'=>$this->_prefind(DIR::lstruct($path,$ext),$key));
+            if ($add!=='') for($i=0;$i<count($dir);$i++)
+                $dir[$i]['path']=$add.$dir[$i]['path'];
+            
+            $files = $this->_prefind($dir,$key);    
+            //_LOGF($dir,'dir',__FILE__,__LINE__,'arr:3');
+            
+
+            //$response = array('res'=>1,'files'=>$this->_prefind(DIR::lstruct($path,$ext),$key));
+            $response = array('res'=>1,'files'=>$files);
             return true;
         };
         
@@ -130,7 +143,9 @@ class find extends WSI_BOTTOM_PANEL{
             
             $file   = $REQUEST->VALUE['file'];
             $key    = $REQUEST->VALUE['key'];
-
+            //$add    = $REQUEST->VALUE['path'];
+            
+            //$add = $add == '/'?'':APP::slash($add,true,false);
         
             $from   = $Application->PATH;
             $to     = $Application->ROOT.$USERS->get('workplace');

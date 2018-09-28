@@ -12,7 +12,9 @@
 }
 .find_input{
     color:$fr_input;
+    width:100px;
 }
+
 .find_select{
     background-color:$fr_item_select !important;
 }
@@ -53,13 +55,18 @@
     background-color:$item;
 }
 
-.find_btn{
+.find_btn,.find_clear{
     cursor:pointer;
     $_icon_center;
-    background-image:url($icon_find);
     opacity:0.7;
 }
+.find_btn{
+    background-image:url($icon_find);
+}
+.find_clear{
+    background-image:url($icon_ereaser);
+}
 
-.find_btn:hover{
+.find_btn:hover,.find_clear:hover{
     opacity:1;
 }

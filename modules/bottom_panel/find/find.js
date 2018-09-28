@@ -16,6 +16,7 @@ init:function(o){
             file:'find_file',
             list:'find_list',
             btn:'find_btn',
+            clear:'find_clear',
             str:'find_str',
             input:'find_input',
             match:'find_match',
@@ -31,16 +32,20 @@ init:function(o){
     ext_id = "find_ext",
     process_frame_id = "find_frame_process",
     process_id = "find_process",
-    btn_id="find_btn";
+    path_id = "path_find",
+    btn_id="find_btn",
+    clear_id="clear_btn";
     
-    c = ut.tag({id:input_id,tag:'input',css:'edit '+p.css.input,attr:{type:'text','placeholder':'regexp'},style:'position:absolute'});
-    c+= ut.tag({id:ext_id,tag:'input',css:'edit',attr:{type:'text','placeholder':'ext','list':'ext_default'},value:'php,js',style:'position:absolute',pos:{w:70}});
+    c = ut.tag({id:input_id,tag:'input',css:'edit '+p.css.input,attr:{type:'text',placeholder:'regexp',autocomplete:"off" },style:'position:absolute'});
+    c+= ut.tag({id:ext_id,tag:'input',css:'edit',attr:{type:'text',placeholder:'ext',list:'ext_default'},value:'php,js',style:'position:absolute',pos:{w:70}});
     c+= ut.tag('<',{tag:'datalist',id:'ext_default'});
     c+= ut.tag({tag:'option',value:'php'});
     c+= ut.tag({tag:'option',value:'js'});
     c+= ut.tag({tag:'option',value:'css,dcss'});
     c+= ut.tag('>',{tag:'datalist'});
-    c+= ut.tag({id:btn_id,css:p.css.btn,style:'position:absolute',pos:{w:34}});
+    c+= ut.tag({id:path_id,tag:'input',css:'edit '+p.css.input,attr:{type:'text',placeholder:'root',autocomplete:"off" },style:'position:absolute'});
+    c+= ut.tag({id:btn_id,css:p.css.btn,style:'position:absolute',pos:{w:28}});
+    c+= ut.tag({id:clear_id,css:p.css.clear,style:'position:absolute',pos:{w:28}});
     
     c+= ut.tag('<',{id:process_frame_id,style:'border:1px solid rgbs(0,0,0,0);position:absolute;',pos:{w:50,h:13}});
         c+= ut.tag({id:process_id,style:'border:0px;position:absolute',css:p.css.process,pos:{h:13,w:0}});
@@ -50,10 +55,13 @@ init:function(o){
     
     p.input     = p.own.find('#'+input_id);
     p.btn       = p.own.find('#'+btn_id);
+    p.clear     = p.own.find('#'+clear_id);
     p.btn.height(p.input.height()+2);
+    p.clear.height(p.input.height()+2);
     
     p.exts      = p.own.find('#'+ext_id);
     p.process   = p.own.find('#'+process_id);
+    p.path      = p.own.find('#'+path_id);
     
     p.item.panel.addClass(p.css.panel);
 
@@ -62,6 +70,13 @@ init:function(o){
 
     Ws.align(function(){t.align();});
     t._event();
+},
+path:function(path){
+    var t=Find,p=t.param;
+    if (path === undefined)
+        return p.path.val();
+    else    
+        return p.path.val(path);
 },
 align:function(){
     var t=Find,p=t.param;
@@ -168,6 +183,10 @@ _find:function(files){
     }
     setTimeout(t._findi,2);
 },
+_clear:function(){
+    var t=Find,p=t.param;
+    p.item.panel.html('');
+},
 _go:function(){
     var t=Find,p=t.param;
     p._key = p.input.val();
@@ -178,7 +197,8 @@ _go:function(){
             id:'get_dir_list',
             value:{
                 ext:p.exts.val(),
-                key:p._key
+                key:p._key,
+                path:t.path(),
             },
             error:
             function(e){
@@ -202,6 +222,7 @@ _event:function(){
     var t=Find,p=t.param,css=p.css;
     
     p.btn.on("click",t._go);
+    p.clear.on("click",t._clear);
     
     p.input.keypress(function(e){if(e.which == 13) t._go();}); 
     p.exts.keypress(function(e){if(e.which == 13) t._go();}); 

@@ -1,4 +1,4 @@
-/*global Ws,Qs,$,editors,ut,jmenu*/
+/*global Ws,Qs,$,editors,ut,jmenu,Find*/
 
 
 var explorer={
@@ -274,10 +274,22 @@ Qs.tree.jstree({
 			data.instance.refresh();
 		});
 })
+.on('click.jstree', function (event) {
+	var node = $(event.target).closest('li');
+	var path =node[0].id;
+	if (node.hasClass('jstree-open')||node.hasClass('jstree-closed'))
+		path+='/';
+	else
+		path = ut.extPath(path);
+	
+	if (Find) Find.path(path);
+	//if (editors)
+	//	editors.add({node:node});
+})
 .on('dblclick.jstree', function (event) {
 	var node = $(event.target).closest('li');
 	/*console.info(node);*/
-	if (editors)
+	if ((!node.hasClass('jstree-open'))&&(!node.hasClass('jstree-closed'))&&(editors))
 		editors.add({node:node});
 })
 .on('changed.jstree', function (e, data) {
