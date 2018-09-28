@@ -22,7 +22,8 @@ Ws.ajax=function(o){
     repeat = p.repeat, 
     dat = {AJAX:1,ID:p.id,VALUE:p.value,SHARE:this.share};
 
-    var noAsync=function(id,bool){
+    let noAsync=(id,bool)=>{
+        
         if (bool ===undefined)
             return (Ws._noAsync.indexOf(id)>=0);
         
@@ -32,7 +33,7 @@ Ws.ajax=function(o){
             let idx = Ws._noAsync.indexOf(id);            
             if (idx>=0)
                 Ws._noAsync.splice(idx,1);
-        }    
+        }     
     };
     
     if (p.noAsync){

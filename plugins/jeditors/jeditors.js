@@ -17,6 +17,7 @@ function jeditors(o){
         check_code_page_on_open:true,
         onrestory:undefined,
         lock:false,
+        _asyncAbort:false,
         css:{
             panel_left:'ed_panel_left',
             panel_right:'ed_panel_right',
@@ -31,18 +32,20 @@ function jeditors(o){
     },o);
     var p=t.param;
     
+    p.noAsyncSave = [];
+    
     p.tabs = new jtab({
         own:p.own,
-        onActivate:function(event,item,sender){
+        onActivate(event,item,sender){
             if ((p.updating)&&(p.onopen)) p.onopen({event:"open",sender:t,item:item});
             t.align({delayed:true});
             t.story_opened();
             t._update_code_page();
         },
-        onSortable:function(){
+        onSortable(){
             t.story_opened();
         },
-        onClickDel:function(o){
+        onClickDel(o){
             if (o.item.changed){
             JDIALOG({
                     caption:'File is changed..',
@@ -51,7 +54,7 @@ function jeditors(o){
                     strip:true,
                     close_btn_enable:false,
                     css:{header:"jd_header_strip"},
-                    onClick:function(a){
+                    onClick(a){
                         if (a.id == 0) 
                             o.sender.del(o.item);
                     }
@@ -60,7 +63,7 @@ function jeditors(o){
                 o.sender.del(o.item);
             }
         },
-        onAfterDel:function (o) {
+        onAfterDel(o) {
             t.story_opened();
             t._update_code_page();
         }
@@ -108,16 +111,17 @@ jeditors.prototype.add=function(o){
         Ws.ajax({
                 id:'get_file',
                 value:{filename:a.filename},
-                error:function(){
+                error(){
                      if (a.done) a.done({sender:t,item:null,type:'error',res:0});
                 },
-                done:function(data){
+                done(data){
+                    var item;
                     
                     if (data.res==1){
 
                         /*create tab*/
                         var eid = 'editor-'+p.tabs.param._id;
-                        var item = p.tabs.add({name:ut.extFileName(a.filename)});
+                        item = p.tabs.add({name:ut.extFileName(a.filename)});
         
                         item.content[0].id = eid;
                         item.node=a.node;
@@ -170,9 +174,9 @@ jeditors.prototype.add=function(o){
                                 css:{header:"jd_header_strip"},
                                 buttons:['Преобразовать','Отменить'],
                                 /*buttons:['Закрыть'],*/
-                                onClick:function(o){
+                                onClick(o){
                                     if (o.id==0){
-                                        t.save_item({item:item,forced:true,toUTF8:1,done:function(){
+                                        t.save_item({item:item,forced:true,toUTF8:1,done(){
                                             item.code_page='UTF-8';
                                             t._update_code_page();
                                             
@@ -185,10 +189,9 @@ jeditors.prototype.add=function(o){
                             
                             t.story_opened();
                             
-                        }else{
+                        }else
                             item.content.text(data.type+':'+a.filename);                    
-                        } 
-                        
+
                         item.type = data.type;
                         if ((p.updating)&&(p.onopen)) p.onopen({event:"open",sender:t,item:item});   
                         
@@ -209,13 +212,13 @@ jeditors.prototype.add=function(o){
         if (a.done) a.done({sender:t,item:item,was_open:true,res:1});
     }
 };
-
 jeditors.prototype.save_item=function(o){
     var t=this,
         p = t.param,
         tabs = p.tabs,
         item=o.item,
         done=o.done,
+        error = o.error,
         forced=(o.forced!==undefined?o.forced:false),
         toUTF8=(o.toUTF8!==undefined?o.toUTF8:0);
     
@@ -224,14 +227,25 @@ jeditors.prototype.save_item=function(o){
         Ws.ajax({
             id:'set_file',
             timeout:2000,
+            noAsync:true,
             value:{filename:item.filename,type:item.type,content:item.editor.getValue(),code_page:item.code_page,toUTF8:toUTF8},
-            done:function(data){
+            error(e){
+                /** если был отказ сохранить, откажем в изменении статуса changed*/
+                if (e=='noAsync') 
+                    p._asyncAbort = true;
+                if (error) error();    
+            },
+            done(data){
                 
                 if (data.res==1){ 
-                    popup({msg:"save: "+ut.extFileName(item.filename)});
-                    tabs.changed(item,false);
+                    
+                    if (!p._asyncAbort){
+                        tabs.changed(item,false);
+                        popup({msg:"save: "+ut.extFileName(item.filename)});
+                    }    
+                    p._asyncAbort = false;
                     item.md5 = data.md5;
-                    //console.info(item.filename);
+                    
                     if (typeof(code_complit)!=='undefined') code_complit.code_update({filename:item.filename,rel_path:1});
                 }else
                     popup({type:'alert',msg:"err save: "+ut.extFileName(item.filename)});
@@ -245,7 +259,7 @@ jeditors.prototype.save_item=function(o){
 
 jeditors.prototype.save_current=function(){
     var t=this,item =t.current();
-    t.save_item({item:item,done:function(){
+    t.save_item({item:item,done(){
         t._update_tab_name();
     }});
 };
@@ -373,17 +387,24 @@ jeditors.prototype.reOpen=function(o){
     
     
 };
-
+/** алгоритм  сохраняет все файлы 
+ * будет сохранять пока есть несохраненные
+*/
 jeditors.prototype.save_all=function(done){
-    var t=this,item;
+    var t=this,item,p = t.param;
+    
     item = t.get_first_changed();
     if (item!==null){
-        t.save_item({item:item,done:function(e){ 
-            t.save_all(done);
-        }});
+        t.save_item({
+            item:item,
+            done(e){ 
+                t.save_all(done);
+            }
+        });
     }else{
+        
         t._update_tab_name();
-        if (done) done();
+        if (done) done(true);
     }    
     
 };
@@ -402,7 +423,7 @@ jeditors.prototype.close_all=function(done){
             shadow_opacity:0.5,
             css:{header:"jd_header_strip"},
             buttons:['Save all','Not close'],
-                onClick:function(o){
+                onClick(o){
                     if (o.id==0){
                         t.save_all(function(){
                             p.tabs.clear();    
@@ -639,7 +660,8 @@ jeditors.prototype._short_template_key_event=function(editor){
             if (typeof(code_complit)!=='undefined') {    
                 code_complit.data['template']=data;
                 code_complit.update({key:[key],ext:['template'],filled:true});
-                code_complit.onEnter=function(o){
+                code_complit.onEnter=
+                function(o){
                     o.current.data.item.jq.trigger("click");
                 };
             }    
@@ -665,7 +687,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "CtrlF2", 
         bindKey: {win: "Ctrl-f2",  mac: "Command-f2"}, 
-        exec: function(editor){
+        exec(editor){
             menu_action.save();
         },                 
         readOnly: true
@@ -674,7 +696,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "CtrlS", 
         bindKey: {win: "Ctrl-s",  mac: "Command-s"}, 
-        exec: function(editor){
+        exec(editor){
             menu_action.save();
         },                 
         readOnly: true
@@ -684,7 +706,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "F9", 
         bindKey: {win: "f9",  mac: "f9"}, 
-        exec: function(editor){
+        exec(editor){
             menu_action.run_opened();
 
         },                 
@@ -694,7 +716,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "CtrlF9", 
         bindKey: {win: "Ctrl-f9",  mac: "Command-f9"}, 
-        exec: function(editor){ 
+        exec(editor){ 
             menu_action.run();
 
         },                 
@@ -704,7 +726,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "CtrlJ", 
         bindKey: {win: "Ctrl-j",  mac: "Command-j"}, 
-        exec: function(editor){
+        exec(editor){
             if (typeof(code_complit)!=='undefined')code_complit.show(false);
             t._short_template_key_event(editor);            
         },                 
@@ -714,7 +736,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "Enter", 
         bindKey: {win: "Enter",  mac: "Enter"}, 
-        exec: function(editor){ 
+        exec(editor){ 
             if ((typeof(code_complit)!=='undefined')&&(code_complit.show())){
                 t.lock = true;
                 code_complit.dokey({key:"Enter",editor:editor});
@@ -732,7 +754,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "ESC", 
         bindKey: {win: "ESC",  mac: "ESC"}, 
-        exec: function(editor){ 
+        exec(editor){ 
             if (typeof(code_complit)!=='undefined') code_complit.show(false);
 
         },                 
@@ -741,7 +763,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "Down", 
         bindKey: {win: "Down",  mac: "Down"}, 
-        exec: function(editor){ 
+        exec(editor){ 
             if ((typeof(code_complit)!=='undefined')&&(code_complit.show()))
                 return code_complit.dokey({key:"Down",editor:editor});
             else
@@ -752,7 +774,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "Up", 
         bindKey: {win: "Up",  mac: "Up"}, 
-        exec: function(editor){ 
+        exec(editor){ 
             if ((typeof(code_complit)!=='undefined')&&(code_complit.show()))
                 return code_complit.dokey({key:"Up",editor:editor});
             else
@@ -764,7 +786,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "Right", 
         bindKey: {win: "Right",  mac: "Right"}, 
-        exec: function(editor){ 
+        exec(editor){ 
             if ((typeof(code_complit)!=='undefined')&&(code_complit.show()))
                 return code_complit.dokey({key:"Right",editor:editor});
             else
@@ -775,7 +797,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "Left", 
         bindKey: {win: "Left",  mac: "Left"}, 
-        exec: function(editor){ 
+        exec(editor){ 
             if ((typeof(code_complit)!=='undefined')&&(code_complit.show()))
                 return code_complit.dokey({key:"Left",editor:editor});
             else
@@ -787,7 +809,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "CtrlSpace", 
         bindKey: {win: "Ctrl-space",  mac: "Command-space"}, 
-        exec: function(editor){ 
+        exec(editor){ 
             var ed =t.current();
             if (!nil(ed)){
                 t._do_code_complit();
@@ -806,7 +828,7 @@ jeditors.prototype._key_event=function(e){
     e.commands.addCommand({               
         name: "ShiftInsert", 
         bindKey: {win: "Shift-insert",  mac: "Shift-insert"}, 
-        exec: function(editor){
+        exec(editor){
             p.prevKeyPress = 'ShiftInsert';
             if (typeof(code_complit)!=='undefined') code_complit.show(false);
             return false;
@@ -897,7 +919,8 @@ jeditors.prototype._do_code_complit=function(){
         
     
     if (typeof(code_complit)!=='undefined') code_complit.update({key:key,ext:ext});
-    if (typeof(code_complit)!=='undefined') code_complit.onEnter=function(o){
+    if (typeof(code_complit)!=='undefined') code_complit.onEnter=
+        function(o){
         if (typeof(jfunc_hint)!=='undefined')
             jfunc_hint({msg:o.current.data.n});
             
@@ -938,7 +961,7 @@ jeditors.prototype._story_opened=function(){
     }
     Ws.ajax({id:'story_opened',
         value:{opened:out},
-        done:function(data){
+        done(data){
             if (data.res!=1)
                 popup({type:"error",msg:data.msg});
         }
@@ -971,7 +994,7 @@ jeditors.prototype._restory_opened=function(){
     var t=this,p=t.param,i;
     t.add({
         filename:p._roi_list[p._roi].name,
-        done:function(){
+        done(){
             p._roi++;
             if(p._roi<p._roi_list.length)
                 t._restory_opened();
