@@ -265,7 +265,7 @@ jtab.prototype.current=function(item){
     }else{
         p.own.tabs("option","active",t.idx(item));
         t.refresh();
-    }
+    } 
 
 };
 
@@ -275,14 +275,25 @@ jtab.prototype.assigned=function(){
 
 jtab.prototype.changed=function(item,bool){
     var t=this,p=t.param,needDo=false;
-    if (bool===undefined) return item.changed;
+    if (bool===undefined) return item.changed?true:false;
 
     bool    = bool?true:false;
     needDo  = (item.changed!==bool);
-
+    
+    // откулючаем готовность снятия признака */
+    
+    t.readyUnChange(item,!bool);
     item.changed = bool;
+    
     if (bool) item.md5 = "-1";
         
     if ((needDo)&&(p.onChanged))
         p.onChanged({sender:t,item:item,changed:bool});
+};
+/** признак готовности файла к снятию признака Changed */
+jtab.prototype.readyUnChange=function(item,bool){
+    var t=this,p=t.param;
+    if (bool===undefined) return item.readyUnChange?true:false;
+
+    item.readyUnChange = bool; 
 };

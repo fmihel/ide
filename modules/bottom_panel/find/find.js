@@ -10,7 +10,7 @@ init:function(o){
         input:null,
         btn:null,
         _loop:false,
-        MAX_FIND_COUNT:500,/*see MAX_FIND_COUNt in find.php*/
+        MAX_FIND_COUNT:1000,/*see MAX_FIND_COUNt in find.php*/
         css:{
             panel:'find_panel',
             file:'find_file',

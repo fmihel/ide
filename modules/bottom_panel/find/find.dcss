@@ -12,7 +12,7 @@
 }
 .find_input{
     color:$fr_input;
-    width:100px;
+    width:200px;
 }
 
 .find_select{

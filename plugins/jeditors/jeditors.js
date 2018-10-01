@@ -17,7 +17,6 @@ function jeditors(o){
         check_code_page_on_open:true,
         onrestory:undefined,
         lock:false,
-        _asyncAbort:false,
         css:{
             panel_left:'ed_panel_left',
             panel_right:'ed_panel_right',
@@ -224,26 +223,32 @@ jeditors.prototype.save_item=function(o){
     
     if(((item)&&(item.changed))||((item)&&(forced))){
         
+        tabs.readyUnChange(item,true);/** разрешаем изменить состояние, после сохранения */
+        
         Ws.ajax({
             id:'set_file',
             timeout:2000,
             noAsync:true,
+            context:{item},
             value:{filename:item.filename,type:item.type,content:item.editor.getValue(),code_page:item.code_page,toUTF8:toUTF8},
-            error(e){
+            error(e,msg,context){
                 /** если был отказ сохранить, откажем в изменении статуса changed*/
-                if (e=='noAsync') 
-                    p._asyncAbort = true;
-                if (error) error();    
-            },
-            done(data){
-                
-                if (data.res==1){ 
+                if (e=='noAsync') {
+                    /* отказ, так как предыдущее сохранение не завершено */
+                }else
+                    popup({type:'alert',msg:"error: "+ut.extFileName(context.item.filename)});                
                     
-                    if (!p._asyncAbort){
+                if (error) error(e);    
+            },
+            done(data,e,context){
+                let item = context.item;
+                if (data.res==1){ 
+                    /** если состояние не было изменено за время сохранения, то изменим состояние файла*/
+                    if (tabs.readyUnChange(item)){
                         tabs.changed(item,false);
                         popup({msg:"save: "+ut.extFileName(item.filename)});
-                    }    
-                    p._asyncAbort = false;
+                    }
+                    
                     item.md5 = data.md5;
                     
                     if (typeof(code_complit)!=='undefined') code_complit.code_update({filename:item.filename,rel_path:1});
@@ -463,14 +468,17 @@ jeditors.prototype.search=function(o){
     a=$.extend({
         filename:'',
         node:null
-    },o);
+    },o),name;
+    
+    name = a.filename!==''?a.filename.trim():(a.node?a.node[0].id.trim():false);
+    if (!name) return null;
+    
+    name = ut.slash(name,false,false);
+    
     for(i=0;i<c;i++){
         var item = tabs.item(i);
-        if (a.filename!==''){
-            if(item.filename == a.filename) return item;
-        }else if (a.node){
-            if(item.filename == a.node[0].id) return item;
-        }
+        if(ut.slash(item.filename,false,false) === name) 
+            return item;
     }
     
     return null;

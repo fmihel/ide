@@ -129,6 +129,24 @@ fill:function(n,o){
 id:function(name){
     return name+ut.random(10000,99999);    
 },
+slash:function(str,left,right){
+    left  = left||left===undefined?true:false;
+    right = right||right===undefined?true:false;
+    str = str.trim();
+    
+    
+    if ((left)&&(str.charAt(0)!=="/"))
+        str = "/"+str;
+    else if ((!left)&&(str.charAt(0)==="/"))    
+        str = str.slice(1);
+    
+    if ((right)&&(str.charAt(str.length-1)!=='/')){
+            str = str+'/';
+    }else  if ((!right)&&(str.charAt(str.length-1)=='/'))
+        str = str.slice(0,str.length-1);
+    return str;
+    
+},
 extFileName:function(f){
     return f.replace(/^.*[\\\/]/, '');
 },
