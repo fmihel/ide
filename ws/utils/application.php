@@ -403,7 +403,9 @@ class TApplication{
     public $LOG_STORY = array(); 
 
     function __construct(){
-        $this->HTTP_TYPE     = isset($_SERVER['REQUEST_SCHEME'])?$_SERVER['REQUEST_SCHEME']:$_SERVER['HTTP_X_FORWARDED_PROTO'];
+        //$this->HTTP_TYPE     = isset()isset($_SERVER['REQUEST_SCHEME'])?$_SERVER['REQUEST_SCHEME']:$_SERVER['HTTP_X_FORWARDED_PROTO'];
+        $this->HTTP_TYPE     = $_SERVER['HTTPS']==1?'https' :( isset($_SERVER['REQUEST_SCHEME'])?$_SERVER['REQUEST_SCHEME']:$_SERVER['HTTP_X_FORWARDED_PROTO']);
+        //$this->HTTP_TYPE     = 'https';
         $this->PUBLIC_HTML   = substr($_SERVER['DOCUMENT_ROOT'],strrpos($_SERVER['DOCUMENT_ROOT'],'/')+1);            
         
         $this->CLASS_PATH   = APP::slash(dirname(__FILE__),false,true);                       
@@ -784,6 +786,14 @@ class TApplication{
         foreach($_SERVER as $k=>$v){
             $res.='$_SERVER['.$k.']=['.$v.']'.$cr;
         }
+
+        foreach($_ENV as $k=>$v){
+            $res.='$_ENV['.$k.']=['.$v.']'.$cr;
+        }
+
+        foreach($_REQUEST as $k=>$v){
+            $res.='$_REQUEST['.$k.']=['.$v.']'.$cr;
+        }
         
         return $res;
     }
@@ -795,7 +805,10 @@ if (!isset($Application))
     $Application = new TApplication();
 
 if ($Application->is_main(__FILE__)){
-
-  echo $Application->debug_info();
+    //echo $_SERVER['REQUEST_SCHEME'].'<hr>';
+    //echo $_SERVER['REQUEST_SCHEME'].'<hr>';
+    //echo $_SERVER['HTTP_X_FORWARDED_PROTO'].'<hr>';
+    
+    //echo $Application->debug_info();
  } 
 ?>

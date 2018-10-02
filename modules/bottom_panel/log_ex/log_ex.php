@@ -13,6 +13,7 @@ class log_ex extends WSI_BOTTOM_PANEL{
         RESOURCE('modules/bottom_panel/log_ex/log_panel.dcss');
         RESOURCE('plugins','common/timer.js');
         RESOURCE('plugins','mselect/mselect.js');
+        
     }
     public function CONTENT(){
         $this->panel_width= 205;

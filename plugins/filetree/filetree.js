@@ -65,7 +65,7 @@ Qs.expContextmenu = new jmenu({
 
 		 ],
 		
-	onClick:function(o){
+	onClick(o){
         var tree = explorer.tree();
         var node = explorer.current();
 		var type = explorer.type(node);
@@ -114,7 +114,7 @@ Qs.expContextmenu = new jmenu({
             shadow_opacity:0.5,
             css:{header:"jd_header_strip"},
             buttons:['Delete','Cancel'],
-                onClick:function(o){
+                onClick(o){
                     if (o.id==0){
                          	if (node){
 								explorer.delete_inside=true;
@@ -289,8 +289,18 @@ Qs.tree.jstree({
 .on('dblclick.jstree', function (event) {
 	var node = $(event.target).closest('li');
 	/*console.info(node);*/
-	if ((!node.hasClass('jstree-open'))&&(!node.hasClass('jstree-closed'))&&(editors))
+	let open = node.hasClass('jstree-open');
+	let close = node.hasClass('jstree-closed');
+	let is_dir = (open||close);
+	if ((!is_dir)&&(editors))
 		editors.add({node:node});
+	if (is_dir){
+	    if (close)
+	        explorer.tree().open_node(node);
+	    else
+	        explorer.tree().close_node(node);
+	}
+		
 })
 .on('changed.jstree', function (e, data) {
 /*

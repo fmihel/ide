@@ -63,7 +63,7 @@ destroy:function(){
  * @return boolean
 */
 assigned:function(){
-    return (m.obj(this)!==undefined)
+    return (m.obj(this)!==undefined);
 },
 /**
  * Story the handler object Tmselect in jquery 
