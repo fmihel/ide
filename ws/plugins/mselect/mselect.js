@@ -232,7 +232,12 @@ Tmselect.prototype.init = function(o){
          * @type {string}
         */
         id:ut.id('mselect'),
+        id_input:ut.id('mselinp'),
         maxid:0,
+        /** включает режим редактирования */
+        editable:false,
+        /** событие onSelect генерируется если нажат enter или произощла смена фокуса */
+        changeOnKeyEnter:true,
         size:100,
         lock:new jlock(),
         handler:new jhandler(),
@@ -242,12 +247,17 @@ Tmselect.prototype.init = function(o){
         /** array of css classes uses in Tmselect */
         css:{
             select:'mselect',
+            input:'minpiut',
+            
         }
         
     },o);
 
     var c='',p=t.param;
+    //---------------------------
     c=ut.tag({id:p.id,tag:'select',css:p.css.select,style:"width:100%;height:100%"});    
+    c+=ut.tag({id:p.id_input,tag:'input',attr:{type:'text'},css:p.css.input,
+        style:"outline:none;display:none;position:absolute;left:0px;top:0px;border:1px solid rgba(0,0,0,0);text-indent:3px"});    
     //---------------------------
     
     $.each(p.plugin.children(),function(i,dd){
@@ -264,14 +274,54 @@ Tmselect.prototype.init = function(o){
     p.plugin.html(c);
     //---------------------------
     p.select = p.plugin.find('#'+p.id);
-    p.select.on('change',function(){
+    p.input  = p.plugin.find('#'+p.id_input);
+    //---------------------------
+    t._event();
+    t.put(t.param);
+    
+};
+Tmselect.prototype._event=function(){
+     var t=this,p=t.param;
+    //-------------------------
+    p.select.on('change',()=>{
+        p.input.val(p.select.val());
         if (p.onSelect)
-            p.onSelect({sender:t,item:t.selected()});
+            p.onSelect({sender:t,item:t.selected(),value:p.select.val()});
+    });
+    //-------------------------
+    let sel=()=>{
+        let item,value = p.input.val();
+        t.each((a)=>{
+            if (a.value===value){
+                item = a.item;
+                return false;
+            }
+        });
+            
+        if (item)
+            t.selected(item);
+                
+        if (p.onSelect)
+            p.onSelect({sender:t,item,value});
+    };
+
+
+    p.input.on('keydown',(e)=>{
+        if((e.which == 13)&&(p.changeOnKeyEnter))
+            sel();
+        
+    });    
+    p.input.on('focusout',()=>{
+        if(p.changeOnKeyEnter)
+            sel();
+    });
+    p.input.on('input',()=>{
+        if (!p.changeOnKeyEnter)
+            sel();
     });
     
-    t.put(t.param);
-};
-  
+    //---------------------------    
+};    
 
 /** Destructor of Tmselect. Call on plugin is deleted.*/
 Tmselect.prototype.done=function(){
@@ -348,11 +398,23 @@ Tmselect.prototype.setData=function(data){
             $.data(have[0],'data',item.data);
     }
     
+    p.input.val(p.select.val());
+    
 };
+Tmselect.prototype.each=function(f){
+    var t=this,p=t.param;
+    $.each(p.select.children(),(i,o)=>{
+        let item = $(o);
+        if (f) 
+            if (f({i,id:o.id,item,value:item.val(),data:$.data(o,'data')}) === false) return false;
+            
+    });
+};
+
 Tmselect.prototype.getData=function(){
     var t=this,p=t.param,css=p.css,out=[];
     $.each(p.select.children(),function(i,o){
-        out.push({id:o.id,value:$(o).text(),data:$.data(o,'data')});
+        out.push({id:o.id,value:$(o).val(),data:$.data(o,'data')});
     });
     
     return out;
@@ -386,7 +448,7 @@ Tmselect.prototype.toData=function(o){
     var t=this,
     opt = t._paramToOpt(o);
     if (opt)
-        return {id:opt[0].id,value:opt.text(),data:$.data(opt[0],'data')};
+        return {id:opt[0].id,value:opt.val(),data:$.data(opt[0],'data')};
 
     return null;
 };
@@ -527,6 +589,22 @@ Tmselect.prototype.attr = function(n/*v*/){
     
 
     /*-----------------------------------*/
+    if (n==='editable'){
+        if (r) 
+            return p.editable;
+        else{    
+            p.editable=v?true:false;
+            JX.visible(p.input,p.editable);
+        }    
+    }
+    /*-----------------------------------*/
+    if (n==='changeOnKeyEnter'){
+        if (r) 
+            return p.changeOnKeyEnter;
+        else
+            p.changeOnKeyEnter=v?true:false;
+    }
+    /*-----------------------------------*/
     /** example
     
     if (n==='visible'){
@@ -553,6 +631,8 @@ Tmselect.prototype.align=function(){
 /** Method calling from Tmselect.align(). Custom call not needed*/ 
 Tmselect.prototype._align=function(){
     var t=this,p=t.param;
+    let pos = JX.pos(p.select);
+    JX.pos(p.input,{y:1,x:1,w:pos.w-22,h:pos.h-4});
 };
 
 

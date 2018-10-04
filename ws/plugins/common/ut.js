@@ -730,15 +730,15 @@ fixFloat:function(f/*precession,def*/){
 * 
 */
 scroll:function(o){
-    var a=$.extend(true,{
+    let a=$.extend(true,{
         scroll:null,
         target:null,
         animate:0,
     },o);
     
-    var anim = 100;
-    var delta = JX.abs(a.target).y;
-    var own  = JX.abs(a.scroll).y;
+    let anim  = 100;
+    let delta = JX.abs(a.target).y;
+    let own   = JX.abs(a.scroll).y;
     delta = delta-own+a.scroll.scrollTop();
     
     if (a.animate == 0)

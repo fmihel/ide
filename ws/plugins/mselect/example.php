@@ -288,12 +288,16 @@ class TWS extends WS{
         //->ALIGN('JX.stretch(Qs.plugin,{margin:10});')
         ->ALIGN('JX.pos({$},{x:20,y:20,w:200,h:32})')
         ->INIT('{$}.mselect({
+            
             onSelect:function(o){
+                
                 jconsole("clear");   
                 jconsole({name:"onSelect",obj:o});   
+
             }
             
         })')
+        
         ->VALUE('
 
             <div id=item1 t="10" y="g">Item1</div>
@@ -342,6 +346,16 @@ class TWS extends WS{
         'change data id=2',
         '$(".plugin").mselect({data:[{id:2,value:33333}]});',
         'Qs.plugin.mselect({data:[{id:2,value:33333}]});'
+        );
+        /*---------------------------------------------*/
+        /*c:editable */
+        $this->item('editable',
+        'editable',
+        '$(".plugin").mselect({editable:true});',
+        '
+            let ed = Qs.plugin.mselect("editable");    
+            Qs.plugin.mselect({editable:!ed});
+        '
         );
         
         /*---------------------------------------------*/
