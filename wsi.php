@@ -1,6 +1,5 @@
 <?php
-
-define('WSI_DEV_VERSION','051018_2');
+define('WSI_DEV_VERSION','051018_3');
 /*
 https://ws-framework-fmihel.c9users.io/ide/wsi.php
 */
