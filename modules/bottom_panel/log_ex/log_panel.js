@@ -34,7 +34,11 @@ init:function(o){
             btn_close:'lp_btn_close',
             btn_update:'lp_btn_update',
             auto:'lp_auto',
+
             log_name:'lp_log_name',
+            log_name_input:'lp_input',
+            log_name_select:'lp_select',
+            
             log_msg_info:'lp_msg_info',
             log_msg:'lp_msg',
             log_iframe:'lp_iframe'
@@ -69,7 +73,7 @@ init:function(o){
     p.btn_add = p.bottom.btn_panel.find('#'+id);
     p.btn_add.on("click",function(){
         var item = t.add();
-        item.log_name.focus();
+        item.log_name.mselect('focus');
     });
 
     id = ut.id('bar');
@@ -171,26 +175,37 @@ change:function(event){
 end_change:function(){
   var t=log_panel,p=t.param;
   p.lock_change--;
-  if ((p.lock_change==0)&&((arguments.length==0)||(arguments[0])))
+  if ((p.lock_change==0)&&((arguments.length===0)||(arguments[0])))
         t.change('group');  
   
 },
 
 load:function(o){
+    
     var t=log_panel,i;
     t.begin_change();
     
     t.del(-1);
-    for(i=0;i<o.length;i++){
-        var a=$.extend(true,{
+    
+    let logs = o.logs;
+    let data = o.files;
+    
+    if (logs)
+    for(i=0;i<logs.length;i++){
+        
+        let a=$.extend(true,{
             type:'log',
             file:'',
             enable:0,
             width:200
-        },o[i]);
-        var item=t.add(a);
-        
-        if (item.log_name) item.log_name.val(a.file);
+        },logs[i]);
+
+        let item=t.add(a);
+
+        if (item.log_name){ 
+            item.log_name.mselect({data});
+            item.log_name.mselect('value',a.file);
+        }    
         t.enable(item.btn_on,a.enable);
         
         JX.pos(item.item,{w:a.width});
@@ -200,7 +215,7 @@ load:function(o){
 },
 
 save:function(){
-    var t=log_panel,items=t.items(),i,out=[];
+    var t=log_panel,items=t.items(),i,j,out=[],files=[],v;
     
     for(i=0;i<items.length;i++){
         var d=items[i];
@@ -208,14 +223,22 @@ save:function(){
         out.push({
             id:d.id,
             type:d.type,
-            file:(d.log_name?d.log_name.val():''),
+            file:(d.log_name?d.log_name.mselect('value'):''),
             enable:t.enable(d.btn_on),
             width:JX.pos(d.item).w
                 
-        });    
+        });
+        
+        v = d.log_name.mselect('data');
+        for(j=0;j<v.length;j++){
+            if (files.indexOf(v[j].value)==-1)
+                files.push(v[j].value);
+        }    
         
     }
-    return out;
+    
+
+    return {logs:out,files};
 },
 
 enable:function(btn){
@@ -254,7 +277,7 @@ add:function(o){
     if (a.type=='log'){
         c+=ut.tag('<',{css:css.subst,style:'position:absolute'});
         c+=ut.tag({css:css.btn_on,style:'position:absolute'});
-        c+=ut.tag({tag:'input',attr:{'type':'text','placeholder':'set log name'},css:css.log_name,style:'position:absolute'});                
+        c+=ut.tag({css:css.log_name,style:'position:absolute'});
         c+=ut.tag({css:css.btn_clear,style:'position:absolute'});
         c+=ut.tag({css:css.btn_close,style:'position:absolute'});
         c+=ut.tag('>');
@@ -290,6 +313,13 @@ add:function(o){
     if (a.type=='log'){
         a.btn_clear = a.item.find('.'+css.btn_clear);
         a.log_name  = a.item.find('.'+css.log_name);
+        a.log_name.mselect({
+            editable:true,
+            css:{
+                input:css.log_name_input,
+                select:css.log_name_select,
+            }
+        });
     }else{
         
     }
@@ -341,9 +371,19 @@ _event:function(a){
     });
     
     if(a.log_name)
-        a.log_name.keyup(function(){
+        a.log_name.mselect({onSelect(){
+            
+        let v = a.log_name.mselect("value").trim();
+        let data = a.log_name.mselect("values");
+        if (data.indexOf(v)===-1){
+            data.push(v);
+            a.log_name.mselect("clear");
+            a.log_name.mselect(data);
+            a.log_name.mselect("value",v);
+        }    
+
         t.change('change');
-    });
+    }});
     if (a.btn_on)
         a.btn_on.on("click",function(){
             var b=$(this);
@@ -356,7 +396,7 @@ _clear:function(data){
     var t=log_panel,a = data;/*$.data(item[0],'data');*/
     a.line = -1;
     Ws.ajax({id:"log_clear",value:{
-        filename:a.log_name.val()
+        filename:a.log_name.mselect('value')
     }});
     a.content.text('');
     t.change('clear');
@@ -376,7 +416,7 @@ del:function(o){
         t.change('del');
     }else
     if (o.item){
-        o.item.remove()
+        o.item.remove();
         t.align();
         t.change('del');
     }    
@@ -520,7 +560,7 @@ _updateItem:function(it){
     if ((!p.lock_update)&&(it.type=='log')&&(t.enable(it.btn_on))&&(it._lockUpdate!==true)){
         
         it._lockUpdate = true;
-        fname = it.log_name.val();
+        fname = it.log_name.mselect('value');
         if (fname!==it.prevFile)
             it.full = false;    
         

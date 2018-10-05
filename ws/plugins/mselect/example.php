@@ -365,7 +365,7 @@ class TWS extends WS{
         'var data = $(".plugin").mselect("selected");',
         'var data = Qs.plugin.mselect("selected");
          jconsole({name:"data",obj:data});
-        ');
+        '); 
         /*---------------------------------------------*/
         /*c:toData */
         $this->item('toData',
@@ -386,6 +386,16 @@ class TWS extends WS{
         /*click*/
         'var value = Qs.plugin.mselect("value");
             jconsole({name:"value",obj:value});
+        ');        
+        /*---------------------------------------------*/
+        /*c:setValue */
+        $this->item('setValue',
+        'set value',
+        /*code*/
+        '$(".plugin").mselect("value","Item2");',
+        /*click*/
+        '
+            Qs.plugin.mselect("value","Item2");
         ');        
         /*---------------------------------------------*/
         /*c:getValues */

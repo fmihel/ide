@@ -135,16 +135,12 @@ values:function(){
     });
     return res;
 },
-    /** возвращает текущее выбранное значение*/
-value:function(/*default*/){
-    var o = m.obj(this),def=(arguments.length>0?arguments[0]:undefined),s=o.selected();
-    if (s.length>0){
-        var dat = o.toData(s);
-        return dat.value;
-    }
-        
-    return def;
+/** возвращает текущее выбранное значение, или default*/
+value:function(val){
+    var o = m.obj(this);
+    return o.value(val);    
 },
+
 /** возвращает элемент как элемент входной структуры данных  
  *  @return object {id:int,value:"text",data:object}
 */
@@ -177,6 +173,10 @@ clear:function(/*param*/){
     var o = m.obj(this);
     o.clear();
 },
+focus:function(){
+    var o = m.obj(this);
+    o.focus();
+},
 delete:function(param){
     var o = m.obj(this);
     o.delete(param);
@@ -207,7 +207,7 @@ $.fn.mselect = function(n){
  * see {@link module:trial/combobox/mselect~Tmselect.param}
  * @class Tmselect
  * @property {json} param see {@link module:trial/combobox/mselect~Tmselect:param param}
- * 
+ *  
 */
 function Tmselect(o){
     var t = this;
@@ -236,8 +236,10 @@ Tmselect.prototype.init = function(o){
         maxid:0,
         /** включает режим редактирования */
         editable:false,
-        /** событие onSelect генерируется если нажат enter или произощла смена фокуса */
+        /** событие onSelect генерируется если нажат enter  */
         changeOnKeyEnter:true,
+        /** событие onSelect генерируется если  произощла смена фокуса */
+        changeOnFocusOut:false,
         size:100,
         lock:new jlock(),
         handler:new jhandler(),
@@ -247,7 +249,7 @@ Tmselect.prototype.init = function(o){
         /** array of css classes uses in Tmselect */
         css:{
             select:'mselect',
-            input:'minpiut',
+            input:'minput',
             
         }
         
@@ -256,7 +258,7 @@ Tmselect.prototype.init = function(o){
     var c='',p=t.param;
     //---------------------------
     c=ut.tag({id:p.id,tag:'select',css:p.css.select,style:"width:100%;height:100%"});    
-    c+=ut.tag({id:p.id_input,tag:'input',attr:{type:'text'},css:p.css.input,
+    c+=ut.tag({id:p.id_input,tag:'input',attr:{type:'text',autocomplete:'off'},css:p.css.input,
         style:"outline:none;display:none;position:absolute;left:0px;top:0px;border:1px solid rgba(0,0,0,0);text-indent:3px"});    
     //---------------------------
     
@@ -312,7 +314,7 @@ Tmselect.prototype._event=function(){
         
     });    
     p.input.on('focusout',()=>{
-        if(p.changeOnKeyEnter)
+        if(p.changeOnFocusOut)
             sel();
     });
     p.input.on('input',()=>{
@@ -443,7 +445,28 @@ Tmselect.prototype._paramToOpt=function(o){
     }    
     return false;    
 };
-
+Tmselect.prototype.value=function(val){
+    var t=this,p=t.param,sel;
+    if (p.editable){
+        
+        if (val!==undefined)
+            t.selected({value:val});
+        return p.input.val();
+    }else{
+        
+        if (val !== undefined)
+                t.selected({value:val});
+        else{
+            sel = t.selected();
+            if (sel){
+                sel = t.toData(sel);
+                return sel.value;
+            }
+        }
+        
+    }
+    
+};    
 Tmselect.prototype.toData=function(o){
     var t=this,
     opt = t._paramToOpt(o);
@@ -455,7 +478,7 @@ Tmselect.prototype.toData=function(o){
 Tmselect.prototype.step=function(step,need_change){
     var t=this,p=t.param;
     var current = t.selected();
-    console.info('current',current);
+    //console.info('current',current);
     
     var obj = (step==='prev'?current.prev():current.next());
     console.info(step,obj);
@@ -468,19 +491,31 @@ Tmselect.prototype.step=function(step,need_change){
         
 };
 /** возвращает jquery объект выделенного елемента ( или устанавливает) */ 
-Tmselect.prototype.selected=function(o){
-    var t=this,p=t.param,opt;
+Tmselect.prototype.selected = function(o){
+    var t=this,p=t.param,opt,d;
     
     if (o){
         opt = t._paramToOpt(o);
+        
         if (opt){
             p.select.children().not(opt).prop('selected',false);
-            opt.prop('selected',true);    
-        }    
+            opt.prop('selected',true);
+            d = t.toData(opt);
+        };
+        
+        if (('value' in o)||((d) && ('value' in d)))
+            p.input.val(('value' in o)?o.value:d.value);
 
     }else
         return p.select.find("option:selected");
     
+};
+
+Tmselect.prototype.focus=function(){
+    var t=this,p=t.param;
+    
+    p.editable?p.input.focus():p.select.focus();
+
 };
 
 Tmselect.prototype.open=function(bool){
@@ -604,6 +639,14 @@ Tmselect.prototype.attr = function(n/*v*/){
         else
             p.changeOnKeyEnter=v?true:false;
     }
+    /*-----------------------------------*/
+    if (n==='changeOnFocusOut'){
+        if (r) 
+            return p.changeOnFocusOut;
+        else
+            p.changeOnFocusOut=v?true:false;
+    }
+
     /*-----------------------------------*/
     /** example
     

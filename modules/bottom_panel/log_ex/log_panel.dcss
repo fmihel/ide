@@ -60,17 +60,21 @@
 }
 
 .lp_log_name{
-    width:10s0px;
+    width:100px;
     height:18px;
     line-height:18px;
     text-align:left;
     border:0px solid ;
-    border-bottom:1px solid $border;
+    //border-bottom:1px solid $border;
     outline:0px;
     background-color:$fone;
     color:$font;
 }
-
+.lp_input,.lp_select{
+    background-color:$fone;
+    border:1px solid $border;
+    color:$font;
+}
 .lp_auto{
     width:80px;
     height:20px;
