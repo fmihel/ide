@@ -46,6 +46,8 @@ init:function(o){
         }        
     },o);
     var p = t.param;
+    
+    p.log_files = [];
 
     p.id = ut.id('lp');
     p.frame = ut.tag({id:p.id,css:p.css.frame,style:'position:absolute'});
@@ -182,7 +184,7 @@ end_change:function(){
 
 load:function(o){
     
-    var t=log_panel,i;
+    var t=log_panel,i,p=t.param;
     t.begin_change();
     
     t.del(-1);
@@ -210,6 +212,10 @@ load:function(o){
         
         JX.pos(item.item,{w:a.width});
     }
+    
+    if (data)
+        p.log_files = data;
+        
     t.align();
     t.end_change(false);
 },
@@ -314,6 +320,7 @@ add:function(o){
         a.btn_clear = a.item.find('.'+css.btn_clear);
         a.log_name  = a.item.find('.'+css.log_name);
         a.log_name.mselect({
+            data:p.log_files,
             editable:true,
             css:{
                 input:css.log_name_input,
@@ -380,7 +387,12 @@ _event:function(a){
             a.log_name.mselect("clear");
             a.log_name.mselect(data);
             a.log_name.mselect("value",v);
-        }    
+        }
+        
+        if (p.log_files.indexOf(v)===-1)
+            p.log_files.push(v);
+        
+        
 
         t.change('change');
     }});
