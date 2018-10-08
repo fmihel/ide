@@ -257,21 +257,21 @@ class WS extends WS_CONTENT{
         //---------------------------------------------
         $res.='<script type='.'"text/javascript"'.'>'.DCR;
         //---------------------------------------------
-        $res.='Ws.url = "'.$Application->ADDR.'";'.DCR;
-        $res.='Ws.version = "'.$version.'";'.DCR;
-        $res.='Ws.share = '.ARR::to_json($REQUEST->SHARE).';'.DCR;
+        $res.="Ws.url = '".$Application->ADDR."';".DCR;
+        $res.="Ws.version = '".$version."';".DCR;
+        $res.="Ws.share = ".ARR::to_json($REQUEST->SHARE).';'.DCR;
         $res.='Dcss.vars='.ARR::to_json($dcss['vars']).';'.DCR;
+        $res.='var Ar={};'.DCR;
         //---------------------------------------------
         $res.=$this->root->RENDER('script');
         //---------------------------------------------
-        $res.='var Ar={};'.DCR;
-        //---------------------------------------------
-        $res.='var Qs={};'.DCR;
-        $res.='Qs.update=function(){'.DCR;
-            $res.='this.body=$("body");'.DCR;
+        $res.='var Qs={'.DCR;
+        $res.='update:function(){'.DCR;
+            $res.='let t=Qs;'.DCR;
+            $res.='t.body=$("body");'.DCR;
             $res.=$this->root->RENDER('groups');
             $res.=$this->root->RENDER('var');
-        $res.='};'.DCR;
+        $res.='}'.DCR.'};';
         //---------------------------------------------
 
         $res.='Ws._align=function(){'.DCR;

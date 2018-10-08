@@ -68,9 +68,9 @@ class BASE_MOD extends WS_MODULE{
             $tab = $tables[$i];
             
             $c.=$tab::NAME.'(f,d){'.$CR. 
-                'var n = "'.$tab::NAME.'",a= "'.$tab::ALIAS.'";'.$CR.
+                'let n = "'.$tab::NAME.'",a= "'.$tab::ALIAS.'";'.$CR.
                 'return (typeof f==="string")?(typeof d ==="object"?tb._u(f,d,n,a):tb._f(f,n,a)):(Array.isArray(f)?tb._a(f,d,n,a):tb._c(f,d,n));},
-                ';
+        ';
             /*return (typeof f==="string"?tb._f(f,n,a):(Array.isArray(f)?tb._a(f,d,n,a):tb._c(f,n,a)));*/
             $outer.='tb.'.$tab::NAME.'.ALIAS="'.$tab::ALIAS.'";'.$CR;
             $outer.='tb.'.$tab::NAME.'.INDEX="'.$tab::INDEX.'";'.$CR;
@@ -78,21 +78,12 @@ class BASE_MOD extends WS_MODULE{
         }
         
         $add = '
-        _u(f,d,n,a){
-            return d[tb._f(f,n,a)];
-        },
-        _f(f,n,a){
-            return (tb[n].noAlias.indexOf(f)>-1?"":(a+"_"))+f;
-        },
-        _c(d,n,a){
-            var o = [],
-                t = Array.isArray(d),
-                v,j,
-                b=t?d:[d];
-                
+        _u(f,d,n,a){return d[tb._f(f,n,a)];},
+        _f(f,n,a){return (tb[n].noAlias.indexOf(f)>-1?"":(a+"_"))+f;},
+        _c(d,n,a){let o = [],t = Array.isArray(d),v,j,b=t?d:[d];
             for(j=0;j<b.length;j++){
-                var r = {};
-                for(var key in b[j]){
+                let r = {};
+                for(let key in b[j]){
                     v=tb._f(key,n,a);
                     r[v]=b[j][key];
                 }    
@@ -104,13 +95,13 @@ class BASE_MOD extends WS_MODULE{
             return o;
         },
         _a(f,d,n,a){
-            var o = [],
+            let o = [],
                 t = Array.isArray(d),
                 v,i,j,
                 b=t?d:[d];
             
             for(j=0;j<b.length;j++){
-                var r = {};
+                let r = {};
                 for(i=0;i<f.length;i++){
                     v=tb._f(f[i],n,a);
                     if (v in b[j])
@@ -127,7 +118,7 @@ class BASE_MOD extends WS_MODULE{
             return o;
         },
         '.$CR;
-        FRAME()->SCRIPT('var tb={'.$add.$CR.$c.'};'.$outer.$CR);                
+        FRAME()->SCRIPT('var tb={'.$add.$CR.$c.'};'.$CR."$(function(){".$CR.$outer.$CR.'});'.$CR);                
     }
 };
 

@@ -208,7 +208,7 @@ class WS_FRAME extends WS_COMMON{
                 $astr = WS_UTILS::macro($this,$this->align);
                 for($i=0;$i<count($this->childs);$i++)
                     $astr=WS_UTILS::concat($astr,$this->childs[$i]->RENDER('align')).DCR;
-                $astr='Ws.only("'.$this->RENDER('id').'",function(){'.DCR.$astr.'});'.DCR;
+                $astr="$(()=>{Ws.only('".$this->RENDER('id')."',()=>{".$astr." });});".DCR;
                 
                 $res.=$astr;
             }
@@ -235,7 +235,7 @@ class WS_FRAME extends WS_COMMON{
         }else if ($context==='align'){
             if ($this->alignAsFunc){
                 
-                $res = 'Ws.only("'.$this->RENDER('id').'");'.DCR;
+                $res = "Ws.only('".$this->RENDER('id')."');".DCR;
                 
             }else{    
                 $res=WS_UTILS::macro($this,$this->align).DCR;
@@ -255,7 +255,7 @@ class WS_FRAME extends WS_COMMON{
             $delim=array('id'=>($group!==''?'_':''),'obj'=>($group!==''?'.':''));
             
             
-            $res=($this->id!==''?'this.'.$group.$delim['obj'].$this->id.'=$("#'.$group.$delim['id'].$this->id.'");':'').DCR;
+            $res=($this->id!==''?'t.'.$group.$delim['obj'].$this->id.'=$("#'.$group.$delim['id'].$this->id.'");':'');
             for($i=0;$i<count($this->childs);$i++)
                 $res.=$this->childs[$i]->RENDER('var');
 
@@ -271,7 +271,7 @@ class WS_FRAME extends WS_COMMON{
                 $groups = array_unique(explode(';',$groups));
                 foreach($groups as $i=>$g){
                     if (trim($g)!==''){
-                        $res.='this.'.trim($g).'={};'.DCR;                
+                        $res.='t.'.trim($g).'={};';                
                     }                        
                 }
             }else
