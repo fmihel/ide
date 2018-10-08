@@ -44,7 +44,7 @@ jwp.prototype._create_tree=function(data){
 
     tree.jstree({
     core:{
-        animation:0,
+        animation:100,
 	    check_callback : function(o, n, p, i, m) {
 		    if ((o=='move_node')||(o=='rename_node'))
 		    	t.do_change({deffer:true});
@@ -100,7 +100,7 @@ jwp.prototype._create_tree=function(data){
     contextmenu : {
 		items : function(node) {
 		//var tmp = $.jstree.defaults.contextmenu.items();
-		var tmp={
+		let tmp={
 		    "new":{
 		        label:"Add workspace",
 		        icon:css.icon.folder,
@@ -190,13 +190,31 @@ jwp.prototype._create_tree=function(data){
     },    
     plugins : ["nocontextmenu", "dnd", "search","state", "types", "wholerow"]
     }).on('dblclick.jstree', function (event) {
-		var node = $(event.target).closest("li");
-		node = t._tree().get_node(node);
-		//console.info(node);
+        
+		let node = $(event.target).closest("li");
 
-		if (editors)
-			editors.add(node.data);
-	})
+	    let open = node.hasClass('jstree-open');
+	    let close = node.hasClass('jstree-closed');
+	    let is_dir = (open||close);
+	    
+	    if ((!is_dir)&&(editors)){
+		    node = t._tree().get_node(node);
+		    //editors.add({node:node});
+		    editors.add(node.data);
+	    }    
+		    
+	    if (is_dir){
+	        if (close)
+	            t._tree().open_node(node);
+	        else
+	            t._tree().close_node(node);
+	    }
+	
+        //node = t._tree().get_node(node);		    
+		//if (editors)
+		//	editors.add(node.data);
+        
+    })
 	.on('changed.jstree', function (e, data) {
 		//console.info('change');
 		//t.do_change();
@@ -369,7 +387,7 @@ jwp.prototype.do_change=function(o){
 	Ws.ajax({
 		id:'change_workspace',
 		value:{data:t.get()},
-		done:function(data){
+		done(data){
 			if (data.res==1)
 				console.info('save ok');
 			else

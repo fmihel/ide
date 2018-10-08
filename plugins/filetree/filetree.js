@@ -153,7 +153,7 @@ Qs.tree.on("contextmenu",false).on("mouseup",function(e){
 
 Qs.tree.jstree({
 'core':{
-    'animation':0,
+    'animation':100,
 	'data' : {
 		'url' : Qs.fs+'operation=get_node',
 		'data' : function (node) {
