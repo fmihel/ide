@@ -127,7 +127,7 @@ fill:function(n,o){
     return out;
 },
 id:function(name){
-    return name+ut.random(10000,99999);    
+    return name+ut.random(1000000,9999999);    
 },
 slash:function(str,left,right){
     left  = left||left===undefined?true:false;
@@ -727,6 +727,10 @@ fixFloat:function(f/*precession,def*/){
 * внешний объект o.scroll:jQuery, 
 * до момента, пока 
 * o.target:jQuery не окажется в области видимости
+* alg - тип алгоритма
+* alg = "simple" - просто смещает target так что бы верхняя граница совпадала с верхней границей scroll
+* alg = "reach"  - target по наиболее короткому расстоянию от текущего сместиться в область видимости scroll
+* 
 * 
 */
 scroll:function(o){
@@ -734,17 +738,30 @@ scroll:function(o){
         scroll:null,
         target:null,
         animate:0,
-    },o);
+        off:0,
+        alg:"simple"/* reach */
+    },o),
+    posTar = JX.abs(a.target),
+    posScr = JX.abs(a.scroll),
+    delta;
     
-    let anim  = 100;
-    let delta = JX.abs(a.target).y;
-    let own   = JX.abs(a.scroll).y;
-    delta = delta-own+a.scroll.scrollTop();
+    if (a.alg ==='reach'){
+
+        if ((posTar.h>posScr.h) || (posTar.y<posScr.y))
+            delta = posTar.y-posScr.y+a.scroll.scrollTop()-a.off;
+        else
+            delta = posTar.y-(posScr.y+posScr.h-posTar.h)+a.scroll.scrollTop()+a.off;    
+
+    }else
+        delta = posTar.y-posScr.y+a.scroll.scrollTop()-a.off;    
+     
     
     if (a.animate == 0)
         a.scroll.scrollTop(delta);
     else    
         a.scroll.animate({scrollTop:delta},a.animate);
+    
+        
     
 }    
 

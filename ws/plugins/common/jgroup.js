@@ -265,11 +265,40 @@ on:function(event,func,group){
 },
 /** возращает плагин по его объекту */
 _plugin:function(obj){
-    if (obj instanceof Tjedit) return {
-            own:obj.param.plugin,
-            name:"jedit"
-    };
+    try{
+        if (obj instanceof Tjedit) return {
+                own:obj.param.plugin,
+                name:"jedit"
+        };
+    }catch(e){};
+
+    try{
+        if (obj instanceof mbtn) return {
+                own:obj.param.plugin,
+                name:"mbtn"
+        };
+    }catch(e){};
     return undefined;
+},
+/** сборка мусора, garbage collection
+ *  если jQuery объект плагина был удален, 
+ *  но не был вызван метод remove
+ *  то в массиве _groups остануться ссылки на неотображаемый
+ *  плагин. Такие объекты будут удалены утилитой gc 
+*/
+gc:function(){
+    let t=jgroup,g=t._groups,i;
+    for(let gr in g){
+        for(i=0;i<g[gr].length;i++){
+            let pl = t._plugin(g[gr][i]);
+            try{
+                if (pl&&pl.own&&JX.inAir(pl.own)){
+                    g[gr].splice(i,1);
+                    i--;
+                }
+            }catch(e){};
+        }
+    }
 }
 
 };

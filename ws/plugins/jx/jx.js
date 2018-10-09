@@ -522,7 +522,17 @@ set:function(to,from){
     if (from.dw!==undefined) to.w = (to.w!==undefined?to.w:0)+from.dw;
     return to;
 },
-
+/** проверяет, что объект или его родня не привязаны к странице */
+inAir:function(o){
+    
+    while(o[0].tagName!=='BODY'){
+        o=o.parent();
+        if (o.length===0)
+            return true;
+    }
+    return false;
+    
+},
 workplace:function(wp,page){
 /*для JSCENE начальная разметка рабочей области*/    
     var r=JX.screen();

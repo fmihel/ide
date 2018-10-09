@@ -24,6 +24,7 @@ init:function(param){
     if (o===undefined){
         if (param===undefined) param = {};
         param.own = this;
+        param.plugin = this;
         m.obj(this,new mbtn(param));
     }else
         o.put(param);                
@@ -31,6 +32,7 @@ init:function(param){
 },
 destroy:function(){
     var o = m.obj(this);
+    o.done();
     m.obj(this,undefined);    
     return this;
 },
@@ -108,6 +110,19 @@ function mbtn(o){
     t._event();
     
 }
+mbtn.prototype.done=function(){
+    var t=this;
+    t.ungroup(-1);
+};
+mbtn.prototype.group=function(group){
+    if (typeof jgroup!=='undefined')
+        jgroup.add(this,group);
+};
+
+mbtn.prototype.ungroup=function(group){
+    if (typeof jgroup!=='undefined')
+        jgroup.remove(this,group);
+};
 
 mbtn.prototype._event = function(o){
     var t=this,p=t.param,css=p.css,b=p.own;
@@ -225,6 +240,22 @@ mbtn.prototype.attr = function(n/*v*/){
             p.own.text(t.active()?p.captions.active:p.captions.common);     
         }    
     }
+    /*-----------------------------------*/
+    if (n==='group'){
+        if (r){
+            if (typeof jgroup!=='undefined')
+                return jgroup.groups(t);
+            else
+                return [];
+        }else
+            t.group(v);
+    }
+    /*-----------------------------------*/
+    if (n==='ungroup'){
+        if (!r)
+            t.ungroup(v);
+    }
+    /*-----------------------------------*/    
 };
 
 mbtn.prototype.active = function(bool){
