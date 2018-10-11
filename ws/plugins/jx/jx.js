@@ -317,11 +317,11 @@ clinger:function(a,b,prm){
                 b.x = c-b.w;
         }else{
             if (p.pivot.b==='left')
-                b.x = a+a.w;
+                b.x = a.x+a.w;
             else if (p.pivot.b==='center')
-                b.x = a+a.w-b.w/2;
+                b.x = a.x+a.w-b.w/2;
             else
-                b.x = a+a.w-b.w;
+                b.x = a.x+a.w-b.w;
         }    
         
         
@@ -369,7 +369,7 @@ clinger:function(a,b,prm){
  *      cross:bool  если после расчета позиции b, объекты a и b пересекаются, то будет проведено симметричное перерасположение
  * }
  * 
- */ 
+ */  
 cling:function(a,b,prm){
     var p=$.extend(true,{
         side:{a:"left",b:"left"},

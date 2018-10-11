@@ -91,6 +91,7 @@ mform.prototype.init = function(o){
         
         onOpen:     undefined,/*событие при открытии формы*/
         onClose:    undefined,/*событие при закрытии формы*/
+        onAfterClose: undefined,/*событие после полного закрытия формы (можно снова открывать)*/
         canClose:   undefined,/*если определено, то должен венрнуть true чтобы форма закрылась*/
         onAlign:    undefined,/* после перерисовки */
         
@@ -202,7 +203,8 @@ mform.prototype.close=function(){
     if (t.attr('visible')){
         if ((p.canClose===undefined)||(p.canClose()===true)){
             if ((!p.onClose)||(p.onClose({sender:t})!==false))
-                t.attr('visible',false);    
+                t.attr('visible',false);
+                if (p.onAfterClose) p.onAfterClose();
         }    
     }
 };
@@ -246,6 +248,13 @@ mform.prototype.attr = function(n/*v*/){
             return p.onClose;
         else    
             p.onClose = v;
+    }
+    /*-----------------------------------*/
+    if (n==='onAfterClose'){
+        if (r) 
+            return p.onAfterClose;
+        else    
+            p.onAfterClose = v;
     }
     /*-----------------------------------*/
     if (n==='onOpen'){

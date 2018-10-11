@@ -185,6 +185,7 @@ Tjedit.prototype.init = function(o){
         modal:Qs.modal,
         _alignName:ut.id('jealw'),
         jq:{
+            icon:undefined,
             label:undefined,
             input:undefined,
             btn:undefined,
@@ -197,8 +198,10 @@ Tjedit.prototype.init = function(o){
             dim:undefined,
             memo:undefined,
             tip:undefined,
+            icon_tip:undefined,
         },
         id:{
+            icon:ut.id('jei'),
             label:ut.id('jel'),
             field:ut.id('jef'),
             input:ut.id('jei'),
@@ -211,6 +214,7 @@ Tjedit.prototype.init = function(o){
             dim:ut.id('jedx'),
             memo:ut.id('jemm'),
             tip:ut.id('jetip'),
+            icon_tip:ut.id('jeitip'),
         },
         /** имя поля для запитки из data */
         field:undefined,
@@ -234,6 +238,8 @@ Tjedit.prototype.init = function(o){
         /** отображать или нет состовляющие элементы компонента */
         disables:{
             label:false,
+            icon:true,
+            icon_tip:true,
             btn_combo:true,
             btn_add:true,
             dim:true
@@ -265,7 +271,7 @@ Tjedit.prototype.init = function(o){
         topLabel:false,
         /** порядок, расположение внутренних компонентов */
         arrange:{
-            order:['label','value','combo','btn','dim'],
+            order:['icon','label','value','combo','btn','dim','icon_tip'],
             stretch:"value",
         },
         
@@ -291,7 +297,7 @@ Tjedit.prototype.init = function(o){
         boolAsText:["нет","да"],
         tip:{
             msg     :"",
-            place   :"right",
+            place   :"bottom",
             width   :"auto",
             height  :"auto",
             modal   :false,
@@ -300,9 +306,10 @@ Tjedit.prototype.init = function(o){
             arrW:   14,
             show    :false,
             padding:{left:5,top:5,bottom:5,right:20},
-            pivot:{}
+            pivot:{a:"center",b:"center"}
         },
-        
+        /** признак, что edit находится в состоянии ошибки */
+        _error:false,
         /** изменение наcтупает на потерю фокуса или на нажатие enter */
         changeOnKeyEnter:true,
         /** задержка на выполнение реакции "change"*/
@@ -321,6 +328,7 @@ Tjedit.prototype.init = function(o){
         events:[],
         cssPref:'',
         css:{
+            icon:'je_icon',
             label:'je_label',
             field:'je_field',
             input:'je_input',
@@ -339,6 +347,9 @@ Tjedit.prototype.init = function(o){
             dim:'je_dim',
             memo:'je_memo',
             
+            error:'je_error',
+            
+            icon_tip:'je_icon_tip',
             tip:        'je_tip',
             tipShadow:  'je_tipShadow',
             tipBtn:     'je_tipBtn',
@@ -411,7 +422,8 @@ Tjedit.prototype.done=function(){
 Tjedit.prototype._create = function(){
     var t = this,p=t.param,css=p.css,c='',id=p.id,jq = p.jq;
     
-    c=ut.tag({id:id.label,css:css.label,value:p.caption,style:'position:absolute'});
+    c+=ut.tag({id:id.icon,css:css.icon,style:'position:absolute'});
+    c+=ut.tag({id:id.label,css:css.label,value:p.caption,style:'position:absolute'});
     c+=ut.tag({id:id.field,css:css.field,style:'position:absolute'});
     c+=ut.tag({tag:'input',id:id.input,css:css.input,value:p.value,style:'position:absolute'});
     
@@ -420,11 +432,14 @@ Tjedit.prototype._create = function(){
     c+=ut.tag({id:id.text,css:css.text,value:p.value,style:'position:absolute'});
     c+=ut.tag({id:id.btn,css:css.btn,value:p.value,style:'position:absolute'});
     c+=ut.tag({id:id.btn_combo,css:css.btn_combo,style:'position:absolute'});
+    c+=ut.tag({id:id.icon_tip,css:css.icon_tip,style:'position:absolute'});
+    
     c+=ut.tag({id:id.btn_add,css:css.btn_add,style:'position:absolute'});
     c+=ut.tag({id:id.checkbox,css:css.checkbox,style:'position:absolute'});
     c+=ut.tag({id:id.dim,css:css.dim,style:'position:absolute'});
     
     p.plugin.html(c);
+    jq.icon = p.plugin.find('#'+id.icon);
     jq.label = p.plugin.find('#'+id.label);
     jq.field = p.plugin.find('#'+id.field);
     jq.input = p.plugin.find('#'+id.input);
@@ -432,6 +447,8 @@ Tjedit.prototype._create = function(){
     jq.text     = p.plugin.find('#'+id.text);
     jq.btn      = p.plugin.find('#'+id.btn);
     jq.btn_combo = p.plugin.find('#'+id.btn_combo);
+    jq.icon_tip = p.plugin.find('#'+id.icon_tip);
+
     jq.btn_add  = p.plugin.find('#'+id.btn_add);
     jq.dim      = p.plugin.find('#'+id.dim);
     jq.memo = p.plugin.find('#'+id.memo);
@@ -456,7 +473,7 @@ Tjedit.prototype._create = function(){
             c+=ut.tag('<',{css:css.tipUp,style:'position:absolute'});
                 c+=ut.tag({css:css.tipText,style:'position:absolute'});
             c+=ut.tag('>');
-            c+=ut.tag({css:css.tipBtn,style:'position:absolute',value:'x'});
+            c+=ut.tag({css:css.tipBtn,style:'position:absolute',value:'&#215;'});
         c+=ut.tag('>');
     c+=ut.tag('>');
     
@@ -593,6 +610,10 @@ Tjedit.prototype._event = function(){
     
     jq.tip.btn.on("click",function(){
         t.put({tip:{show:false}});
+    });
+    
+    jq.icon_tip.on("click",()=>{
+        t.put({tip:{show:true}});
     });
 };
 
@@ -913,6 +934,24 @@ Tjedit.prototype.attr = function(n/*v*/){
         }   
     }
     /*-----------------------------------*/
+    if (n==='error'){
+        if (r) 
+            return p._error;
+        else{    
+           v = v?true:false;
+           if (v!==p._error){
+                p._error = v;
+                [jq.label,jq.input,jq.text,jq.memo,jq.btn].forEach((e,i)=>{
+                    (v?e.addClass(p.css.error):e.removeClass(p.css.error));
+                });
+           }
+           
+           
+           
+        }   
+    }
+    /*-----------------------------------*/
+
     if (n==='boolAsText'){
         if (r) 
             return p.boolAsText;
@@ -1458,6 +1497,15 @@ Tjedit.prototype._updateArrange=function(){
                     ar.gapLabel = 'left';
                         
             }        
+        }else if (or[i]==='icon'){ 
+            if (!p.disables.icon){
+                o=p.jq.icon;
+                if (!p.topLabel)
+                    ar._obj.push(o)    
+            }        
+        }else if (or[i]==='icon_tip'){ 
+            if (!p.disables.icon_tip)
+                ar._obj.push(p.jq.icon_tip);        
         }else if (or[i]==='value'){
             o=p.jq.field;
                 
@@ -1485,13 +1533,16 @@ Tjedit.prototype._updateArrange=function(){
         }
     }
     
-
+    JX.visible(p.jq.icon,      !p.disables.icon);
+    JX.visible(p.jq.icon_tip,  !p.disables.icon_tip);
+    
     JX.visible(p.jq.label,      !p.disables.label);
     JX.visible(p.jq.memo,      p.type==='memo');
     JX.visible(p.jq.input,      p.type==='edit');
     JX.visible(p.jq.checkbox,   p.type==='checkbox');
     JX.visible(p.jq.text,       p.type==='text');
     JX.visible(p.jq.btn,        p.type==='button');
+    
     JX.visible(p.jq.btn_add,    !p.disables.btn_add);
     JX.visible(p.jq.btn_combo,  !p.disables.btn_combo);
     JX.visible(p.jq.dim,        !p.disables.dim);
@@ -1508,19 +1559,15 @@ Tjedit.prototype._updateArrange=function(){
     
 };
 Tjedit.prototype._align_tip=function(){
-    var t=this, p=t.param, tip = p.tip, 
-        cling ,
-        jq=p.jq.tip, css=p.css,plgn = p.plugin,pos,otype,opos,w,h,off,a,s,b,width,height,pivot;
+    let t=this, p=t.param, tip = p.tip, cling ,jq=p.jq.tip, css=p.css,pos,otype,opos,w,h,off,a,s,b,width,height,pivot;
+    let obj = {memo:p.jq.memo,edit:p.jq.input,checkbox:p.jq.field,text:p.jq.text,button:p.jq.btn},
+        btnComboW=(p.disables.btn_combo?0:JX.pos(p.jq.btn_combo).w);
     
-
     if (!tip.show) return;
+
+    //let plgn = tip.width==='edit'? obj[p.type]:p.plugin;
+    let plgn = p.plugin;
     
-    //jq.frame.show();
-    //tip.place = "bottom";
-    //tip.arrOff = "center";
-    //tip.arrW = 12;
-
-
     pos = JX.abs(plgn);
 
     if (tip.place === "bottom")
@@ -1535,10 +1582,18 @@ Tjedit.prototype._align_tip=function(){
     
     if (tip.width === "auto")
         width = pos.w<300?pos.w:300;
+    else if (tip.width === "edit")
+        width = JX.pos(obj[p.type]).w+btnComboW;
+    else
+        width = tip.width;
+        
     if (tip.height === "auto"){    
-        height = (tip.msg.split('<br>').length+1)*13;
-        height = (height<26)?26:(height>120?120:height);
-    }    
+        let hadd = (tip.padding.top?tip.padding.top:0)+(tip.padding.bottom?tip.padding.bottom:0);
+        height = (tip.msg.split('<br>').length+1)*14+hadd;
+        
+        height = (height<(hadd+28))?(hadd+28):(height>120?120:height);
+    }else
+        height = tip.height;
     
     
     w   = tip.arrW;
@@ -1549,16 +1604,29 @@ Tjedit.prototype._align_tip=function(){
     
 
     if (tip.place === "bottom"){
-        
-        cling={side:{a:"bottom",b:"top"},pivot:pivot,abs:true};
+        let add = {x:0,y:0};
+        if (tip.width==='edit'){
+            add  = {y:tip.arrW/4,x:btnComboW/2+1};
+            plgn = obj[p.type];
+        }
+        cling={side:{a:"bottom",b:"top"},pivot:pivot,abs:true,off:add};
         a = {w:w,h:w,x:off,y:-w/2+1};   
         s = {w:w,h:w,x:off,y:1};   
-        b = {top:w/2};   
+        b = {top:w/2};
+        if (tip.width==='edit') plgn = obj[p.type];
+        
     }else if (tip.place === "top"){ 
-        cling = {side:{a:"top",b:"bottom"},pivot:pivot,abs:true};   
+        let add = {x:0,y:0};
+        if (tip.width==='edit'){
+            add  = {y:-tip.arrW/4,x:btnComboW/2+1};
+            plgn = obj[p.type];
+        }
+        
+        cling = {side:{a:"top",b:"bottom"},pivot:pivot,abs:true,off:add};   
         a = {w:w,h:w,x:off,y:height-w-1};   
         s = {w:w,h:w,x:off,y:height-w-1};   
         b = {bottom:w/2};   
+
     }else if (tip.place === "left"){ 
 
         cling = {side:{a:"left",b:"right"},pivot:pivot,abs:true};   

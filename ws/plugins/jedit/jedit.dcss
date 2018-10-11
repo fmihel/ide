@@ -112,8 +112,21 @@ $jeDimW     = 20;
     border:1px solid $jeBorder;
 }
 
-.je_disable{
+.je_disable{ 
     opacity:0.5;    
+}
+
+.je_icon_tip{
+    width:$jeBtnSize|px;
+    height:$jeBtnSize|px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABE0lEQVR4nO3ULU5DQRSG4WdAQILA4AgKAQKHBMcCwFPBAhAVFRXNpBlVgbiCBZCwARwYFAsAJEtAkCAwJJBB9Iqm3P7cQgKir5s555vvnJmTYc5fE+okJ2EJV2hE+WUazULNglpYQ29awdQGSVhHA/vYScLurxroV92N8juaKGpox5OEvSTcDe1dJuF4knZiB0lYxBlOy3UuQy10krDyIwOc4CHKj4ObUX7GBdozGyRhtTygMyKlwFESNmcyQBfFqJkvH7ytf4X1SMJWEu7LN5iUe52Eg6rYuA7O0Yry59BhuSK3iaKqmEqDJBziNcq3w7Eof/teovyEG+WkDVL5F5Uzv423qvgIlvER5Y0amjlz/gNfOnY+PZwKJfUAAAAASUVORK5CYII=');    
+    cursor:pointer;    
+}
+
+.je_error{
+    color:#922021;
 }
 
 

@@ -686,9 +686,151 @@ class TWS extends WS{
             
             {$plugin}.jedit("getData",data);
             jconsole(data);
+            '
+        );   
+        
+        
+        /*c:tip */
+        $this->item(
+            'tip',
+            /*------------caption---------------*/
+            'tip',                  
+            /*------------code------------------*/
+            '
+            /** всплывающее сообщение для контрола */
+            /** простой пример */
+            {$plugin}.jedit({
+                tip:{
+                    msg:"text in tip box",
+                    show:true
+                }
+            });
+            
+            /** расширенные настройки */
+            {$plugin}.jedit({
+                tip:{
+                    msg     :"text in tip",
+                    place   :"right", /* bottom | top | right | left */
+                    width   :"auto", /* int| auto |edit */
+                    height  :"auto", /* int | auto */
+                    modal   :false,
+                    delay   :20000,
+                    arrOff  :"center",/** place arrow, arrOff =  int | "center"   */  
+                    arrW:   14,
+                    show    :false, 
+                    padding:{left:5,top:5,bottom:5,right:20},
+                    pivot:{}  /* pivot:{a:"left",b:"right"}   a-plugin   b-tip  */
+                }                
+            });
+            ',
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit({
+               disables:{
+                    icon_tip:false,
+                }
+            });
+            {$plugin}.jedit({tip:"text in tip box"});
             
             '
         );        
+        
+        
+        /*c:tip_example1 */
+        $this->item(
+            'tip_example1',
+            /*------------caption---------------*/
+            'tip bottom',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.jedit({
+                tip:{
+                    msg     :"string1<br>string2<br>string3<br>string4",
+                    place   :"bottom",
+                    show    : true,
+                    width   :"auto",
+                }                
+            });
+            
+            ', 
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit({
+                tip:{
+                    msg     :"string1<br>string2<br>string3<br>string4",
+                    place   :"bottom",
+                    show    : true,
+                    width   :"edit",
+                    pivot:  {a:"center",b:"center"}
+                }                
+            });
+            '
+        );        
+        /*c:tip_example1 */
+        $this->item(
+            'tip_example2',
+            /*------------caption---------------*/
+            'tip right',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.jedit({
+                tip:{
+                    msg     :"string1<br>string2<br>string3<br>string4",
+                    place   :"bottom",
+                    show    : true,
+                    width   :"auto",
+                    arrOff  : "center",
+                    pivot:  {a:"top",b:"top"}
+                    
+                }                
+            });
+            
+            ', 
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit({
+                tip:{
+                    msg     :"string1<br>string2<br>string3<br>string4",
+                    place   :"right",
+                    show    : true,
+                    width   :"auto",
+                    arrOff  : "center",
+                    pivot:  {a:"top",b:"top"}
+                    
+                }                
+            });
+            '
+        );        
+
+        
+        /*c:error */
+        $this->item(
+            'error',
+            /*------------caption---------------*/
+            'error',                  
+            /*------------code------------------*/
+            '
+            
+            {$plugin}.jedit({
+                error:!{$plugin}.jedit("get","error")
+            });
+            
+            ',
+            /*------------event-----------------*/
+            '
+            
+            {$plugin}.jedit({
+                error:!{$plugin}.jedit("get","error")
+            });
+            
+            '
+        );        
+
+
+    
+    
+
+    
     }
     
     private function css(){
