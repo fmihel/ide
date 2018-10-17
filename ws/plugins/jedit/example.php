@@ -392,9 +392,11 @@ class TWS extends WS{
             '
             
             {$plugin}.jedit({disables:{
-                label:false,
-                btn_combo:false,
-                btn_add:false
+                label       :false,
+                btn_combo   :false,
+                btn_add     :false,
+                dim         :false
+                
                 
             }});
             

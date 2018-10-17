@@ -1731,7 +1731,7 @@ Tjedit.prototype._align=function(){
     if ((p.combo.data)&&(JX.visible(jq.combo))){
         a = JX.abs(jq.field);
         
-        c = {x:a.x,w:a.w,y:a.y+a.h};
+        c = {x:a.x,w:a.w+1,y:a.y+a.h};
         
         JX.abs(jq.combo,c);
         
