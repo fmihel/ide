@@ -176,7 +176,7 @@ mbtn.prototype.attr = function(n/*v*/){
         if (r) 
             return JX.visible(p.own);
         else    
-            JX.visible(p.own);
+            JX.visible(p.own,v);
     }
     /*-----------------------------------*/
     if (n==='active'){

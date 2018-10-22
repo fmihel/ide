@@ -453,9 +453,9 @@ Tjedit.prototype._create = function(){
     jq.dim      = p.plugin.find('#'+id.dim);
     jq.memo = p.plugin.find('#'+id.memo);
     
-    jq.btn.mbtn();
-    jq.btn_combo.mbtn();
-    jq.btn_add.mbtn();
+    jq.btn.mbtn({css:{disable:css.disable}});
+    jq.btn_combo.mbtn({css:{disable:css.disable}});
+    jq.btn_add.mbtn({css:{disable:css.disable}});
     
     p.modal.append(ut.tag({
         id:id.combo,
