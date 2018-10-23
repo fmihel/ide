@@ -44,13 +44,19 @@ class TWS extends WS{
         
 
     public function plugin(){
-        
+        $edits = '';
+        $js = '';
+        for($i=6;$i<50;$i++){
+            $edits.='<edit'.$i.' "edit" |edit'.$i.'|>';
+            $js.='{$edit'.$i.'}.jedit({type:"edit"});';
+        };
         FRAMET('
             <edit1 "edit" |Label|>
             <edit2 "edit" |Combo|>
             <edit3 "edit" |Button|>
             <edit4 "edit" |Edit|>
             <edit5 "memo" |Memo|>
+            '.$edits.'
         ',FRAME('plugin'))
         ->CSS('
         .edit{
@@ -66,6 +72,7 @@ class TWS extends WS{
         ->INIT('
         
             {$edit1}.jedit({type:"text",value:"labeled text"});
+            '.$js.'
             {$edit2}.jedit({type:"button",
             disables:{
                 btn_combo:false,    
@@ -96,7 +103,14 @@ class TWS extends WS{
                 onAlign:function(){
                     
                     JX.accom({$plugin}.children());
+                    console.info("start..");
+                    var tt = 0;
+                    for(let i=0;i<10;i++){
+                        let p = ut.random_str(100);
+                        tt=p;
+                    }    
                     
+                    console.info("stop..",tt)
                 },
                 buttons:{
                     ok:function(){
@@ -952,7 +966,8 @@ class TWS extends WS{
                 padding:0px;
                 font-family:arial, sans-serif;
                 font-size:13px;
-                
+                background:#303130;
+                color:silver;
             }
             
             /*c:layout */
@@ -1287,7 +1302,7 @@ class TWS extends WS{
         
         FRAME('top')->VALUE('mform');
         FRAME('left')->STYLE('width:220px');
-        FRAME('right')->STYLE('width:650px');
+        FRAME('right')->STYLE('width:250px');
         FRAME('codeFrame')->STYLE('height:150px');
         FRAME('consoleFrame')->STYLE('height:600px');
         FRAME('plugin')->STYLE('overflow:auto');

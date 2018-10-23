@@ -1,4 +1,4 @@
-/*global ut,$,jQuery,JX,Qs,Ws*/
+/*global ut,$,jQuery,JX,Qs,Ws,jlock*/
 (function( $ ){
 
 var m={
@@ -96,6 +96,8 @@ mform.prototype.init = function(o){
         onAlign:    undefined,/* после перерисовки */
         
         visible:false,/*признак видимости (НЕ вызывает onOpen)*/
+        animate:0,
+        animateType:'slide',/** slide | fade */
         caption:'',/*заголовок*/
         
         needCloseBtn:true, /*отображаете кнопку закрытия*/
@@ -209,6 +211,132 @@ mform.prototype.close=function(){
     }
 };
 
+mform.prototype._create=function(){
+    var t=this,p=t.param,css=p.css,c='';
+    
+    p.id={
+        frame:ut.id('frame'),
+        header:ut.id('hdr'),
+        footer:ut.id('ftr'),
+        content:ut.id('cnt'),
+        caption:ut.id('cpt'),
+        close:ut.id('cls'),
+        close_frame:ut.id('clf'),
+        resize:ut.id('rs')
+    };
+    
+    c+=ut.tag('<',{id:p.id.frame,css:css.frame,style:'position:absolute'});
+
+    c+=ut.tag({id:p.id.close_frame,   css:css.close_frame,      style:'position:absolute'});
+
+    c+=ut.tag({id:p.id.content,css:css.content,style:'position:absolute'});
+
+    c+=ut.tag('<',{id:p.id.header,css:css.header,style:'position:absolute'});
+        c+=ut.tag({id:p.id.caption, css:css.caption,    style:'position:absolute'});
+        c+=ut.tag({id:p.id.close,   css:css.close,      style:'position:absolute'});
+    c+=ut.tag('>');
+
+    c+=ut.tag({id:p.id.footer,css:css.footer,style:'position:absolute'});
+
+
+    c+=ut.tag({id:p.id.resize,css:css.resize,style:'position:absolute'});
+    c+=ut.tag('>');
+    
+    p.jq.parent.append(c);
+    
+    p.jq.frame     = p.jq.parent.find('#'+p.id.frame);
+    p.jq.header    = p.jq.parent.find('#'+p.id.header);
+    p.jq.content   = p.jq.parent.find('#'+p.id.content);
+    p.jq.footer    = p.jq.parent.find('#'+p.id.footer);
+
+    p.jq.caption    = p.jq.parent.find('#'+p.id.caption);
+    p.jq.close    = p.jq.parent.find('#'+p.id.close);
+    p.jq.close_frame    = p.jq.parent.find('#'+p.id.close_frame);
+
+    p.jq.resize    = p.jq.parent.find('#'+p.id.resize);
+    
+    p.jq.own.appendTo(p.jq.content);
+    p.jq.own.css('position','absolute');
+    
+    $.data(p.jq.own[0],p.jq.ref,this);
+    
+    
+};
+
+mform.prototype._event=function(){
+    var t=this,p=t.param,css=p.css;
+    
+    p.jq.footer.on('click',function(e){
+        var tar=$(e.target);
+        if (tar.hasClass(css.btn_common)&&(!tar.hasClass(css.btn_disable))){
+            var data = $.data(tar[0],'data');
+            if (data.click) data.click({sender:t});
+        }
+            
+    });
+    
+    p.jq.close.on('click',function(){
+        t.close();
+    });
+ 
+    p.jq.header.on('mousedown',function(){
+        if ((p.draggable)&&(p.stretch==='custom'))        
+            p._draggable = {
+                mouse:JX.mouse()
+            };
+    });
+    
+    p.jq.content.on('mousedown',function(){
+        if ((p.draggable)&&(p.stretch==='custom')&&(p.dragOnAllForm))        
+            p._draggable = {
+                mouse:JX.mouse()
+            };
+    });
+
+    p.jq.resize.on('mousedown',function(){
+        if ((p.resizable)&&(p.stretch==='custom'))        
+            p._resizable = {
+                mouse:JX.mouse()
+            };
+    });
+    
+    JX.window().on('mousemove',function(){
+        if ((p.draggable)&&(p._draggable)&&(p.stretch==='custom')){
+            var m = JX.mouse();
+            var d = {x:m.x-p._draggable.mouse.x,y:m.y-p._draggable.mouse.y};
+            var f=JX.abs(p.jq.frame);
+            
+            JX.abs(p.jq.frame,{x:f.x+d.x,y:f.y+d.y});
+            p._draggable.mouse = m;
+            
+        }
+        if ((p.resizable)&&(p._resizable)&&(p.stretch==='custom')){
+            var m = JX.mouse();
+            var d = {x:m.x-p._resizable.mouse.x,y:m.y-p._resizable.mouse.y};
+            var f=JX.pos(p.jq.frame);
+            
+            JX.pos(p.jq.frame,{w:f.w+d.x,h:f.h+d.y});
+            p._resizable.mouse = m;
+            t.align();
+        }
+    });
+    
+    JX.window().on('mouseup',function(){
+            p._draggable = undefined;
+            p._resizable = undefined;
+    });
+    
+    if (Ws) 
+        Ws.align({
+            id:p.align_id,
+            func(){ 
+                t.align();
+            
+            }}
+        );
+
+};
+
 mform.prototype._css = function(css){
     var t = this,p=t.param;
     if (css===undefined)
@@ -223,19 +351,24 @@ mform.prototype._css = function(css){
 };
 
 mform.prototype.put = function(o){
-    var t=this,p=t.param,l=p.lock;
+    let t=this,p=t.param,l=p.lock,visible;
     /*t.lock('align','begin');*/
     l.lock('align');
+    if ('visible' in o){
+        visible = o.visible;
+        delete o.visible;
+    }
+    
     $.each(o,function(n,v){
         t.attr(n,v);
     });
     l.unlock('align');
-    /*if (!t.lock('align','end'))
+    
+    if (visible!==undefined)
+        t.attr('visible',visible);
+    else
         t.align();
-    */
-    t.align();
 };    
-
 
 mform.prototype.attr = function(n/*v*/){
     var t=this,p=t.param,v,r=(arguments.length===1),css=p.css;
@@ -264,6 +397,20 @@ mform.prototype.attr = function(n/*v*/){
             p.onOpen = v;
     }
     /*-----------------------------------*/
+    if (n==='animate'){
+        if (r) 
+            return p.animate;
+        else    
+            p.animate = v;
+    }
+    /*-----------------------------------*/
+    if (n==='animateType'){
+        if (r) 
+            return p.animateType;
+        else    
+            p.animateType = v;
+    }
+    /*-----------------------------------*/     
     if (n==='onAlign'){
         if (r) 
             return p.onAlign;
@@ -288,9 +435,11 @@ mform.prototype.attr = function(n/*v*/){
     /*-----------------------------------*/
 
     if (n==='visible'){
-        if (r) 
-            return JX.visible(p.jq.frame);
-        else    
+        if (r){ 
+            if (p._visible===undefined)
+                p._visible = JX.visible(p.jq.frame);
+            return p._visible;
+        }else    
             t._visible(v);
     }
     /*-----------------------------------*/
@@ -514,24 +663,24 @@ mform.prototype.attr = function(n/*v*/){
 mform.prototype._visible=function(bool){
     
     var t=this,p=t.param,f=p.jq.frame;
-    if (bool===JX.visible(f)) return;
+    if (bool===p._visible) return;
+    p._visible = bool;
     
     if (bool){
 
         f.detach().appendTo(p.jq.parent);
         
-        if (p.modal)
-        f.jshadow({
+        if (p.modal) f.jshadow({
             show:true,
             opacity:p.shadowOpacity,
-            click:function(e){
+            click(e){
                 if (p.shadowAsClose)
                     t.close();
             },
-            onhide:function(){
+            onhide(){
                 f.jshadow('destroy');
             },
-            onshow:function(){
+            onshow(){
                 
             }
         });
@@ -543,7 +692,61 @@ mform.prototype._visible=function(bool){
     
     p._shadow = (bool&&p.modal);
     
-    JX.visible(f,bool);
+    if (p.animate>0)
+        t._fade(!bool);
+    else    
+        JX.visible(f,bool);
+    
+};
+
+mform.prototype._fade=function(bool){
+    var t=this,p=t.param,f=p.jq.frame,l=p.lock,pos,opacity;
+    
+    if (bool){
+       JX.visible(f,false);
+    }else{
+        
+        l.lock('align');
+        
+        opacity = f.css('opacity');
+        f.css('opacity',0.01);
+        
+        JX.visible(f,true);
+        t._align();
+        
+        if (p.animateType==='slide'){
+            pos = JX.abs(f);
+            JX.abs(f,{y:pos.y+pos.h/2,h:0});
+        }else    
+            JX.visible(f,false);
+        
+        f.css('opacity',opacity);
+        
+        if (l.can('fade')){
+            l.lock('fade');
+            
+            
+            if (p.animateType==='fade')
+            f.fadeIn({
+                duration:p.animate,
+                complete(){
+                    l.unlock('fade');
+                    l.unlock('align');
+                }
+            });
+            if (p.animateType==='slide')
+                f.animate({
+                    height:pos.h,
+                    top   :pos.y
+                },
+                p.animate,
+                ()=>{
+                    JX.abs(f,pos);
+                    l.unlock('fade');
+                    l.unlock('align');                    
+                });
+        }
+    }    
 };
 
 mform.prototype.lock=function(func,event){
@@ -559,6 +762,36 @@ mform.prototype.lock=function(func,event){
         l[func]-=1;
     
     return (l[func]>0);    
+};
+
+mform.prototype._area_culc=function(){
+    /*предварительный размеров основного расчет фрейма*/
+    var t=this,p=t.param,h=JX.pos(p.jq.header),c=JX.pos(p.jq.own),f=JX.pos(p.jq.footer);
+    return {
+            w   :   Math.max(h.w,c.w,f.w)+(p.padding.left+p.padding.right),
+            h   :   h.h+c.h+f.h
+    };
+};
+
+mform.prototype._recreate_buttons = function(){
+    var t=this,p=t.param,css=p.css,bcss,c='';
+    
+    
+    $.each(p.buttons,function(id,o){
+        bcss =css.btn_common+' ';
+        if ((o.css)&&(o.css.btn)) bcss+=o.css.btn; else bcss+=css.btn;
+        if (o.disable)
+            if ((o.css)&&(o.css.btn_disable)) bcss+=' '+o.css.btn_disable; else bcss+=' '+css.btn_disable;
+        
+        c+=ut.tag({id:id,css:bcss,style:"position:absolute",value:(o.caption?o.caption:'')});
+    });
+    
+    p.jq.footer.html(c);
+    $.each(p.buttons,function(id,o){
+        o.jq = p.jq.footer.find("#"+id);
+        $.data(o.jq[0],'data',o);
+    });
+    
 };
 
 mform.prototype.align=function(){
@@ -676,160 +909,7 @@ mform.prototype._align=function(){
 };
 
 
-mform.prototype._create=function(){
-    var t=this,p=t.param,css=p.css,c='';
-    
-    p.id={
-        frame:ut.id('frame'),
-        header:ut.id('hdr'),
-        footer:ut.id('ftr'),
-        content:ut.id('cnt'),
-        caption:ut.id('cpt'),
-        close:ut.id('cls'),
-        close_frame:ut.id('clf'),
-        resize:ut.id('rs')
-    };
-    
-    c+=ut.tag('<',{id:p.id.frame,css:css.frame,style:'position:absolute'});
-
-    c+=ut.tag({id:p.id.close_frame,   css:css.close_frame,      style:'position:absolute'});
-
-    c+=ut.tag({id:p.id.content,css:css.content,style:'position:absolute'});
-
-    c+=ut.tag('<',{id:p.id.header,css:css.header,style:'position:absolute'});
-        c+=ut.tag({id:p.id.caption, css:css.caption,    style:'position:absolute'});
-        c+=ut.tag({id:p.id.close,   css:css.close,      style:'position:absolute'});
-    c+=ut.tag('>');
-
-    c+=ut.tag({id:p.id.footer,css:css.footer,style:'position:absolute'});
 
 
-    c+=ut.tag({id:p.id.resize,css:css.resize,style:'position:absolute'});
-    c+=ut.tag('>');
-    
-    p.jq.parent.append(c);
-    
-    p.jq.frame     = p.jq.parent.find('#'+p.id.frame);
-    p.jq.header    = p.jq.parent.find('#'+p.id.header);
-    p.jq.content   = p.jq.parent.find('#'+p.id.content);
-    p.jq.footer    = p.jq.parent.find('#'+p.id.footer);
 
-    p.jq.caption    = p.jq.parent.find('#'+p.id.caption);
-    p.jq.close    = p.jq.parent.find('#'+p.id.close);
-    p.jq.close_frame    = p.jq.parent.find('#'+p.id.close_frame);
-
-    p.jq.resize    = p.jq.parent.find('#'+p.id.resize);
-    
-    p.jq.own.appendTo(p.jq.content);
-    p.jq.own.css('position','absolute');
-    
-    $.data(p.jq.own[0],p.jq.ref,this);
-    
-    
-};
-
-mform.prototype._event=function(){
-    var t=this,p=t.param,css=p.css;
-    
-    p.jq.footer.on('click',function(e){
-        var tar=$(e.target);
-        if (tar.hasClass(css.btn_common)&&(!tar.hasClass(css.btn_disable))){
-            var data = $.data(tar[0],'data');
-            if (data.click) data.click({sender:t});
-        }
-            
-    });
-    
-    p.jq.close.on('click',function(){
-        t.close();
-    });
- 
-    p.jq.header.on('mousedown',function(){
-        if ((p.draggable)&&(p.stretch==='custom'))        
-            p._draggable = {
-                mouse:JX.mouse()
-            };
-    });
-    
-    p.jq.content.on('mousedown',function(){
-        if ((p.draggable)&&(p.stretch==='custom')&&(p.dragOnAllForm))        
-            p._draggable = {
-                mouse:JX.mouse()
-            };
-    });
-
-    p.jq.resize.on('mousedown',function(){
-        if ((p.resizable)&&(p.stretch==='custom'))        
-            p._resizable = {
-                mouse:JX.mouse()
-            };
-    });
-    
-    JX.window().on('mousemove',function(){
-        if ((p.draggable)&&(p._draggable)&&(p.stretch==='custom')){
-            var m = JX.mouse();
-            var d = {x:m.x-p._draggable.mouse.x,y:m.y-p._draggable.mouse.y};
-            var f=JX.abs(p.jq.frame);
-            
-            JX.abs(p.jq.frame,{x:f.x+d.x,y:f.y+d.y});
-            p._draggable.mouse = m;
-            
-        }
-        if ((p.resizable)&&(p._resizable)&&(p.stretch==='custom')){
-            var m = JX.mouse();
-            var d = {x:m.x-p._resizable.mouse.x,y:m.y-p._resizable.mouse.y};
-            var f=JX.pos(p.jq.frame);
-            
-            JX.pos(p.jq.frame,{w:f.w+d.x,h:f.h+d.y});
-            p._resizable.mouse = m;
-            t.align();
-        }
-    });
-    
-    JX.window().on('mouseup',function(){
-            p._draggable = undefined;
-            p._resizable = undefined;
-    });
-    
-    if (Ws) 
-        Ws.align({
-            id:p.align_id,
-            func:
-            function(){ 
-                t.align();
-            
-            }}
-        );
-
-};
-
-mform.prototype._area_culc=function(){
-    /*предварительный размеров основного расчет фрейма*/
-    var t=this,p=t.param,h=JX.pos(p.jq.header),c=JX.pos(p.jq.own),f=JX.pos(p.jq.footer);
-    return {
-            w   :   Math.max(h.w,c.w,f.w)+(p.padding.left+p.padding.right),
-            h   :   h.h+c.h+f.h
-    };
-};
-
-mform.prototype._recreate_buttons = function(){
-    var t=this,p=t.param,css=p.css,bcss,c='';
-    
-    
-    $.each(p.buttons,function(id,o){
-        bcss =css.btn_common+' ';
-        if ((o.css)&&(o.css.btn)) bcss+=o.css.btn; else bcss+=css.btn;
-        if (o.disable)
-            if ((o.css)&&(o.css.btn_disable)) bcss+=' '+o.css.btn_disable; else bcss+=' '+css.btn_disable;
-        
-        c+=ut.tag({id:id,css:bcss,style:"position:absolute",value:(o.caption?o.caption:'')});
-    });
-    
-    p.jq.footer.html(c);
-    $.each(p.buttons,function(id,o){
-        o.jq = p.jq.footer.find("#"+id);
-        $.data(o.jq[0],'data',o);
-    });
-    
-};
 
