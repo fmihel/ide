@@ -251,7 +251,6 @@ class _table{
     public static function field($field){
         return static::ALIAS.'.'.$field;
     }
-    
     /** возвращает строку, содержащую список полей из указанного набора selectName
      *  наборы указваются в массиве select объекта _table;
      *  _table::select[selectName]
@@ -304,7 +303,6 @@ class _table{
                 
         }    
     }
-    
     /** удаляем префикс из имени поля если надо 
      *  (если поле не входит в таблицу, то возвращает false)
      *  так же $name может быть хешем, тогда будет произведена работа с ключами
@@ -337,7 +335,6 @@ class _table{
             }        
         }    
     }
-    
     /** генерирует запрос к данной таблице с указанием условия $where и набора selectName 
      *  наборы указваются в массиве select объекта _table;
      *  _table::select[selectName]
@@ -487,7 +484,6 @@ class _table{
      * ::FIELD - преобразует в значение поля FIELD в data
      * :: - преобразует в значение поля INDEX в data 
     */
-    
     public static function update($data,$where='',$base=null,$coding='UTF8'){
         $CR = baseSetup::CR();
         
@@ -602,7 +598,6 @@ class _table{
         
     }
 
-    
     /** обработка макрокоманд в str в запросах select */
     public static function macro($str){
         if (defined(get_called_class().'::INDEX'))
@@ -663,6 +658,97 @@ class _table{
         
         
     }
+    /** 
+     * создание копии строки 
+     * 
+     * $copyFromId - id| ds | assoc |array  - 
+     * $change - false|["NAME"=>"Mike","NUMBER"=>10,..] массив данных для замены (скопированы будут все данные, а указанные в change буду заменены)
+     * $exclude false|array("ID_NUM","NAME","PHONE")- список полей, которые не надо клонировать
+     * 
+     * @return 
+     *      $copyFromId = id|assoc   =>  array ('res'=>0|1,'from'=>id,INDEX_NAME=>new_id);
+     *      $copyFromId = ds|array   =>  array ('res'=>0|1,'list'=>array(..));
+     *      error                    =>  array ('res'=>0);
+     * 
+    */
+    public static function copyRow($copyFromId,$copyToId='insert',$change=false,$exclude=false,$base=null,$coding = 'UTF8'){
+        
+        $tp = TYPE::info($copyFromId);
+        
+        if ($tp==='object'){//ds
+            
+            $list   = array();
+            $res    = 1;
+            while(base::by($copyFromId,$row)){
+                $r = self::copyRow($row[static::INDEX],'insert',$change,$exclude,$base,$coding);
+                if ($r==0) $res = 0;
+                $list[] = $r;
+            };
+            
+            return array('res'=>$res,'list'=>$list);
+            
+
+        }elseif ($tp==='array'){
+            
+            $list   = array();
+            $res    = 1;
+            for($i=0;$i<count($copyFromId);$i++){
+                $r = self::copyRow($copyFromId[$i],'insert',$change,$exclude,$base,$coding);
+                if ($r==0) $res = 0;
+                $list[] = $r;
+            }
+
+            return array('res'=>$res,'list'=>$list);
+            
+        }elseif ($tp==='assoc'){
+            return self::copyRow($copyFromId[static::INDEX],$copyToId,$change,$exclude,$base,$coding);
+        }else
+        try{
+            if ($base==='null')
+                throw new Exception("base===null");
+
+            if ($copyToId==='insert')
+                $copyToId = self::insert_uuid($base);
+
+            if ($copyToId===false)
+                throw new Exception("insert_uuid");
+                
+            $q = 'select * from '.static::NAME.' where '.static::INDEX.'='.$copyFromId;
+            $row = base::row($q,$base,$coding);
+            if ($row===false)
+                throw new Exception($q);
+    
+            if ($exclude===false) 
+                $exclude = array();
+                
+            $exclude[]=static::INDEX;
+            $exclude[]='UUID';
+            
+            $fields = '';
+            foreach(static::$types as $field=>$type){
+                if (isset($row[$field])){
+                    if (($exclude===false)||(array_search($field,$exclude)===false)){
+                        if (isset($change[$field]))
+                            $row[$field] =  $change[$field];
+                        $fields.=($fields!==''?',':'').$field.'='.base::typePerform($row[$field],$type);
+                    }
+                }    
+            };
+            
+            $q = 'update '.static::NAME.' set '.$fields.' where '.static::INDEX.'='.$copyToId;
+            
+            if (!base::query($q,$base,$coding))
+                throw new Exception($q);
+
+            return array('res'=>1,'from'=>$copyFromId,static::INDEX=>$copyToId);
+            
+        }catch(Exception $e){
+            _LOGF($e->getMessage(),'Exception',__FILE__,__LINE__);
+            return array('res'=>0,'msg'=>$e->getMessage(),'from'=>$copyFromId);
+        }
+        
+    }
+    
     
 };
 class base{
@@ -1510,7 +1596,7 @@ class base{
      * 
      *  $ds = base::ds('select *,CAPTION CC from K_TOVAR where ID_K_TOVAR = 23674');
      *  $rows = base::rows($ds);
-     *  $fields = base:;fields($ds,false);
+     *  $fields = base::fields($ds,false);
      * 
      *  $rows = base::forcedTyping($rows,$ds); // будут помечены все строковые поля
      *  or
