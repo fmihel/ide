@@ -482,7 +482,12 @@ jeditors.prototype.search=function(o){
     }
     
     return null;
-    
+};
+jeditors.prototype.itemByEditor=function(ed){
+    var t=this,p=t.param,tabs=p.tabs;
+    return tabs.each((o)=>{ 
+        return ((o.item.editor) && (ut.oEq(o.item.editor,ed)));
+    });
 };
 
 jeditors.prototype.panel=function(o){
@@ -647,13 +652,14 @@ jeditors.prototype._short_template_key_event=function(editor){
     var range = editor.getSelectionRange();
     var currline = range.start.row;
     var currcol   = range.start.column;
-            
+    var item    = t.itemByEditor(editor);
+
     var key = editor.session.getLine(currline);
         key=key.replace(/\s*$/g,'').replace(/^[\s\S]*\s/g,"");
     
     if (key.trim()==='') return;
     
-    var items=Templates.find_short({short:key});
+    var items=Templates.find_short({short:key,ext:(item&&item.ext?item.ext:'')});
     if (items.length>0){
 
         editor.selection.selectWordLeft();

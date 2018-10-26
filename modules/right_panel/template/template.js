@@ -46,8 +46,11 @@ find_short:function(o){
 
         for(j=0;j<chi.length;j++){
             dat=chi[j];
-            if ((dat.short==a.short)||(dat.short.substr(0,a.short.length)==a.short))
-                out.push(dat);
+            if ((dat.short==a.short)||(dat.short.substr(0,a.short.length)==a.short)){
+                o.ext = (typeof o.ext ==='string'?o.ext.trim():'');
+                if ((o.ext==='')||(!(dat.ext.length))||(dat.ext.indexOf(o.ext)>=0))
+                    out.push(dat);
+            }    
         }
     }
 

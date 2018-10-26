@@ -166,6 +166,20 @@ jtab.prototype.itemById=function(id){
     }
     return null;
 };
+/** цикл по всем вкладкам */
+jtab.prototype.each=function(f){
+    if (typeof f!=='function') {
+        console.error('f must by function');
+        return;
+    }
+    let t=this,count=t.count(),i,item;
+    
+    for(i=0;i<count;i++){
+        item = t.item(i);
+        if (f({i,item,count}) === true) 
+            return item;
+    }
+};
 
 jtab.prototype.del=function(item){
     var t=this,p=t.param;

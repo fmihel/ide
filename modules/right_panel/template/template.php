@@ -37,7 +37,7 @@ class TEMPLATES{
             if (!is_dir($path))
                 return array();
         }
-        
+         
         $struct = DIR::struct($path,'xml',false,1);
         
         for($i=0;$i<count($struct);$i++){
@@ -52,6 +52,16 @@ class TEMPLATES{
                     $struct[$i]['childs'][$j]['caption'] = $xml->header->info;
                     $struct[$i]['childs'][$j]['access']  = $access;
                     $struct[$i]['childs'][$j]['short']  = $xml->header->short;
+                    /** подготовка массива расширений (удаляем все пустые )*/
+                    $exts = explode(',',trim($xml->header->ext));
+                    $k=count($exts);
+                    while($k>0){
+                        $ext = trim($exts[$k-1]);
+                        if ($ext=='') 
+                            array_splice($exts,$k-1,1);
+                        $k--;
+                    }
+                    $struct[$i]['childs'][$j]['ext']  = $exts;
                     
                 }    
             };
