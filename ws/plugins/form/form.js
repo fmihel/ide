@@ -103,6 +103,7 @@ mform.prototype.init = function(o){
         needCloseBtn:true, /*отображаете кнопку закрытия*/
         shadowAsClose:true,/*нажатие вне формы аналогичное вызову close*/
         shadowOpacity:0.2,/** прозрачность подложки */
+        shadowSpeed:200, /* скорость анимации тени */
         placeCloseOnTopRight:false, /*отображает кнопку закрытия вынесенной на угол*/
         bumpClose:3,/*max or [2..8]  коэф - на сколько вынесена кнопка закрытия */ 
         showHeader:false,/*отображать или нет заголовок*/
@@ -426,6 +427,13 @@ mform.prototype.attr = function(n/*v*/){
             p.shadowOpacity = v;
     }
     /*-----------------------------------*/
+    if (n==='shadowSpeed'){
+        if (r) 
+            return p.shadowSpeed;
+        else    
+            p.shadowSpeed = v;
+    }
+    /*-----------------------------------*/
     if (n==='canClose'){
         if (r) 
             return p.canClose;
@@ -673,6 +681,7 @@ mform.prototype._visible=function(bool){
         if (p.modal) f.jshadow({
             show:true,
             opacity:p.shadowOpacity,
+            speed:p.shadowSpeed,
             click(e){
                 if (p.shadowAsClose)
                     t.close();
@@ -717,6 +726,9 @@ mform.prototype._fade=function(bool){
         if (p.animateType==='slide'){
             pos = JX.abs(f);
             JX.abs(f,{y:pos.y+pos.h/2,h:0});
+        }else if (p.animateType==='slideDown'){
+            pos = JX.abs(f);
+            JX.abs(f,{y:pos.y,h:0});
         }else    
             JX.visible(f,false);
         
@@ -734,7 +746,7 @@ mform.prototype._fade=function(bool){
                     l.unlock('align');
                 }
             });
-            if (p.animateType==='slide')
+            if ((p.animateType==='slide')||(p.animateType==='slideDown'))
                 f.animate({
                     height:pos.h,
                     top   :pos.y
@@ -745,6 +757,7 @@ mform.prototype._fade=function(bool){
                     l.unlock('fade');
                     l.unlock('align');                    
                 });
+
         }
     }    
 };
