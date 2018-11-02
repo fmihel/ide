@@ -736,7 +736,8 @@ mform.prototype._fade=function(bool){
         
         if (l.can('fade')){
             l.lock('fade');
-            
+        
+        Ws.align('begin');    
             
             if (p.animateType==='fade')
             f.fadeIn({
@@ -744,6 +745,7 @@ mform.prototype._fade=function(bool){
                 complete(){
                     l.unlock('fade');
                     l.unlock('align');
+                    Ws.align('end');
                 }
             });
             if ((p.animateType==='slide')||(p.animateType==='slideDown'))
@@ -756,6 +758,7 @@ mform.prototype._fade=function(bool){
                     JX.abs(f,pos);
                     l.unlock('fade');
                     l.unlock('align');                    
+                    Ws.align('end');
                 });
 
         }

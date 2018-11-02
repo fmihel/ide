@@ -91,6 +91,7 @@ function mbtn(o){
         _active:false,
         _disable:false,
         caption:false,
+        readOnly:false,
         captions:{
             common:undefined,
             active:undefined
@@ -135,6 +136,8 @@ mbtn.prototype._event = function(o){
     });
     
     b.on('click',function(){
+        if (p.readOnly) return;
+        
         if (!t.disable()&&(p.click!==undefined)){
             p.click(t);
         }
@@ -184,6 +187,13 @@ mbtn.prototype.attr = function(n/*v*/){
             return t.active();
         else    
             t.active(v);
+    }
+    /*-----------------------------------*/
+    if (n==='readOnly'){
+        if (r) 
+            return p.readOnly;
+        else    
+            p.readOnly = v?true:false;
     }
     /*-----------------------------------*/
     if (n==='disable'){

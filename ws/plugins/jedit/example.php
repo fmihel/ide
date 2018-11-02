@@ -433,6 +433,31 @@ class TWS extends WS{
             '
         );        
 
+        /*c:readonly */
+        $this->item(
+            'readOnly',
+            /*------------caption---------------*/
+            'readOnly',                  
+            /*------------code------------------*/
+            '
+            
+            var a = !{$}.mbtn("active");
+            {$}.mbtn("active",a);
+            
+            {$plugin}.jedit({readOnly:a});
+            
+            var ro = {$plugin}.jedit("readOnly"); 
+            
+            ',
+            /*------------event-----------------*/
+            '
+            
+            var a = !{$}.mbtn("active");
+            {$}.mbtn("active",a);
+            {$plugin}.jedit({readOnly:a});
+            
+            '
+        );        
 
     
     

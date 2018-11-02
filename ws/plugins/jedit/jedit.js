@@ -99,6 +99,12 @@ on:function(event,fn){
     o.on(event,fn);
     return this;
 },
+trigger:function(to,event,p){
+    var o = m.obj(this);
+    o.trigger(to,event,p);
+    return this;
+    
+},
 setData:function(data){
     var o = m.obj(this);
     o.setData(data);
@@ -233,6 +239,7 @@ Tjedit.prototype.init = function(o){
             btn_combo:{x:0,y:-1}
         },
         prop:{},
+        readOnly:false,
         /** признак неактивности компонента */
         disable:false,
         /** отображать или нет состовляющие элементы компонента */
@@ -286,6 +293,7 @@ Tjedit.prototype.init = function(o){
             valueKey:''     // поле значение которого будет использовано при запросе value
             
         },
+        comboShadow:0.01,
         
         lock:new jlock(),
         handler:new jhandler(),
@@ -498,26 +506,28 @@ Tjedit.prototype._create = function(){
 
 Tjedit.prototype._event = function(){
     var t = this,p=t.param,jq=p.jq;
-    jq.btn_combo.mbtn({click:
-    function(){
+    jq.btn_combo.mbtn({click(){
+        if (p.readOnly) return;
+        
         if (!t.do('btnComboClick'))
             t.combo('open');
-                
     }});
     
-    jq.btn.mbtn({click:
-    function(){
+    jq.btn.mbtn({click(){
+        if (p.readOnly) return;
+        
         if (!t.do('btnClick'))
             t.combo('open');
     }});
     
-    jq.btn_add.mbtn({click:
-    function(){
+    jq.btn_add.mbtn({click(){
+        if (p.readOnly) return;
         t.do('btnAddClick');
     }});
     
-    jq.memo.on('keyup',
-    function(){
+    jq.memo.on('keyup',()=>{
+        if (p.readOnly) return;
+        
         t.begin('draw');
         t.put({value:jq.memo.val()});
         t.end('draw');
@@ -526,21 +536,23 @@ Tjedit.prototype._event = function(){
         
     });
     
-    jq.input.on('focusout',function(){
+    jq.input.on('focusout',()=>{
         if ((t.param.changeOnKeyEnter)&&(t.changed())){
             t.do("change",{enableChange:true});
         }
     });
-    jq.input.on('keyup',
-    function(){
+    jq.input.on('keyup',()=>{
+        if (p.readOnly) return;
+        
         t.begin('draw');
         t.put({value:jq.input.val()});
         t.end('draw');
         t.changed(t.changed());
     });
     
-    jq.input.on('keydown',
-    function(e){
+    jq.input.on('keydown',e=>{
+        if (p.readOnly) return;
+        
         if(e.which == 13){
             if (t.param.changeOnKeyEnter){
                 t.do("change",{enableChange:true});
@@ -583,9 +595,9 @@ Tjedit.prototype._event = function(){
     });
 
 
-    jq.input.on('keyup',
-    function(e){
-
+    jq.input.on('keyup',e=>{
+        if (p.readOnly) return;
+        
         if(e.which == 8){
             if (t.eventDefined('keyBackspace')){
                 t.do('keyBackspace');
@@ -597,18 +609,22 @@ Tjedit.prototype._event = function(){
     });
 
 
-    jq.label.on('click',function(){
+    jq.label.on('click',()=>{
+        if (p.readOnly) return;
+        
         if (p.type==='checkbox')
             jq.checkbox.trigger("click");
         
     });
     
-    jq.checkbox.on('click',function(){
+    jq.checkbox.on('click',()=>{
+        if (p.readOnly) return;
+        
         if (!t.attr('disable'))
             t.attr("checked",!t.attr("checked"));    
     });
     
-    jq.tip.btn.on("click",function(){
+    jq.tip.btn.on("click",()=>{
         t.put({tip:{show:false}});
     });
     
@@ -650,6 +666,21 @@ Tjedit.prototype._css = function(css){
     p.css=$.extend(true,p.css,css);
 };
 
+Tjedit.prototype.trigger = function(to,ev,p){
+    var t = this,p=t.param,jq = p.jq,obj;
+    if ((to === 'memo') && (p.type==="memo"))
+        obj = jq.memo;
+  
+    if ((to === 'edit')&&(p.type==="edit"))
+        obj = jq.input;
+    
+    if ((to === 'button')&&(p.type==="button"))
+        obj = jq.btn;
+        
+    if (obj) 
+        obj.trigger(ev,p);
+};    
+    
 Tjedit.prototype.focus = function(){
     var t = this,p=t.param;
     
@@ -721,7 +752,7 @@ Tjedit.prototype.combo = function(param,param2){
                 
                 JX.visible(c,true);
                 c.grid('update');
-                c.jshadow('show');
+                c.jshadow('show',{opacity:p.comboShadow});
             }
             
         }else if (param==='close'){
@@ -924,6 +955,23 @@ Tjedit.prototype.attr = function(n/*v*/){
             return p.css;
         else    
            t._css(v);
+    }
+    /*-----------------------------------*/
+    if (n==='comboShadow'){
+        if (r) 
+            return p.comboShadow;
+        else    
+           p.comboShadow = v;
+    }
+    /*-----------------------------------*/
+    if (n==='readOnly'){
+        if (r) 
+            return p.readOnly;
+        else{    
+            p.readOnly = v?true:false;
+            jq.memo.attr('readonly', p.readOnly);
+            jq.input.attr('readonly', p.readOnly);
+        }   
     }
     /*-----------------------------------*/
     if (n==='field'){

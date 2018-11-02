@@ -237,6 +237,12 @@ value:function(value,group){
         o.obj.attr('value',value);
     },group);
 },
+readOnly:function(bool,group){
+    var t=jgroup;
+    t.each(o=>{
+        o.obj.attr('readOnly',bool);
+    },group);
+},
 setData:function(data,group){
     var t=jgroup;
     t.each(function(o){
