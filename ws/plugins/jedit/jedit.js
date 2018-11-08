@@ -29,6 +29,9 @@ obj:function(t/*set*/){
     }    
     return $.data(t[0],m.name);
 },
+created:function(){
+    return (m.obj(this)!==undefined);
+},
 /** возвращает отображаемое значение jedit */
 text:function(){
     var o = m.obj(this);
@@ -535,7 +538,8 @@ Tjedit.prototype._event = function(){
         t.changed(t.changed());
         
     });
-    
+
+
     jq.input.on('focusout',()=>{
         if ((t.param.changeOnKeyEnter)&&(t.changed())){
             t.do("change",{enableChange:true});
@@ -548,6 +552,16 @@ Tjedit.prototype._event = function(){
         t.put({value:jq.input.val()});
         t.end('draw');
         t.changed(t.changed());
+    });
+
+    jq.input.on('mouseup',()=>{
+        if (p.readOnly) return;
+        if (p.attr.type==='number'){
+            t.begin('draw');
+            t.put({value:jq.input.val()});
+            t.end('draw');
+            t.changed(t.changed());
+        }    
     });
     
     jq.input.on('keydown',e=>{

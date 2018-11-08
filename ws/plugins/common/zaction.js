@@ -55,6 +55,7 @@ zAction.param = {
         'update':0,
         'do':0
     },
+    update:[]
 };
 /**
  * определение action и/или ф-ции состояния
@@ -121,6 +122,8 @@ zAction.define=function(o){
 
 /**
  * Привязка ф-ции к action или state
+ * o = function  - добавляет обработчик, который возникает на каждый вызов update
+ *   or 
  * o={ 
  *      on:string,          "action"|"state"
  *      to:string,          name of action
@@ -130,26 +133,35 @@ zAction.define=function(o){
  * 
  */
  zAction.bind=function(o){
-    var t=zAction,
-        p=t.param,
-        g=t._get(o.to);
+    let t=zAction,
+        p=t.param;
     
-    if (g===false)
-        g = t.define({name:o.to});
-    
-    if (g===false) return false;
-    
-    if (o.funcName===undefined)  o.funcName = t._id('bind');
-    
-    var on = t._get(o.funcName,false,g.on[o.on]);
-    
-    if (!on)
-        g.on[o.on].push({name:o.funcName,func:o.func});    
-    else
-        on.func = o.func;
+    if (typeof o ==='function'){
         
-    if ((o.on==='state')&&(o.func)&&(g._firstCallState))
-            o.func(g.prevState);
+        if (p.update.indexOf(o)<0)
+            p.update.push(o);
+        
+    }else{
+        
+        let g=t._get(o.to);
+    
+        if (g===false)
+            g = t.define({name:o.to});
+    
+        if (g===false) return false;
+    
+        if (o.funcName===undefined)  o.funcName = t._id('bind');
+    
+        let on = t._get(o.funcName,false,g.on[o.on]);
+    
+        if (!on)
+            g.on[o.on].push({name:o.funcName,func:o.func});    
+        else
+            on.func = o.func;
+        
+        if ((o.on==='state')&&(o.func)&&(g._firstCallState))
+                o.func(g.prevState);
+    }            
 };
 /** удаление привязанного обработчика 
  * @param {string} actionName - имя action
@@ -157,30 +169,37 @@ zAction.define=function(o){
  * @param {string|undefined} funcName - имя функции если не указать, то будут удалены все из секции on
 */
 zAction.unbind=function(actionName,on,funcName){
-    var t=zAction,p=t.param,_on,
-    g = t._get(actionName);
+    let t=zAction,p=t.param,_on;
     
-    if (g){
-        if (on===undefined){
-            $.each(g.on,function(n){
-                g.on[n] = [];
-            });
-            return;
-        }
-        if (funcName===undefined){
-            g.on[on]=[];
-            return;
-        }
-        _on = t._get(funcName,true,g.on[on]);
-        if (_on!==false)
-            g.on[on].splice(_on,1);
+    if (typeof actionName ==='function'){
+        let idx = p.update.indexOf(actionName);
+        if (idx>=0)
+            p.update.splice(idx,1);
+    }else{
+        let g = t._get(actionName);
+    
+        if (g){
+            if (on===undefined){
+                $.each(g.on,function(n){
+                    g.on[n] = [];
+                });
+                return;
+            }
+            if (funcName===undefined){
+                g.on[on]=[];
+                return;
+            }
+            _on = t._get(funcName,true,g.on[on]);
+            if (_on!==false)
+                g.on[on].splice(_on,1);
         
-    }
+        }
+    };    
 };
 
 /** пооечередно вызывает все определенные ф-ции state , и если состояние изменилось, то вызываются все приаттаченные (bind) обработчики*/
 zAction.update=function(name){
-    var t=zAction,p=t.param,a=p.action,newState;
+    var t=zAction,p=t.param,a=p.action,newState,updNeed=false,updActions=[];
     
     if (t._lock('update')){
         
@@ -191,14 +210,18 @@ zAction.update=function(name){
                 v._firstCallState = true;
                 
                 if (!t._eq(newState,v.prevState)){
+                    updNeed = true;
+                    updActions.push(v.name);
                     v.prevState = (typeof newState === "object")?$.extend(false,newState,{}):newState;
                     v.on.state.forEach(function(vv){
                         if (vv.func) try{ vv.func(newState);}catch(e){}    
                     });
                 }
-                
             }
         });
+        
+        
+        p.update.forEach((f)=>{try{f({change:updNeed,list:updActions});}catch(e){}});
         
     }
     t._unlock('update');
