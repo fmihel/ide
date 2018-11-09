@@ -50,6 +50,7 @@ class WS extends WS_CONTENT{
     public $version; // номер версии (используется для кеширования)
     public $loadOptimizedResources; // будут загружаться оптимизированные скрипты ( если существуют), т.е у которых к имени файла добавлено .min
     public $icon;// путь к иконке приложения (если не указан то берется из корня приложения, если  в корне нет, то берет от wsi)
+    public $mode;// тип сборки production | development
     function __construct(){
         global $_WS;
         $_WS = $this;
@@ -62,6 +63,8 @@ class WS extends WS_CONTENT{
         $this->version = '';
         $this->loadOptimizedResources=false;
         $this->icon = '';
+        // тип сборки production | development
+        $this->mode = 'development';
     } 
     
     public function RUN(){
@@ -207,29 +210,39 @@ class WS extends WS_CONTENT{
             RESOURCE("https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js");
             
         }
+        
         //--------------------------------------------
+        $js_build = ($this->mode === 'production')?$this->builder('js',$version):false;
+        //--------------------------------------------
+        if ($js_build!==false)
+            $res.='<script type="text/javascript" src="'.$js_build.'"></script>'.DCR;
+        
+        
         if (isset($Application->EXTENSION['JS']))
         for($i=0;$i<count($Application->EXTENSION['JS']);$i++){
-            $js_script_file = $Application->EXTENSION['JS'][$i]['remote'];
-            if ($this->loadOptimizedResources === true){
-                
-                $f = APP::pathinfo($Application->EXTENSION['JS'][$i]['local']);
-                $js_script_file_min = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
-                
-                if (file_exists($js_script_file_min)){
-                    $f = APP::pathinfo($js_script_file);
-                    $js_script_file = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
-
-                    //_LOG('js: '.$js_script_file,__FILE__,__LINE__);
-                }    
-            }
-
-            $res.='<script type="text/javascript" src="';
-            $res.=$js_script_file;
-            $res.=($version!==''?'?'.$version:'');
             
-            $res.='"></script>'.DCR;
+            if (($js_build===false)||($Application->EXTENSION['JS'][$i]['local']=='')){
+                $js_script_file = $Application->EXTENSION['JS'][$i]['remote'];
+                if ($this->loadOptimizedResources === true){
+            
+                    $f = APP::pathinfo($Application->EXTENSION['JS'][$i]['local']);
+                    $js_script_file_min = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
+            
+                    if (file_exists($js_script_file_min)){
+                        $f = APP::pathinfo($js_script_file);
+                        $js_script_file = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
+                    }    
+                }
+
+                $res.='<script type="text/javascript" src="';
+                $res.=$js_script_file;
+                $res.=($version!==''?'?'.$version:'');
+            
+                $res.='"></script>'.DCR;
+            }
         };
+        
+        
         //---------------------------------------------
         if (isset($Application->EXTENSION['JSX']))
         for($i=0;$i<count($Application->EXTENSION['JSX']);$i++){
@@ -312,7 +325,53 @@ class WS extends WS_CONTENT{
         ENCODING::OUT($res);
         
     }
+    /** создание сборки */
+    public function builder($type,$version){
+        global $Application;
+        
+        if ($type==='js'){
+            
+            if (isset($Application->EXTENSION['JS'])){
+                // определяем build - уникальное имя сборки
+                $build = '';
+                
+                for($i=0;$i<count($Application->EXTENSION['JS']);$i++)
+                    $build.= $Application->EXTENSION['JS'][$i]['local'];
+                $build.=$version;
+                $build = md5($build);
     
+                $pBuild = '_render/';
+                $nBuild = $pBuild.$build.'.js';
+                // проверяем, существует ли сборка
+                $eBuild = true;
+                
+                if (!file_exists($pBuild)){
+                    $eBuild= false;
+                    mkdir($pBuild);
+                };
+                if (!file_exists($nBuild))
+                    $eBuild= false;
+                
+                if (!$eBuild){
+                    $cBuild = '';
+                    for($i=0;$i<count($Application->EXTENSION['JS']);$i++){
+                        
+                        $fBuild = trim($Application->EXTENSION['JS'][$i]['local']);
+                        if ($fBuild!==''&&(file_exists($fBuild))){
+                           // _LOGF($fBuild,$i.':',__FILE__,__LINE__);                
+                            $cBuild.=($cBuild!=''?';':'').file_get_contents($fBuild);
+                        }    
+                    }
+                    file_put_contents($nBuild,$cBuild);
+                }
+                
+                return $nBuild;
+            }
+        }
+        
+        return false;
+        
+    }
     public function CONTENT(){
             
     }

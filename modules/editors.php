@@ -6,14 +6,22 @@ $content_type_by_ext = array(
 );
 
 $DECONET_CODE_PAGES=array('CP1251','MAC','KOI8-R');
-
+        //RESOURCE('plugins/ace/ace.js');
+        //RESOURCE('plugins/jeditors/jeditors.js');
+        //RESOURCE('plugins/jeditors/jeditors.dcss');
+        //RESOURCE('plugins/jtab/jtab.js');
+        //RESOURCE($Application->HTTP.'plugins/ace/ace.js');
 MODULES::ADD('EDITORS');
 class EDITORS extends WS_MODULE{
    
    function __construct($owner){
         parent::__construct($owner);
+        global $Application;
         
-        RESOURCE('plugins/ace/ace.js');
+        // данный plugin добавлем с помощью внешнего http адреса 
+        // plugin добавленный таким образом не будет компилится при ws->mode = 'production'
+        RESOURCE($Application->HTTP.'plugins/ace/ace.js');
+        //RESOURCE('plugins/ace/ace.js');
         RESOURCE('plugins/jeditors/jeditors.js');
         RESOURCE('plugins/jeditors/jeditors.dcss');
         RESOURCE('plugins/jtab/jtab.js');
