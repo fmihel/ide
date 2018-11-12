@@ -135,48 +135,56 @@ Ws.error=function(obj,msg,context){
 Ws._aligns = [];
 Ws._lockAlign = 0;
 Ws._only = [];
-
+Ws._locking = false;
 Ws.align=function(o){
     
     
     if (o===undefined){
         if (Ws._lockAlign!==0) return;
-
-        var recall=[],remove=[],i,item;
+        if (Ws._lockign) return;
+        Ws._locking = true;
+        try{
+            
+            var recall=[],remove=[],i,item;
         
-        Ws._align();
-        for(i=0;i<Ws._aligns.length;i++){
-            item = Ws._aligns[i];
-            try{
+            Ws._align();
+            
+            for(i=0;i<Ws._aligns.length;i++){
+               item = Ws._aligns[i];
+                try{
 
-                if (item.func) item.func();
-                if (item.recall) recall.push(item);
+                    if (item.func) item.func();
+                    if (item.recall) recall.push(item);
 
-            }catch(e){
-                console.error('align: '+Ws._aligns[i].id+' remove handler');
-                remove.push(item);
+                }catch(e){
+                    console.error('align: '+Ws._aligns[i].id+' remove handler');
+                    remove.push(item);
+                }
             }
-        }
         
-        for(i=0;i<remove.length;i++)
-            Ws.removeAlign(remove[i].id);
+            for(i=0;i<remove.length;i++)
+                Ws.removeAlign(remove[i].id);
 
 
-        for(i=0;i<recall.length;i++){
-            item = recall[i];        
-            if (item.func) item.func();
-        }
+            for(i=0;i<recall.length;i++){
+                item = recall[i];        
+                if (item.func) item.func();
+            }
         
-        JX.lh('update');
+            JX.lh('update');
+            
+        }catch(e){
+            Ws._locking = false;    
+        }
         
     }else{
         
         if (o==='begin'){
-            Ws._lockAlign=1;
+            Ws._lockAlign++;
             return;
         }
         if (o==='end'){
-            Ws._lockAlign=0;
+            Ws._lockAlign--;
             if (Ws._lockAlign<0){ console.error('Ws._lockAlign < 0 ...!');}
             return;
         }

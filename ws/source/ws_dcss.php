@@ -53,7 +53,7 @@ class DCSS{
                 array_push($files,$css['remote']);
         };
         
-        
+          
         return array('css'=>$_dcss->render($styles),'vars'=>$_dcss->render_vars(),'files'=>$files);
     }
     
@@ -99,6 +99,8 @@ class WS_DCSS{
     private $group_current;
     private $is_pre_render; 
     private $cache;
+    private $renderPath;
+    private $version;
     
     function __construct(){
         
@@ -110,7 +112,7 @@ class WS_DCSS{
         
         $this->is_render = false;
         $this->is_pre_render = false;
-        
+        $this->renderPath = '_render/';
     }
     
     public function default_style(){
@@ -131,12 +133,9 @@ class WS_DCSS{
 
         }else{
             
-            if (!$this->is_pre_render){
-            
-                $this->is_pre_render = true;
-                $this->pre_render();
-            }
 
+            $this->_load_stored_styles();
+            
             if (count($this->styles)==0)
                     $this->styles=$this->default_style();
 
@@ -159,31 +158,97 @@ class WS_DCSS{
         /*выделяем dcss из исходников*/
         global $Application;
         
-        $res = '';
-        $res.=$this->source.'';
+        if (!$this->is_pre_render){
+            
+            $this->source=$this->source.''.$Application->getExtConcat('DCSS',"\n");
 
-        for($i=0;$i<count($Application->EXTENSION['DCSS']);$i++){
-            $filename = $Application->EXTENSION['DCSS'][$i]['local'];
-            $res.=file_get_contents($filename).' '."\n";
-        };
-        
-        $this->source = $res;
+            $this->_extract_comments($this->source);
+            $this->_extract_dcss($this->source);
+            
+            $this->is_pre_render = true;
+            
+        }    
 
+    }
+    
+    /** загрузка сохраненного стиля 
+     *  стиль будет помещен в $this->dcss['styles']
+    */
+    private function _load_stored_styles(){
+        /*выделяем dcss из исходников*/
+        global $Application;
+        
+        // выстраиваем цепочку
+        //$hash = $Application->getExtHash('DCSS',$this->version);
+        //$renderFile = $this->renderPath.$hash.'.php';
+        $file = $this->renderPath.'styles.json';
         
         
-        $this->_extract_comments($this->source);
-        $this->_extract_dcss($this->source);
+        if (!file_exists($this->renderPath))
+            mkdir($this->renderPath);
         
+        if (!file_exists($file)){
+            
+            $this->pre_render();
+            $json = ARR::to_json($this->dcss['styles']);
+            file_put_contents($file,$json);
+            
+        }else{
+            
+            $json = file_get_contents($file);            
+            $this->dcss['styles'] = ARR::from_json($json);
+
+        };    
+            
+    }
+    
+    private function _get_css_name($ext='css'){
+        /*выделяем dcss из исходников*/
+        global $Application;
         
+        // выстраиваем цепочку
+        $style = ARR::to_json($this->current_style());
+        
+        $hash  = $Application->getExtHash('DCSS',$this->version.$style);
+
+        return $this->renderPath.$hash.'.'.$ext;
+    }    
+    private function cache_css($css){
+        /*выделяем dcss из исходников*/
+        global $Application;
+        
+        $file = $this->_get_css_name();
+
+        // проверяем, существует ли сборка
+
+        if (!file_exists($this->renderPath))
+            mkdir($this->renderPath);
+        
+        if (!file_exists($file))
+            file_put_contents($file,$css);
+
     }
 
     public function render(){
         global $Application;
-        if (!$this->is_render)
-            $this->_generate();
+        $file = $this->_get_css_name();
         
-        $this->is_render = true;
+        if (!file_exists($file)){
+            
+            $this->pre_render();        
         
+            if (!$this->is_render)
+                $this->_generate();
+        
+            $this->is_render = true;
+        
+            $this->cache_css($this->css);
+            
+        }else{
+            
+            $this->css = file_get_contents($file);
+            
+        }
         
         return $this->css;
     }
@@ -246,7 +311,8 @@ class WS_DCSS{
             return $this->_var($name);
     }
     
-    public function render_vars(){
+    public function _render_vars(){
+        
         $out = array();
         foreach($this->vars as $k=>$v){
             $mean = $this->var_mean($k);
@@ -255,6 +321,27 @@ class WS_DCSS{
             if (mb_strlen($mean.'')<20)
                 $out[$k]=$mean;    
         }
+        return $out;
+    }
+    public function render_vars(){
+        
+        /*выделяем dcss из исходников*/
+        global $Application;
+        $file = $this->_get_css_name('json');
+        if (file_exists($file)){
+            
+            $json = file_get_contents($file);
+            $out = ARR::from_json($json);
+            
+        }else{
+            if (!file_exists($this->renderPath))
+                mkdir($this->renderPath);
+            
+            $out = $this->_render_vars();
+            
+            file_put_contents($file,ARR::to_json($out));    
+        }
+        
         return $out;
     }
     
@@ -529,14 +616,40 @@ class WS_DCSS{
                 $trim = trim($arr[$i]);
                 $lenTrim = mb_strlen($trim); 
                 $is_var_defined = true;
-            
-                if (($trim[0]==='$')&&($trim[$lenTrim-1]===';')&&(mb_strpos($trim,'=')!==false)){
-                        // var defined ($var = ...;)    
-                        $this-> _var_from_fill(array('find'=>$trim));
+                
+                /** ищем конструкцию типа 
+                 * 
+                 * $STRING = ..
+                 * .. 
+                 * .. ;
+                 * 
+                 */ 
+                if (($trim[0]=='$')&&(mb_strpos($trim,'=')!==false)){
+                    $buff = $trim;
+
+                    array_splice($arr,$i,1);
+                    $count--;
+                    
+                    $loop = 100;
+                    while($trim[$lenTrim-1]!==';'){
+                        
+                        if (($loop--)===0){
+                            _LOGF('dcss not have ";" ','Error',__FILE__,__LINE__);
+                            exit;
+                        }
+                        
+                        $trim       = trim($arr[$i]);
+                        $lenTrim    = mb_strlen($trim); 
+                        $buff.=$trim;
+                        
                         array_splice($arr,$i,1);
                         $count--;
-                        $i--;
                         
+                    }
+                    
+                    $this-> _var_from_fill(array('find'=>$buff));
+                    $i--;
+
                 }else{
                     // uses var in css code 
                     // insert var mean

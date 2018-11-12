@@ -450,7 +450,7 @@ class TApplication{
         return APP::eq_path($file,$_SERVER['SCRIPT_FILENAME']);
     }
     
-    function includes(/*filename  || tag(ws/root),filename */){
+    public function includes(/*filename  || tag(ws/root),filename */){
         //S: добавление ресурса в приложение 
         /*D:  
             includes(filename) - добавляет ресурс с использованием пути относительно стартового файла проекта
@@ -518,6 +518,29 @@ class TApplication{
             return $local;
             
 
+    }
+
+    /** возвращает хеш сумму md5 по заданному расширению (для проверки появился ли новый файл в списке) 
+     * $add - дополнительная строка добавляемая к сумме
+    */
+    public function getExtHash($ext,$add=''){
+        $files = '';
+            
+        for($i=0;$i<count($this->EXTENSION[$ext]);$i++)
+            $files.= $this->EXTENSION[$ext][$i]['local'];
+        $files.=$add;
+        return md5($files);
+    }
+    
+    /** возвращает весь контент ресурса одним файлом */
+    public function getExtConcat($ext,$delim){
+        $res = '';
+        for($i=0;$i<count($this->EXTENSION[$ext]);$i++){
+            $file = trim($this->EXTENSION[$ext][$i]['local']);
+            if (($file!=='')&&(file_exists($file)))
+                $res.=($res!=''?$delim:'').file_get_contents($file);
+        }
+        return $res;
     }
     
     private function _add_to_extension($ext,$dat){

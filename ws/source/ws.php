@@ -98,7 +98,6 @@ class WS extends WS_CONTENT{
             
             DEVICE::SET($device);
             DCSS::STYLES($styles);
-            
             $dcss = DCSS::RENDER();
             
             $dcss['res'] = 1;
@@ -130,12 +129,8 @@ class WS extends WS_CONTENT{
         //---------------------------------------------
         
         $styles = DCSS::STYLES();
-        
-        //error_log(print_r($styles,true));
-        //CT::START('RENDER');
         $dcss   = DCSS::RENDER();
-        //CT::STOP('RENDER');
-        //CT::STOP('WS'); 
+        
         //---------------------------------------------
         $this->root = FRAME::ADD('')->TAG_NAME('body');
         //---------------------------------------------
@@ -326,19 +321,20 @@ class WS extends WS_CONTENT{
         
     }
     /** создание сборки */
-    public function builder($type,$version){
+    private function builder($type,$version){
         global $Application;
         
         if ($type==='js'){
             
             if (isset($Application->EXTENSION['JS'])){
                 // определяем build - уникальное имя сборки
-                $build = '';
+                $build = $Application->getExtHash('JS',$version);
+                //$build = '';
                 
-                for($i=0;$i<count($Application->EXTENSION['JS']);$i++)
-                    $build.= $Application->EXTENSION['JS'][$i]['local'];
-                $build.=$version;
-                $build = md5($build);
+                //for($i=0;$i<count($Application->EXTENSION['JS']);$i++)
+                //    $build.= $Application->EXTENSION['JS'][$i]['local'];
+                //$build.=$version;
+                //$build = md5($build);
     
                 $pBuild = '_render/';
                 $nBuild = $pBuild.$build.'.js';
@@ -352,18 +348,9 @@ class WS extends WS_CONTENT{
                 if (!file_exists($nBuild))
                     $eBuild= false;
                 
-                if (!$eBuild){
-                    $cBuild = '';
-                    for($i=0;$i<count($Application->EXTENSION['JS']);$i++){
-                        
-                        $fBuild = trim($Application->EXTENSION['JS'][$i]['local']);
-                        if ($fBuild!==''&&(file_exists($fBuild))){
-                           // _LOGF($fBuild,$i.':',__FILE__,__LINE__);                
-                            $cBuild.=($cBuild!=''?';':'').file_get_contents($fBuild);
-                        }    
-                    }
-                    file_put_contents($nBuild,$cBuild);
-                }
+                if (!$eBuild)
+                    file_put_contents($nBuild,$Application->getExtConcat('JS',';'));
+                
                 
                 return $nBuild;
             }
