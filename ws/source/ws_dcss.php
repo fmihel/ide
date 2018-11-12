@@ -328,15 +328,17 @@ class WS_DCSS{
         /*выделяем dcss из исходников*/
         global $Application;
         $file = $this->_get_css_name('json');
+        
         if (file_exists($file)){
             
             $json = file_get_contents($file);
-            $out = ARR::from_json($json);
+            $out = ARR::from_json_ex($json);
             
         }else{
+            
             if (!file_exists($this->renderPath))
                 mkdir($this->renderPath);
-            
+            $this->render();
             $out = $this->_render_vars();
             
             file_put_contents($file,ARR::to_json($out));    
