@@ -1,6 +1,8 @@
 /.vscode/
 /.vscode/*
-/_render/
-/_render/*
+_render/
+_render/*
+
+ws_conf.json
 
 wsi.code-workspace

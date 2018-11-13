@@ -3,20 +3,22 @@
 if(!isset($Application))
   require_once '../utils/application.php';
 require_once UNIT('utils','ctime.php'); 
-//CT::START('WS');
 
 
 define('DCR',"\n");
 //define('DCR',"");
 
+
+require_once UNIT('utils','common.php');
+
+require_once UNIT('ws','ws_conf.php');
 require_once UNIT('ws','ws_request.php');
-require_once UNIT('ws','ws_utils.php');
 require_once UNIT('ws','ws_common.php');
+require_once UNIT('ws','ws_utils.php');
 require_once UNIT('ws','ws_frame.php');
 require_once UNIT('ws','ws_module.php');
 require_once UNIT('ws','ws_dcss.php');
 
-require_once UNIT('utils','common.php');
 
 //RESOURCE('https://code.jquery.com/jquery-3.1.1.min.js');
 //RESOURCE('plugins','jquery/jquery-3.1.1.js');
@@ -29,6 +31,7 @@ RESOURCE('plugins','jx/jx.js');
 RESOURCE('plugins','common/dvc.js');
 RESOURCE('ws','ws.js');
 RESOURCE('ws','dcss.js');
+
 /*
     Подключение данных модулей автоматически если  есть расширения jsx ( см WS.RENDER() )
     
@@ -39,6 +42,13 @@ RESOURCE('ws','dcss.js');
 
 require_once UNIT('utils','encoding.php');
 
+// ---------------------------------------------------------------
+/** предварительное определение параметров настройки 
+ * по хорошему их нужно вынести в отдельный файл :)
+*/
+WS_CONF::DEF('renderPath','_render/');
+WS_CONF::DEF('mode','development');
+// ---------------------------------------------------------------
 
 $_WS = null;// ссылка на объект WS инициализируем в конструкторе WS
 
@@ -66,8 +76,8 @@ class WS extends WS_CONTENT{
 
         $this->version = '';
         // тип сборки production | development
-        $this->mode = 'development';
-        $this->renderPath = '_render/';
+        $this->mode         = WS_CONF::GET('mode');
+        $this->renderPath   = WS_CONF::GET('renderPath');
     } 
     
     public function RUN(){
@@ -332,13 +342,7 @@ class WS extends WS_CONTENT{
             if (isset($Application->EXTENSION['JS'])){
                 // определяем build - уникальное имя сборки
                 $build = $Application->getExtHash('JS',$version);
-                //$build = '';
-                
-                //for($i=0;$i<count($Application->EXTENSION['JS']);$i++)
-                //    $build.= $Application->EXTENSION['JS'][$i]['local'];
-                //$build.=$version;
-                //$build = md5($build);
-    
+
                 $pBuild = '_render/';
                 $nBuild = $pBuild.$build.'.js';
                 // проверяем, существует ли сборка

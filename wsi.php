@@ -203,7 +203,6 @@ if($Application->is_main(__FILE__)){
   //$app->version='';
   //$app->version='nocache';
   $app->version=WSI_DEV_VERSION;
-  $app->mode='production';
   $app->RUN();
   //echo $Application->debug_info();
   

@@ -64,7 +64,7 @@ class DCSS{
         
         $_dcss->version     = $_WS->version;
         $_dcss->renderPath  = $_WS->renderPath;
-        $_dcss->mode        = $_WS->mode;
+        $_dcss->mode        = DEVICE::isMobile()?'development':$_WS->mode;
         
         
         
@@ -103,9 +103,12 @@ class DEVICE{
         
         return MATH::translate($mm,0,$_device['size']['w'],0,$_device['browser']['w']);
     }   
-    
-    
-    
+
+    public static function isMobile(){
+        global $_device;
+        return $_device['mobile']==1;
+    }
+
 }
 //----------------------------------------------------------
 class WS_DCSS{
