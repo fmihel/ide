@@ -22,6 +22,7 @@ $_device = array(   'browser'=>array('w'=>1024,'h'=>768),
 //----------------------------------------------------------
 
 class DCSS{
+    
     public static function CSS($css){
         global $_dcss;
         $_dcss->add($css.DCR);
@@ -59,11 +60,19 @@ class DCSS{
     
     public static function STYLES(/*set new styles*/){
         global $_dcss;
+        global $_WS;
+        
+        $_dcss->version     = $_WS->version;
+        $_dcss->renderPath  = $_WS->renderPath;
+        $_dcss->mode        = $_WS->mode;
+        
+        
         
         if(func_num_args()>0){
             
             $styles=func_get_arg(0);
             $_dcss->current_style($styles);
+            
         }else    
             return $_dcss->current_style();
     }
@@ -79,12 +88,23 @@ class DEVICE{
         
     }
     
+    public static function GET(){
+        global $_device;
+        return $_device ;
+    }
+    
+    public static function asString(){
+        global $_device;
+        return serialize($_device);
+    }
+    
     public static function toPX($mm){
         global $_device;
         
         return MATH::translate($mm,0,$_device['size']['w'],0,$_device['browser']['w']);
-        
     }   
+    
+    
     
 }
 //----------------------------------------------------------
@@ -99,8 +119,10 @@ class WS_DCSS{
     private $group_current;
     private $is_pre_render; 
     private $cache;
-    private $renderPath;
-    private $version;
+    
+    public $renderPath;
+    public $version;
+    public $mode;
     
     function __construct(){
         
@@ -112,7 +134,10 @@ class WS_DCSS{
         
         $this->is_render = false;
         $this->is_pre_render = false;
+        
         $this->renderPath = '_render/';
+        $this->version = '';
+        $this->mode = 'development';
     }
     
     public function default_style(){
@@ -132,9 +157,12 @@ class WS_DCSS{
             $this->styles = func_get_arg(0);
 
         }else{
-            
 
-            $this->_load_stored_styles();
+            if ($this->mode === 'production')
+                $this->_cached_styles();
+            else
+                $this->pre_render();
+                
             
             if (count($this->styles)==0)
                     $this->styles=$this->default_style();
@@ -171,85 +199,85 @@ class WS_DCSS{
 
     }
     
+    /** возвращает необходимость кеширования ( и создает необходимые папки ) */
+    private function _cache_need($fileName){
+        
+        if (!file_exists($this->renderPath))
+            mkdir($this->renderPath);
+        return !file_exists($fileName);
+    }
+    
     /** загрузка сохраненного стиля 
      *  стиль будет помещен в $this->dcss['styles']
     */
-    private function _load_stored_styles(){
+    private function _cached_styles(){
         /*выделяем dcss из исходников*/
         global $Application;
         
-        // выстраиваем цепочку
-        //$hash = $Application->getExtHash('DCSS',$this->version);
-        //$renderFile = $this->renderPath.$hash.'.php';
-        $file = $this->renderPath.'styles.json';
-        
-        
-        if (!file_exists($this->renderPath))
-            mkdir($this->renderPath);
-        
-        if (!file_exists($file)){
-            
-            $this->pre_render();
-            $json = ARR::to_json($this->dcss['styles']);
-            file_put_contents($file,$json);
-            
-        }else{
-            
-            $json = file_get_contents($file);            
-            $this->dcss['styles'] = ARR::from_json($json);
-
-        };    
-            
-    }
+        $file = $this->renderPath.'styles.dat';
     
-    private function _get_css_name($ext='css'){
+        if ($this->_cache_need($file)){
+            $this->pre_render();
+            $json = serialize($this->dcss['styles']);
+            file_put_contents($file,$json);
+        }else{
+            $json = file_get_contents($file);            
+            $this->dcss['styles'] = unserialize($json);
+        };    
+
+    }
+    /** возвращает имя файла, который будет записан кешь */
+    private function _cached_name($ext='css'){
         /*выделяем dcss из исходников*/
         global $Application;
         
-        // выстраиваем цепочку
-        $style = ARR::to_json($this->current_style());
+        $style = serialize($this->current_style());
         
-        $hash  = $Application->getExtHash('DCSS',$this->version.$style);
+        $hash  = $Application->getExtHash('DCSS',$this->version.$style.DEVICE::asString());
 
         return $this->renderPath.$hash.'.'.$ext;
     }    
-    private function cache_css($css){
+    
+    /** сохраняем css в кешь */
+    private function _cache($fileName){
         /*выделяем dcss из исходников*/
         global $Application;
+
+        if ($this->_cache_need($fileName))
+            file_put_contents($fileName,$this->css);
+
+    }
+    
+    /** set $this->css    */
+    private function _render(){
+        global $Application;
+
+        $this->pre_render();        
         
-        $file = $this->_get_css_name();
-
-        // проверяем, существует ли сборка
-
-        if (!file_exists($this->renderPath))
-            mkdir($this->renderPath);
+        if (!$this->is_render)
+            $this->_generate();
         
-        if (!file_exists($file))
-            file_put_contents($file,$css);
-
+        $this->is_render = true;
+        
     }
 
     public function render(){
         global $Application;
-        $file = $this->_get_css_name();
         
-        if (!file_exists($file)){
+        if ($this->mode==='production'){
             
-            $this->pre_render();        
+            $file = $this->_cached_name('css');
         
-            if (!$this->is_render)
-                $this->_generate();
-        
-            $this->is_render = true;
-        
-            $this->cache_css($this->css);
+            if ($this->_cache_need($file)){
+
+                $this->_render();
+                $this->_cache($file);
             
-        }else{
-            
-            $this->css = file_get_contents($file);
-            
-        }
-        
+            }else
+                $this->css = file_get_contents($file);
+        }else
+            $this->_render();
+                    
         return $this->css;
     }
 
@@ -260,9 +288,6 @@ class WS_DCSS{
         
         
         $out = $this->source;
-        
-        //$this->_extract_comments($out);
-        //$this->_extract_dcss($out);
         
         $this->_extract_string($out);
 
@@ -327,23 +352,22 @@ class WS_DCSS{
         
         /*выделяем dcss из исходников*/
         global $Application;
-        $file = $this->_get_css_name('json');
-        
-        if (file_exists($file)){
+
+        if ($this->mode==='production'){
+            $file = $this->_cached_name('dat');
             
-            $json = file_get_contents($file);
-            $out = ARR::from_json_ex($json);
-            
-        }else{
-            
-            if (!file_exists($this->renderPath))
-                mkdir($this->renderPath);
-            $this->render();
+            if ($this->_cache_need($file)){
+
+                $out = $this->_render_vars();
+                file_put_contents($file,serialize($out));    
+                
+            }else{
+                $json = file_get_contents($file);
+                $out  = unserialize($json);
+            }
+        }else
             $out = $this->_render_vars();
-            
-            file_put_contents($file,ARR::to_json($out));    
-        }
-        
+
         return $out;
     }
     

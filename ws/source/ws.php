@@ -51,6 +51,7 @@ class WS extends WS_CONTENT{
     public $loadOptimizedResources; // будут загружаться оптимизированные скрипты ( если существуют), т.е у которых к имени файла добавлено .min
     public $icon;// путь к иконке приложения (если не указан то берется из корня приложения, если  в корне нет, то берет от wsi)
     public $mode;// тип сборки production | development
+    public $renderPath;// тип сборки production | development
     function __construct(){
         global $_WS;
         $_WS = $this;
@@ -60,11 +61,13 @@ class WS extends WS_CONTENT{
         $this->tabColor = false;
         
         $this->root = null;
-        $this->version = '';
         $this->loadOptimizedResources=false;
         $this->icon = '';
+
+        $this->version = '';
         // тип сборки production | development
         $this->mode = 'development';
+        $this->renderPath = '_render/';
     } 
     
     public function RUN(){
