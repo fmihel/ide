@@ -12,6 +12,7 @@ define('DCR',"\n");
 require_once UNIT('utils','common.php');
 
 require_once UNIT('ws','ws_conf.php');
+require_once UNIT('ws','ws_conf_def.php');
 require_once UNIT('ws','ws_request.php');
 require_once UNIT('ws','ws_common.php');
 require_once UNIT('ws','ws_utils.php');
@@ -20,9 +21,6 @@ require_once UNIT('ws','ws_module.php');
 require_once UNIT('ws','ws_dcss.php');
 
 
-//RESOURCE('https://code.jquery.com/jquery-3.1.1.min.js');
-//RESOURCE('plugins','jquery/jquery-3.1.1.js');
-//RESOURCE('plugins','jquery/jquery-3.2.1.js');
 RESOURCE('plugins','jquery/jquery-3.3.1.js');
 RESOURCE('plugins','common/addition.js');
 RESOURCE('plugins','common/ut.js');
@@ -34,7 +32,6 @@ RESOURCE('ws','dcss.js');
 
 /*
     Подключение данных модулей автоматически если  есть расширения jsx ( см WS.RENDER() )
-    
     RESOURCE("https://unpkg.com/react@16/umd/react.production.min.js");
     RESOURCE("https://unpkg.com/react-dom@16/umd/react-dom.production.min.js");
     RESOURCE("https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js");
@@ -42,12 +39,6 @@ RESOURCE('ws','dcss.js');
 
 require_once UNIT('utils','encoding.php');
 
-// ---------------------------------------------------------------
-/** предварительное определение параметров настройки 
- * по хорошему их нужно вынести в отдельный файл :)
-*/
-WS_CONF::DEF('renderPath','_render/');
-WS_CONF::DEF('mode','development');
 // ---------------------------------------------------------------
 
 $_WS = null;// ссылка на объект WS инициализируем в конструкторе WS
@@ -220,7 +211,7 @@ class WS extends WS_CONTENT{
         }
         
         //--------------------------------------------
-        $js_build = ($this->mode === 'production')?$this->builder('js',$version):false;
+        $js_build = ($this->mode === 'production')?$this->builder('js',$version,(WS_CONF::GET('bildFrameJS')==1?$this->main_js($dcss,$styles,$version):'')):false;
         //--------------------------------------------
         if ($js_build!==false)
             $res.='<script type="text/javascript" src="'.$js_build.'"></script>'.DCR;
@@ -267,8 +258,6 @@ class WS extends WS_CONTENT{
         $res.='<'.'style'.' id="ws_style" type="text/css">'.$dcss['css'].'</style>';
         
         //---------------------------------------------
-        
-        
         $res.='<'.'style type='.'"text/css"'.'>';
         //DCSS::CSS($this->root->RENDER('css'));
             $res.=$this->root->RENDER('css');
@@ -276,8 +265,27 @@ class WS extends WS_CONTENT{
         $res.='</style>'.DCR;
 
         //---------------------------------------------
-        $res.='<script type='.'"text/javascript"'.'>'.DCR;
+        if (($this->mode==='development')||(WS_CONF::GET('bildFrameJS')==0)){
+            $res.='<script type='.'"text/javascript"'.'>'.DCR;
+            $res.= $this->main_js($dcss,$styles,$version);
+            $res.='</script>'.DCR;
+        }; 
         //---------------------------------------------
+        $res.='</head>'.DCR;
+        //---------------------------------------------
+        $res.=$this->root->RENDER('html');
+        //---------------------------------------------
+        $res.='</html>'.DCR;
+        
+        ENCODING::OUT($res);
+        
+    }
+    /** генерация JS кода  из FRAME */
+    private function main_js($dcss,$styles,$version){
+        global $Application;
+        global $REQUEST;
+        
+        $res = '';
         $res.="Ws.url = '".$Application->ADDR."';".DCR;
         $res.="Ws.version = '".$version."';".DCR;
         $res.="Ws.share = ".ARR::to_json($REQUEST->SHARE).';'.DCR;
@@ -321,20 +329,11 @@ class WS extends WS_CONTENT{
             $res.='});';
             
         $res.='});'.DCR;
-        //---------------------------------------------
-        $res.='</script>'.DCR;
-        //---------------------------------------------
-        $res.='</head>'.DCR;
-        //---------------------------------------------
-        $res.=$this->root->RENDER('html');
-        //---------------------------------------------
-        $res.='</html>'.DCR;
-        
-        ENCODING::OUT($res);
-        
+         
+        return $res; 
     }
     /** создание сборки */
-    private function builder($type,$version){
+    private function builder($type,$version,$right = ''){
         global $Application;
         
         if ($type==='js'){
@@ -356,7 +355,7 @@ class WS extends WS_CONTENT{
                     $eBuild= false;
                 
                 if (!$eBuild)
-                    file_put_contents($nBuild,$Application->getExtConcat('JS',';'));
+                    file_put_contents($nBuild,$Application->getExtConcat('JS',';').';'.$right);
                 
                 
                 return $nBuild;
