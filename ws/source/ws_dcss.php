@@ -236,7 +236,8 @@ class WS_DCSS{
         
         $style = serialize($this->current_style());
         
-        $hash  = $Application->getExtHash('DCSS',$this->version.$style.DEVICE::asString());
+        //$hash  = $Application->getExtHash('DCSS',$this->version.$style.DEVICE::asString());
+        $hash  = $Application->getExtHash('DCSS',$this->version.$style);
 
         return $this->renderPath.$hash.'.'.$ext;
     }    
