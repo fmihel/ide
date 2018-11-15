@@ -1,7 +1,7 @@
 $dcss={
     styles:{
         size:[compact,normal], 
-        color:[light,dark]
+        color:[dark,light]
     }    
 };
 

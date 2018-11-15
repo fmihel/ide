@@ -8,8 +8,10 @@
  * Определние настроек
  * WS_CONF::DEF('renderPath','_render/');
  * WS_CONF::DEF('mode','development');
- * 
  * Однако, если в ws_conf.json  соотвествующая настройка , то она переопределит существующую
+ * 
+ * Если же необходимо, намеренно переопределять параметр из программы, то можно использовать 
+ * WS_CONF::SET('mode','production'); 
  * 
  * Получение настоек
  * $mode = WS_CONF::GET('mode');
@@ -30,12 +32,15 @@
  * 
 */
 
-$_ws_conf = new _WS_CONF();
 
 class WS_CONF{
     static function GET($name,$default=''){
         global $_ws_conf;
         return $_ws_conf->get($name,$default);
+    }
+    static function SET($name,$mean){
+        global $_ws_conf;
+        return $_ws_conf->set($name,$mean);
     }
     static function DEF($name,$default=''){
         global $_ws_conf;
@@ -70,8 +75,12 @@ class _WS_CONF{
     }
     
     function def($name,$mean){
-        if ((!isset($this->param[$name]))||($this->param[$name]==''))
+        if (!isset($this->param[$name]))
             $this->param[$name] = $mean;
+    }
+
+    function set($name,$mean){
+        $this->param[$name] = $mean;
     }
     
     function get($name,$default){
@@ -82,5 +91,6 @@ class _WS_CONF{
     
 };
 
+$_ws_conf = new _WS_CONF();
 
 ?>

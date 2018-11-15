@@ -24,12 +24,12 @@ class AUTORIZE extends WS_MODULE{
         
         $width=$width -45;
         $text = FRAME("text",$form)
-            ->STYLE('position:absolute;left:20px;top:20px;color:gray')
+            ->STYLE('position:absolute;left:20px;top:20px')
             ->VALUE('Autorize');
         
         $login = FRAME("login",$form)
             ->TAG_NAME('input')
-            ->ATTR('autocomplete',"new-password")
+            ->ATTR('autocomplete',"nope")
             ->ATTR('placeholder','login')
             ->READY('
                 {$}.focus();

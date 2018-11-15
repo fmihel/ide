@@ -67,6 +67,7 @@ RESOURCE('style/url_lighter/list.dcss');
 
 RESOURCE('plugins','url_lighter/url_lighter.js');
 
+WS_CONF::SET('bildFrameJS',0);
 
 class WSI extends WS{
         
@@ -117,7 +118,7 @@ class WSI extends WS{
             
         };
         
-        $styles = array('color'=>'light','size'=>'normal');
+        $styles = array('color'=>'dark','size'=>'normal');
         if ($USERS->is_autorize()){ 
             if ($USERS->get('theme')=='dark')
                 $styles=array('color'=>'dark','size'=>'compact');
