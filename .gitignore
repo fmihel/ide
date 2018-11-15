@@ -4,5 +4,6 @@ _render/
 _render/*
 
 ws_conf.json
+ws_conf.php
 
 wsi.code-workspace

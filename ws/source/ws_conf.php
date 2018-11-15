@@ -1,8 +1,8 @@
 <?php
 /**
  * Загрузка настроек проекта 
- * Настройки проекта лежат в файле ws_conf.json ( в корне проекта)
- * Файл может отсутствовать!!
+ * Настройки проекта лежат в файле ws_conf.php или ws_conf.json  ( в корне проекта)
+ * Файл может отсутствовать!! Приортетным считается php
  * 
  * В самом проекте можно предопределить значения
  * Определние настроек
@@ -13,6 +13,20 @@
  * 
  * Получение настоек
  * $mode = WS_CONF::GET('mode');
+ * 
+ * Example: ws_conf.php
+ * <?php
+ *  $ws_conf = array(
+ *      'mode'=>'production',
+ *      'renderPath'=>'_build/',
+ *  )
+ * ?>
+ * 
+ * Example: ws_conf.json
+ * {
+ *      mode:'production',
+ *      renderPath:'_build/',
+ * }
  * 
 */
 
@@ -35,14 +49,24 @@ class _WS_CONF{
     
     function __construct(){
         $this->param = array();
-        $this->load('ws_conf.json');
+        $this->load();
     }
     
-    function load($file){
+    function load(){
+        
+        $file = 'ws_conf.php';
         if (file_exists($file)){
-            $cont = file_get_contents($file);
-            $this->param = ARR::extend($this->param,$cont);
-        }
+            require_once $file;
+            $this->param = ARR::extend($this->param,$ws_conf);
+            
+        }else{    
+            
+            $file = 'ws_conf.js';
+            if (file_exists($file)){
+                $cont = file_get_contents($file);
+                $this->param = ARR::extend($this->param,$cont);
+            }
+        };    
     }
     
     function def($name,$mean){
