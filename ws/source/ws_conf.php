@@ -66,7 +66,7 @@ class _WS_CONF{
             
         }else{    
             
-            $file = 'ws_conf.js';
+            $file = 'ws_conf.json';
             if (file_exists($file)){
                 $cont = file_get_contents($file);
                 $this->param = ARR::extend($this->param,$cont);
