@@ -743,7 +743,7 @@ class TWS extends WS{
                     modal   :false,
                     delay   :20000,
                     arrOff  :"center",/** place arrow, arrOff =  int | "center"   */  
-                    arrW:   14,
+                    arrW:   14, 
                     show    :false, 
                     padding:{left:5,top:5,bottom:5,right:20},
                     pivot:{}  /* pivot:{a:"left",b:"right"}   a-plugin   b-tip  */
@@ -757,7 +757,14 @@ class TWS extends WS{
                     icon_tip:false,
                 }
             });
-            {$plugin}.jedit({tip:"text in tip box"});
+            {$plugin}.jedit({
+                tip:{
+                    msg:"text in tip box",
+                    modal:true,
+                    delay:0
+                    
+                }
+            });
             
             '
         );        

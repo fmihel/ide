@@ -311,8 +311,8 @@ Tjedit.prototype.init = function(o){
             place   :"bottom",
             width   :"auto",
             height  :"auto",
-            modal   :false,
-            delay   :20000,
+            modal   :true,
+            delay   :0,
             arrOff  :"center",/** int or center */
             arrW:   14,
             show    :false,
@@ -424,7 +424,10 @@ Tjedit.prototype.done=function(){
     p.jq.combo.remove();
     
     if (p.tip._delay){ clearTimeout(p.tip._delay);p.tip._delay=undefined;};
-    p.jq.tip.frame.jshadow('destroy');
+    if (p.jq.tip.modal!==undefined){
+        p.jq.tip.modal.jshadow('destroy');
+        p.jq.tip.modal.remove()
+    }    
     p.jq.tip.frame.remove();
     
     p.plugin.html("");
@@ -492,6 +495,7 @@ Tjedit.prototype._create = function(){
     var tip = p.plugin.find('#'+id.tip);
     jq.tip={
         frame   :tip,
+        modal   :undefined,  
         shadow  :tip.find('.'+css.tipShadow),
         border  :tip.find('.'+css.tipBorder),
         arrow   :tip.find('.'+css.tipArrow),
@@ -1411,27 +1415,41 @@ Tjedit.prototype.tip=function(){
         
         //JX.visible(p.jq.tip.frame,tip.show);
         if (tip.show)
-            p.jq.tip.frame.fadeIn({duration:200,step(){ t._align_tip();}})
+            p.jq.tip.frame.fadeIn({duration:200,step(){ t._align_tip();}});
         else
             p.jq.tip.frame.fadeOut(200);
         delay();
 
         if (tip.modal){
             if (tip.show){
-                p.jq.tip.frame.jshadow({
+                
+                /** созддаем панель заведомо выше компонента */
+                if (p.jq.tip.modal===undefined){
+                    
+                    let mid = ut.id('mid');
+                    Qs.modal.append('<div id="'+mid+'"></div>');
+                    p.jq.tip.modal = Qs.modal.find('#'+mid);
+
+                }else
+                    p.jq.tip.modal.detach().appendTo(Qs.modal);
+                
+                 
+                p.jq.tip.modal.jshadow({
                     show:true,
-                    opacity:0.2,
-                    click:function(e){
+                    opacity:0.01,
+                    toBack:true,
+                    click(e){
                         t.put({tip:{show:false}});
                     },
-                    onhide:function(){
-                        p.jq.tip.frame.jshadow('destroy');
+                    onhide(){
+                        
                     },
-                    onshow:function(){
+                    onshow(){
                     }
                 });
-            }else
-                p.jq.tip.frame.jshadow("hide");
+            }else{
+                p.jq.tip.modal.jshadow("hide");
+            }    
         }
     }else{
         delay();        

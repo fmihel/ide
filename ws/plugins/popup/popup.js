@@ -277,7 +277,7 @@ Tpopup.prototype.show=function(o){
     var a = $.extend(true,pp,o);
     
     
-    p.lock.lock("align");        
+    p.lock.lock("align");
 
     if (typeof(o) === 'string') 
         o = {caption:o};
@@ -292,7 +292,7 @@ Tpopup.prototype.show=function(o){
 
 Tpopup.prototype._show=function(o){
     var t=this,p=o,css=p.css,c='',id=ut.id('pp');
-    var cancel = o.onButton,ok = o.onDelayClose,context  = o.context;
+    var cancel = o.onButton,ok = o.onDelayClose,context  = o.context,handler;
     
     c = ut.tag('<',{id:id,css:css.frame,style:'position:absolute'});
     c+= ut.tag({css:css.msg,style:'position:absolute',value:o.caption});
@@ -308,15 +308,26 @@ Tpopup.prototype._show=function(o){
 
     JX.arrange(c.children(),o.alignChild);
     
-    var handler = setTimeout(function(){
-        c.fadeOut(500,function(){
-            cancel = undefined;
-            if (ok) 
-                ok(context);
-            $(this).remove();
-        });
-    },o.delay);    
-
+    t._align();
+    var from = JX.abs(c);
+    JX.abs(c,{y:from.y+from.h,h:0});
+    c.animate({
+        top:from.y,
+        height:from.h
+    },200,()=>{
+        t._align();
+        
+        handler = setTimeout(()=>{
+            c.fadeOut(400,()=>{
+                cancel = undefined;
+                if (ok) 
+                    ok(context);
+                $(this).remove();
+                //t._align();
+            });
+        },o.delay);    
+    });
+    
     c.find('.'+css.btn).on("click",function(){
         clearTimeout(handler);
         ok = undefined;

@@ -636,7 +636,6 @@ Tmtree.prototype.buffer=function(update){
                 childs      :childs,
                 count       :childs.length,
                 parent      :parent,
-                count       :child.children().length,
                 off         :item.children('.'+css.off), /* отступ {jquery}*/
                 unfold      :item.children('.'+css.unfold),/* индикатор свернут/развернут {jquery}*/
                 icon        :item.children('.'+css.icon), /* иконка {jquery}*/
