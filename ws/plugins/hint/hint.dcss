@@ -1,0 +1,11 @@
+.hint_frame{
+    
+    background-color:$hintFone;
+    border:1px solid $hintBorder;
+
+}
+
+.hint_text{
+    text-align:center;
+    color:$hintColor;
+}

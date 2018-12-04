@@ -1,0 +1,3 @@
+$hintFone = $foneHint;
+$hintBorder = $border;
+$hintColor = $fontHint;
