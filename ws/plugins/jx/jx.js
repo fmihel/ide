@@ -367,6 +367,7 @@ clinger:function(a,b,prm){
  *      abs:bool  - какой алгоритм расчета позиции 
  *      area: "screen" | jquery | false - область или объект за который не должен выйти b
  *      cross:bool  если после расчета позиции b, объекты a и b пересекаются, то будет проведено симметричное перерасположение
+ *      strong:bool - тип а
  * }
  * 
  */  
@@ -378,6 +379,7 @@ cling:function(a,b,prm){
         abs:false,
         area:false,
         cross:false,
+        strong:false,
     },prm),
     ad = JX._dom(a),
     bd = JX._dom(b),
@@ -417,16 +419,41 @@ cling:function(a,b,prm){
             bp = JX._pos(bd);
         }
     
-        if (JX.iscrossr(ap,bp,false)){
-            if (p.side.a==="left") p.side.a = "right";
-            else if (p.side.a==="right") p.side.a = "left";
-            else if (p.side.a==="top") p.side.a = "bottom";
-            else if (p.side.a==="bottom") p.side.a = "top";
+        if (JX.iscrossr(ap,bp,p.strong)){
+            let isx = true,isy = true,
+            fx=()=>{
+                if (isx)p.off.x = -p.off.x;
+                isx = false;
+            },fy=()=>{
+                if (isy)p.off.y = -p.off.y;
+                isy = false;
+            };
+            
+            if (p.side.a==="left") {p.side.a = "right";fx();}
+            else if (p.side.a==="right"){ p.side.a = "left";fx();}
+            else if (p.side.a==="top") {p.side.a = "bottom";fy();}
+            else if (p.side.a==="bottom") {p.side.a = "top";fy();}
 
-            if (p.side.b==="left") p.side.b = "right";
-            else if (p.side.b==="right") p.side.b = "left";
-            else if (p.side.b==="top") p.side.b = "bottom";
-            else if (p.side.b==="bottom") p.side.b = "top";
+            if (p.side.b==="left") {p.side.b = "right";fx();}
+            else if (p.side.b==="right") {p.side.b = "left";fx();}
+            else if (p.side.b==="top") {p.side.b = "bottom";fy();}
+            else if (p.side.b==="bottom") {p.side.b = "top";fy();}
+            
+            if (p.side.a==="center"){
+                if (p.pivot.a==="left")         {p.pivot.a = "right";fx();}
+                else if (p.pivot.a==="right")   {p.pivot.a = "left";fx();}
+                else if (p.pivot.a==="top")     {p.pivot.a = "bottom";fy();}
+                else if (p.pivot.a==="bottom")  {p.pivot.a = "top";fy();}
+            }
+            
+            if (p.side.b==="center"){
+                if (p.pivot.b==="left")         {p.pivot.b = "right";fx();}
+                else if (p.pivot.b==="right")   {p.pivot.b = "left";fx();}
+                else if (p.pivot.b==="top")     {p.pivot.b = "bottom";fy();}
+                else if (p.pivot.b==="bottom")  {p.pivot.b = "top";fy();}
+                
+            }
+            
             
             p.cross = false;
             JX.cling(a,b,p);
