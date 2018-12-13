@@ -42,7 +42,7 @@ class MENU_TREE extends WS{
         line-height:24px;
         text-align:center;
     ')
-    ->VALUE('create')
+    ->VALUE('show')
      
      ->EVENT('click','
         menu.show();
@@ -71,10 +71,14 @@ class MENU_TREE extends WS{
         
         menu = new jmenu({
         stick:Qs.stick,
+        onClick(o){
+          
+          menu.enable("id1","toggle");
+        },
         data:[
           "itemZ",
           "-",
-            {caption:"item2  ",enable:true,
+            {caption:"item2  ",enable:true,id:"id1",
               children:[
                 "item7",
                 

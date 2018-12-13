@@ -1,8 +1,10 @@
-/*global Ws,Qs,$,editors,ut,jmenu,Find*/
+/*global Ws,Qs,$,editors,ut,jmenu,Find,menu_action,JDIALOG,popup*/
 
 
 var explorer={
 delete_inside:false,
+paste:{from:'',enable:false},
+editMode:false,
 tree:function(){
 	return Qs.tree.jstree(true);
 },
@@ -22,6 +24,45 @@ type:function(node){
 refresh:function(){
     var t=explorer,tree=t.tree();
     tree.refresh();
+},
+deleteNode:function(){
+	var tree = explorer.tree();
+    var node = explorer.current();
+	var type = explorer.type(node);
+	
+	JDIALOG({
+        caption:"Delete:",
+        msg:node,
+        strip:false,
+        close_btn_enable:true,
+        pos:{w:500,h:150},
+        shadow_opacity:0.5,
+        css:{header:"jd_header_strip"},
+        buttons:['Delete','Cancel'],
+        onClick(o){
+            if (o.id==0){
+                if (node){
+					explorer.delete_inside=true;
+					tree.delete_node(node);					        		
+				}   
+         }}
+    });			
+},
+editNode:function(bool){
+	var tree = explorer.tree();
+   	var node = explorer.current();
+	
+	if (bool===false){
+		explorer.editMode = false;
+		if (node)
+			tree.get_node(node, true).children('.jstree-anchor').focus();
+	}else{	
+		
+    	if (node) {
+    		explorer.editMode = true;
+    		tree.edit(node);  		
+    	}
+	}	
 }
 
 };
@@ -51,11 +92,13 @@ $(document).bind("dnd_start.vakata", function(e, data) {
 Qs.expContextmenu = new jmenu({
     off:{sx:20},
     data:[
-		 {caption:"Rename",id:"rename"},
-		 '-',
 		 {caption:"Run",id:"run",enable:true},
-		 {caption:"Copy",id:"copy",enable:false},
+		 '-',
+		 
+		 {caption:"Copy",id:"copy",enable:true},
 		 {caption:"Paste",id:"paste",enable:false},
+		 {caption:"Duplicate",id:"duplicate",enable:true},
+		 {caption:"Rename",id:"rename"},
 		 {caption:"Delete",id:"delete"},
 		 '-',
 		 {caption:"New folder",id:"new_folder"},
@@ -72,9 +115,7 @@ Qs.expContextmenu = new jmenu({
 		
         switch(o.id){
         case "refresh":{
-  			//Qs.tree.jstree("refresh");
             explorer.refresh();
-  			
             break;
 	    }
 
@@ -96,7 +137,7 @@ Qs.expContextmenu = new jmenu({
             break;
 	    }
         case "rename":{
-            if (node) tree.edit(node);  		
+            explorer.editNode();
             break;
 	    }
         case "run":{
@@ -105,33 +146,43 @@ Qs.expContextmenu = new jmenu({
 	     }
 	    
 	    case "delete":{
-	JDIALOG({
-            caption:"Delete:",
-            msg:node,
-            strip:false,
-            close_btn_enable:true,
-            pos:{w:500,h:150},
-            shadow_opacity:0.5,
-            css:{header:"jd_header_strip"},
-            buttons:['Delete','Cancel'],
-                onClick(o){
-                    if (o.id==0){
-                         	if (node){
-								explorer.delete_inside=true;
-								tree.delete_node(node);					        		
-					}   
-                }}
-            });		
-			
-		
+			explorer.deleteNode();
 			break;
 	    }
+	    case "duplicate":{
+			Ws.ajax({
+				id:'duplicate',
+				value:{src:node},
+				error(e){console.error(e);},
+				done(data){
+					if (data.res==1)
+						explorer.refresh();
+					else
+						popup({type:'alert',msg:data.msg});
+				}		
+			});
+	    }	
         case "copy":{
-              		
+            
+			explorer.paste.enable = true;
+			explorer.paste.from = node;
+			Qs.expContextmenu.enable('paste',true);
             break;
 	    }
         case "paste":{
-              		
+			explorer.paste.enable = false;
+			Qs.expContextmenu.enable('paste',false);
+			Ws.ajax({
+				id:'paste',
+				value:{from:explorer.paste.from,to:node},
+				error(e){console.error(e);},
+				done(data){
+					if (data.res==1)
+						explorer.refresh();
+					else
+						popup({type:'alert',msg:data.msg});
+				}		
+			});
             break;
 	    }
 	    
@@ -249,6 +300,8 @@ Qs.tree.jstree({
 	$.get(Qs.fs+'operation=rename_node', { 'id' : data.node.id, 'text' : data.text })
 		.done(function (d) {
 			data.instance.set_id(data.node, d.id);
+			explorer.editNode(false);
+			
 		})
 		.fail(function () {
 			data.instance.refresh();
@@ -286,6 +339,21 @@ Qs.tree.jstree({
 	//if (editors)
 	//	editors.add({node:node});
 })
+.on('keyup.jstree', function (e,data) { 
+    var tree = explorer.tree();
+    var node = explorer.current();
+	
+	if (e.key ==='F2')
+		explorer.editNode();
+		
+	if ((e.key ==='Delete')&&(!explorer.editMode))	
+		explorer.deleteNode();
+		
+	if (((e.key ==='ArrowUp')||(e.key ==='ArrowDown'))&&(!explorer.editMode)){
+		$(e.target).trigger('click');
+	}
+		
+})
 .on('dblclick.jstree', function (event) {
 	var node = $(event.target).closest('li');
 	/*console.info(node);*/
@@ -303,6 +371,7 @@ Qs.tree.jstree({
 		
 })
 .on('changed.jstree', function (e, data) {
+	
 /*
 	if(data && data.selected && data.selected.length) {
 		$.get('?operation=get_content&id=' + data.selected.join(':'), function (d) {

@@ -169,6 +169,7 @@ class DIR{
         }
         return $res;
     }
+    
     static function dirs($path,$full_path=false){
         $struct = DIR::struct($path,'',true,0);
         $res = array();
@@ -203,6 +204,64 @@ class DIR{
             rmdir($path.$dirs[$i]);
         };    
     }
+    
+    static function info($src){
+        $exist = file_exists($dir);
+        
+        if ($exist){
+            $is_dir = is_dir($dir);
+            $is_file = !$is_dir;
+        }else{
+            $is_dir = false;
+            $is_file = false;
+        };    
+        
+        return array('exist'=>$exist,'is_dir'=>$is_dir,'is_file'=>$is_file);
+    }
+    
+    /**
+     * проверка существовния папки
+     */ 
+    static function exist($dir){
+        return (file_exists($dir) && is_dir($dir));
+    }
+    
+    /**
+     * копирует папку
+    */
+    static function copy($src,$dst,$stopOnError = false) { 
+        $res = true;
+        
+        if (!DIR::exist($src)) return false;
+        
+        $dir = opendir($src);
+        
+        if ($dir!==false){
+            @mkdir($dst); 
+            while(false !== ( $file = readdir($dir)) ) { 
+                if (( $file != '.' ) && ( $file != '..' )) { 
+                    
+                    if ( is_dir($src . '/' . $file) ){ 
+                        if (!self::copy($src . '/' . $file,$dst . '/' . $file,$stopOnError))
+                            $res = false;
+                    }else{ 
+                        if (!copy($src . '/' . $file,$dst . '/' . $file))
+                            $res = false;
+                    }
+                    
+                    if ((!$res)&&($stopOnError))
+                        break;
+                } 
+            } 
+            closedir($dir); 
+            
+        }else
+            return false;
+            
+        return $res;    
+    }
+    
+    
 
 };//class DIR
 
