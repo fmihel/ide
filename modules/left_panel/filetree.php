@@ -90,7 +90,7 @@ class FILETREE extends WS_MODULE{
                 
                 //_LOG("path:[$path] from:[$from], to:[$to] root:[$last] pos[$pos] ",__FILE__,__LINE__);
                 
-                if (strpos($to,$from)===0)
+                if (strpos($to,$from.'/')===0)
                     $response = array("res"=>0,'msg'=>'Can`t copy inside!');
                 elseif (!DIR::copy($from,$to.$last))
                     $response = array("res"=>0,'msg'=>"Copy with errors!");

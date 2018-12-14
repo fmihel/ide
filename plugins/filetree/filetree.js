@@ -94,9 +94,9 @@ Qs.expContextmenu = new jmenu({
     data:[
 		 {caption:"Run",id:"run",enable:true},
 		 '-',
-		 
 		 {caption:"Copy",id:"copy",enable:true},
 		 {caption:"Paste",id:"paste",enable:false},
+		 '-',
 		 {caption:"Duplicate",id:"duplicate",enable:true},
 		 {caption:"Rename",id:"rename"},
 		 {caption:"Delete",id:"delete"},
