@@ -113,6 +113,7 @@ mform.prototype.init = function(o){
         draggable:true,/*форму можно перемещать*/
         dragOnAllForm:false,/* если true - то для перемещения формы используется вся форма, false- только заголовок */
         resizable:true,/*можно изменять размеры формы */
+        showPin:false,/** показывать или нет кноку фиксации формы */
         
         stretch:"custom",/* указывает как будет отрисовываться окно "custom" "horiz"  "fullscreen"  */
         fullscreen:false, /* deprecated, use  stretch=="fullscreen" */
@@ -157,6 +158,8 @@ mform.prototype.init = function(o){
             
             close_frame:'mfr_close_frame',
             close:'mfr_close',
+            pinUp:'mfr_pin_up',
+            pinDown:'mfr_pin_down',
             
             btn_common:'mfr_btn_common',
             btn:'mfr_btn',
@@ -222,6 +225,7 @@ mform.prototype._create=function(){
         content:ut.id('cnt'),
         caption:ut.id('cpt'),
         close:ut.id('cls'),
+        pin:ut.id('pin'),
         close_frame:ut.id('clf'),
         resize:ut.id('rs')
     };
@@ -234,6 +238,7 @@ mform.prototype._create=function(){
 
     c+=ut.tag('<',{id:p.id.header,css:css.header,style:'position:absolute'});
         c+=ut.tag({id:p.id.caption, css:css.caption,    style:'position:absolute'});
+        c+=ut.tag({id:p.id.pin,   css:css.pinUp,        style:'position:absolute'});
         c+=ut.tag({id:p.id.close,   css:css.close,      style:'position:absolute'});
     c+=ut.tag('>');
 
@@ -250,8 +255,9 @@ mform.prototype._create=function(){
     p.jq.content   = p.jq.parent.find('#'+p.id.content);
     p.jq.footer    = p.jq.parent.find('#'+p.id.footer);
 
-    p.jq.caption    = p.jq.parent.find('#'+p.id.caption);
-    p.jq.close    = p.jq.parent.find('#'+p.id.close);
+    p.jq.caption        = p.jq.parent.find('#'+p.id.caption);
+    p.jq.close          = p.jq.parent.find('#'+p.id.close);
+    p.jq.pin            = p.jq.parent.find('#'+p.id.pin);
     p.jq.close_frame    = p.jq.parent.find('#'+p.id.close_frame);
 
     p.jq.resize    = p.jq.parent.find('#'+p.id.resize);
@@ -260,8 +266,7 @@ mform.prototype._create=function(){
     p.jq.own.css('position','absolute');
     
     $.data(p.jq.own[0],p.jq.ref,this);
-    
-    
+
 };
 
 mform.prototype._event=function(){
@@ -278,6 +283,10 @@ mform.prototype._event=function(){
     
     p.jq.close.on('click',function(){
         t.close();
+    });
+
+    p.jq.pin.on('click',function(){
+        t.pinDown('toggle');
     });
  
     p.jq.header.on('mousedown',function(){
@@ -309,6 +318,9 @@ mform.prototype._event=function(){
             
             JX.abs(p.jq.frame,{x:f.x+d.x,y:f.y+d.y});
             p._draggable.mouse = m;
+
+            if (t.pinDown())
+                t.pinDown('reculc');
             
         }
         if ((p.resizable)&&(p._resizable)&&(p.stretch==='custom')){
@@ -318,8 +330,14 @@ mform.prototype._event=function(){
             
             JX.pos(p.jq.frame,{w:f.w+d.x,h:f.h+d.y});
             p._resizable.mouse = m;
+
+            if (t.pinDown())
+                t.pinDown('reculc');
+
             t.align();
         }
+        
+
     });
     
     JX.window().on('mouseup',function(){
@@ -337,6 +355,43 @@ mform.prototype._event=function(){
         );
 
 };
+
+mform.prototype.pinDown=function(bool){
+    var t=this,p=t.param,css=p.css;
+    
+    if (bool === undefined){
+        
+        return (p._pinFixed !== undefined);
+
+    }else{
+        if (bool==='toggle'){
+            
+            t.pinDown( !t.pinDown());
+            
+        }else if (bool ==='reculc'){
+            let s = JX.screen();
+            let pos = JX.pos(p.jq.frame);
+            let left = pos.x-s.x;
+            let right = s.x+s.w-pos.x;
+            
+            p._pinFixed = {
+                pos,
+                cling:Math.abs(left)<Math.abs(right)?'left':'right',
+                left,
+                right
+            }
+        }else if (bool){
+            p.jq.pin.removeClass(css.pinUp).addClass(css.pinDown);
+            t.pinDown('reculc');
+        }else{
+            p.jq.pin.removeClass(css.pinDown).addClass(css.pinUp);
+            p._pinFixed = undefined;
+        }
+    }
+    
+};
+
+
 
 mform.prototype._css = function(css){
     var t = this,p=t.param;
@@ -523,6 +578,20 @@ mform.prototype.attr = function(n/*v*/){
         else    
             p.showFooter=v;
     }
+    /*-----------------------------------*/
+    if (n==='showPin'){
+        if (r) 
+            return p.showPin;
+        else    
+            p.showPin=v?true:false;
+    }
+    if (n==='pinDown'){
+        if (r) 
+            return t.pinDown();
+        else    
+            t.pinDown(v?true:false);
+    }
+    
     /*-----------------------------------*/
     if (n==='buttons'){
         if (r) 
@@ -823,7 +892,7 @@ mform.prototype.align=function(){
 
 mform.prototype._align=function(){
     
-    var t=this,p=t.param,pos=p.position,screen = JX.screen(),r,hPadding={};
+    var t=this,p=t.param,pos=p.position,screen = JX.screen(),r,hPadding={},enablePin = false;
     if (!t.attr('visible')) return;
 
     var brdr = JX._border(p.jq.frame[0]).t;
@@ -831,16 +900,14 @@ mform.prototype._align=function(){
     JX.visible(p.jq.header,p.showHeader);
     JX.visible(p.jq.footer,p.showFooter);
     JX.visible(p.jq.close,p.needCloseBtn&&p.showHeader);
-
+    enablePin = p.showPin&&p.showHeader&&(['fullscreen','horiz'].indexOf(p.stretch)==-1);
+    JX.visible(p.jq.pin,enablePin);
+    
+    enablePin = enablePin&&t.pinDown();
+    
     if (p.stretch === 'horiz'){
         
-
         JX.abs(p.jq.frame,{x:0,y:(screen.h-p.height)/2,w:screen.w,h:p.height});
-        
-        /*
-        JX.arrange([p.jq.header,p.jq.content,p.jq.footer],{direct:"vert",type:"stretch",align:"center",stretch:p.jq.content});
-        */
-
         JX.stretch(p.jq.own,{margin:p.padding});
 
     }else{
@@ -851,7 +918,15 @@ mform.prototype._align=function(){
         }else{
             
             if (p._resizable===undefined){
-                if ((pos.keep)||(pos._keeping==undefined)){
+                if (enablePin){
+                    
+                    if (p._pinFixed.cling === 'left'){
+                        JX.abs(p.jq.frame,{x:p._pinFixed.left});
+                    }else{
+                        JX.abs(p.jq.frame,{x:screen.x+screen.w-p._pinFixed.right});
+                    }
+                    
+                }else if ((pos.keep)||(pos._keeping==undefined)){
                     pos._keeping=true;
                     if (pos.type=='custom')
                         JX.abs(p.jq.frame,pos);
@@ -902,7 +977,7 @@ mform.prototype._align=function(){
         if (p.stretch === 'horiz')
             JX.arrange([p.jq.caption,p.jq.close],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:hPadding});
         else
-            JX.arrange([p.jq.caption,p.jq.close],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:{left:p.padding.left,right:p.padding.right}});
+            JX.arrange([p.jq.caption,p.jq.pin,p.jq.close],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:{left:p.padding.left,right:p.padding.right}});
         
     }    
     

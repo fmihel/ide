@@ -493,6 +493,28 @@ class TWS extends WS{
             '            
         );        
         
+        /*c:showPin */
+        $this->item(
+            'showPin',
+            /*------------caption---------------*/
+            'showPin',                  
+            /*------------code------------------*/
+            '
+            //--------------------------------------
+            // кнопка фиксации 
+            //--------------------------------------
+            
+            {$plugin}.mform({showPin:true});
+            
+            ',
+            /*------------event-----------------*/
+            '
+            
+            {$plugin}.mform({showPin:(!{$plugin}.mform("showPin"))});
+            
+            '
+        );        
+
         
         /*c:shadowOpacity */
         $this->item(
