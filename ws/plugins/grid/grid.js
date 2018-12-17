@@ -1057,9 +1057,9 @@ Tgrid.prototype._setColsWidthStyle=function(){
     var h = p.jq.headerTd;
     var c = p.jq.cells.find('td');
     
-    
-    h.css('border-left-width','1px');
-    c.css('border-left-width','1px');
+     
+    if ((h)&&(h.length)) h.css('border-left-width','1px');
+    if ((c)&&(c.length)) c.css('border-left-width','1px');
     
 
     

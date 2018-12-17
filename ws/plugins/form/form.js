@@ -114,7 +114,7 @@ mform.prototype.init = function(o){
         dragOnAllForm:false,/* если true - то для перемещения формы используется вся форма, false- только заголовок */
         resizable:true,/*можно изменять размеры формы */
         showPin:false,/** показывать или нет кноку фиксации формы */
-        
+        autoPin:true, /** если showPin, и пользователь сместил форму, то pin включается */
         stretch:"custom",/* указывает как будет отрисовываться окно "custom" "horiz"  "fullscreen"  */
         fullscreen:false, /* deprecated, use  stretch=="fullscreen" */
         margin:0,
@@ -319,6 +319,8 @@ mform.prototype._event=function(){
             JX.abs(p.jq.frame,{x:f.x+d.x,y:f.y+d.y});
             p._draggable.mouse = m;
 
+            if ((p.showPin)&&(p.autoPin))
+                t.pinDown(true);
             if (t.pinDown())
                 t.pinDown('reculc');
             
@@ -331,6 +333,8 @@ mform.prototype._event=function(){
             JX.pos(p.jq.frame,{w:f.w+d.x,h:f.h+d.y});
             p._resizable.mouse = m;
 
+            if ((p.showPin)&&(p.autoPin))
+                t.pinDown(true);
             if (t.pinDown())
                 t.pinDown('reculc');
 
@@ -584,6 +588,12 @@ mform.prototype.attr = function(n/*v*/){
             return p.showPin;
         else    
             p.showPin=v?true:false;
+    }
+    if (n==='autoPin'){
+        if (r) 
+            return p.autoPin;
+        else    
+            p.autoPin=v?true:false;
     }
     if (n==='pinDown'){
         if (r) 
