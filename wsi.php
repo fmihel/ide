@@ -1,6 +1,8 @@
 <?php
 define('WSI_DEV_VERSION','131218_1');
 define('WSI_GIT_VERSION','1.0.2');
+
+error_reporting(0);
 /*
 https://ws-framework-fmihel.c9users.io/ide/wsi.php
 */

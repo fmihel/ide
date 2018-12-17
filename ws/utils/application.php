@@ -404,7 +404,9 @@ class TApplication{
 
     function __construct(){
         //$this->HTTP_TYPE     = isset()isset($_SERVER['REQUEST_SCHEME'])?$_SERVER['REQUEST_SCHEME']:$_SERVER['HTTP_X_FORWARDED_PROTO'];
-        $this->HTTP_TYPE     = $_SERVER['HTTPS']==1?'https' :( isset($_SERVER['REQUEST_SCHEME'])?$_SERVER['REQUEST_SCHEME']:$_SERVER['HTTP_X_FORWARDED_PROTO']);
+        //$this->HTTP_TYPE     = $_SERVER['HTTPS']==1?'https' :( isset($_SERVER['REQUEST_SCHEME'])?$_SERVER['REQUEST_SCHEME']:$_SERVER['HTTP_X_FORWARDED_PROTO']);        
+        $this->HTTP_TYPE     = (isset($_SERVER['HTTPS'])&&$_SERVER['HTTPS'])==1?'https' :( isset($_SERVER['REQUEST_SCHEME'])?$_SERVER['REQUEST_SCHEME']:$_SERVER['HTTP_X_FORWARDED_PROTO']);
+        //
         //$this->HTTP_TYPE     = 'https';
         $this->PUBLIC_HTML   = substr($_SERVER['DOCUMENT_ROOT'],strrpos($_SERVER['DOCUMENT_ROOT'],'/')+1);            
         
