@@ -464,7 +464,103 @@ class STR{
 };
 
 class ARR{ 
-    
+    /** сравнение массивов или хешей 
+     *  soft = true - сравнение с приведением типов
+    */
+    public static function eq($a,$b,$param){
+        
+        $param = self::extend('{
+            soft@bool:false,
+            include:[],
+            exclude:[]
+
+        }',$param);
+
+        $typeA = TYPE::info($a);
+        $typeB = TYPE::info($b);
+        
+        $soft = $param['soft'];
+        $include = $param['include'];
+        if (TYPE::info($include)!=='array')
+            $include = array($include);
+        
+        $exclude = $param['exclude'];    
+        if (TYPE::info($exclude)!=='array')
+            $exclude = array($exclude);
+        //--------------------------------
+
+        $cnt = count($include);
+        if($cnt>0){
+            $aaa = array();
+            $bbb = array();
+            for($i=0;$i<$cnt;$i++){
+                $key = $include[$i];
+                if (isset($a[$key])) 
+                    $aaa[$key]=$a[$key];
+                if (isset($b[$key])) 
+                    $bbb[$key]=$b[$key];
+            }
+            $a = $aaa;
+            $b = $bbb;
+        }
+
+        //--------------------------------
+        $cnt = count($exclude);
+        if($cnt>0){
+            for($i=0;$i<$cnt;$i++){
+                $key = $exclude[$i];
+                if (isset($a[$key])) 
+                    unset($a[$key]);
+                    
+                if (isset($b[$key])) 
+                    unset($b[$key]);
+            }
+        }
+        //--------------------------------
+        
+        if ($typeA!==$typeB) return false;
+        
+        
+        if ($typeA==='array'){
+            $count = count($a);
+            if ($count!==count($b)) return false;
+            
+            for($i=0;$i<count();$i++){
+                if ($soft){
+                    if ($a[$i]!=$b[$i])
+                        return false;
+                }else{ 
+                    if ($a[$i]!==$b[$i])
+                        return false;
+                }    
+            }
+            return true; 
+                
+        }else if ($typeA==='assoc'){
+            $keyA = array_keys($a);
+            $keyB = array_keys($b);
+
+            $count = count($keyA);
+            if ($count!==count($keyA)) return false;
+            
+            foreach($a as $k=>$v){
+                if (!isset($b[$k])) 
+                    return false;
+                if ($soft){
+                    if ($a[$k]!=$b[$k])
+                        return false;
+                }else{ 
+                    if ($a[$k]!==$b[$k])
+                        return false;
+                }    
+            }
+            return true;
+            
+        }else
+            return false;
+        
+        
+    }
     public static function is_assoc($arr){
         
         if (is_array($arr)){
