@@ -374,6 +374,9 @@ class WS extends WS_CONTENT{
         return false;
         
     }
+    /**
+     * Минификация, а также приведения к стандарту ES5
+     */
     private function optimization($js_code){
         $res = false;
         $curl = curl_init();

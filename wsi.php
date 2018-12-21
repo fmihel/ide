@@ -1,6 +1,6 @@
 <?php
-define('WSI_DEV_VERSION','131218_1');
-define('WSI_GIT_VERSION','1.0.2');
+define('WSI_DEV_VERSION','211218_1');
+define('WSI_GIT_VERSION','1.0.3');
 
 error_reporting(0);
 /*
