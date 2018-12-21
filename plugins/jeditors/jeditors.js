@@ -456,7 +456,8 @@ jeditors.prototype._setmode=function(editor,file){
                 'css':'css',
                 'xml':'xml',
                 'html':'html',
-                'htm':'html'
+                'htm':'html',
+                'json':'json'
         
     };
     var mode = (modes[e]!==undefined?modes[e]:'text');
