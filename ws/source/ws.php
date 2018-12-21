@@ -342,7 +342,8 @@ class WS extends WS_CONTENT{
                 // определяем build - уникальное имя сборки
                 $build = $Application->getExtHash('JS',$version);
 
-                $pBuild = '_render/';
+                //$pBuild = '_render/';
+                $pBuild = WS_CONF::GET('renderPath','_render');
                 $nBuild = $pBuild.$build.'.js';
                 // проверяем, существует ли сборка
                 $eBuild = true;
@@ -354,8 +355,16 @@ class WS extends WS_CONTENT{
                 if (!file_exists($nBuild))
                     $eBuild= false;
                 
-                if (!$eBuild)
-                    file_put_contents($nBuild,$Application->getExtConcat('JS',';').';'.$right);
+                if (!$eBuild){
+                    $js_code = $Application->getExtConcat('JS',';').';'.$right;
+                    if (WS_CONF::GET('optimizeJS',0)==1){
+                        $js_code_opt = self::optimization($js_code);
+                        if ($js_code_opt!==false)
+                            $js_code = $js_code_opt;
+                    }
+                        
+                    file_put_contents($nBuild,$js_code);
+                }    
                 
                 
                 return $nBuild;
@@ -364,6 +373,36 @@ class WS extends WS_CONTENT{
         
         return false;
         
+    }
+    private function optimization($js_code){
+        $res = false;
+        $curl = curl_init();
+        try{
+            //$url = 'https://closure-compiler.appspot.com/compile';
+            $url = WS_CONF::GET('urlOptimizeCompiler');
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => http_build_query(array(
+                    'compilation_level'=>'SIMPLE_OPTIMIZATIONS',
+                    'output_format'=>'text',
+                    'output_info'=>'compiled_code',
+                    'js_code'=> $js_code
+                    //'code_url'=>'https://../_render/f3d04e50550a2863aca1e79a8d24bdbc.js'
+                )),
+            ));
+
+            $res = curl_exec($curl);
+            if (empty($res))
+                throw new Exception("google compile closure return empty..may be error in js code");
+                
+        }catch(Exception $e){
+            _LOGF($e->getMessage(),'Optimization error:',__FILE__,__LINE__);
+            $res = false;
+        }
+        curl_close($curl);
+        return $res;
     }
     public function CONTENT(){
             
