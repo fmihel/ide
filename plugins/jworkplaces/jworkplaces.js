@@ -203,12 +203,12 @@ jwp.prototype._create_tree=function(data){
 		    editors.add(node.data);
 	    }    
 		    
-	    if (is_dir){
-	        if (close)
-	            t._tree().open_node(node);
-	        else
-	            t._tree().close_node(node);
-	    }
+	    //if (is_dir){
+	    //    if (close)
+	    //        t._tree().open_node(node);
+	    //    else
+	    //        t._tree().close_node(node);
+	   // }
 	
         //node = t._tree().get_node(node);		    
 		//if (editors)
@@ -231,7 +231,7 @@ jwp.prototype._create_tree=function(data){
 			{caption:"Run",id:"run",enable:true},
 			{caption:"Copy",id:"copy",enable:false},
 			{caption:"Paste",id:"paste",enable:false},
-			{caption:"Delete",id:"delete"},
+			{caption:"<font style='color:#e84646'>Delete</font>",id:"delete"},
 			 '-',
 			 {caption:"New workspace",id:"new_workspace"}
 		],

@@ -99,7 +99,7 @@ Qs.expContextmenu = new jmenu({
 		 '-',
 		 {caption:"Duplicate",id:"duplicate",enable:true},
 		 {caption:"Rename",id:"rename"},
-		 {caption:"Delete",id:"delete"},
+		 {caption:"<font style='color:#e84646'>Delete</font>",id:"delete"},
 		 '-',
 		 {caption:"New folder",id:"new_folder"},
 		 {caption:"New file",id:"new_file"},
