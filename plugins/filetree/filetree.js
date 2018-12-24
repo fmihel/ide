@@ -354,22 +354,23 @@ Qs.tree.jstree({
 	}
 		
 })
+
 .on('dblclick.jstree', function (event) {
 	var node = $(event.target).closest('li');
-	/*console.info(node);*/
 	let open = node.hasClass('jstree-open');
 	let close = node.hasClass('jstree-closed');
 	let is_dir = (open||close);
 	if ((!is_dir)&&(editors))
 		editors.add({node:node});
-	if (is_dir){
-	    if (close)
-	        explorer.tree().open_node(node);
-	    else
-	        explorer.tree().close_node(node);
-	}
+	//if (is_dir){
+	//    if (close)
+	//        explorer.tree().open_node(node);
+	//    else
+	//        explorer.tree().close_node(node);
+	//	}
 		
 })
+
 .on('changed.jstree', function (e, data) {
 	
 /*

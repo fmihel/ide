@@ -27,7 +27,7 @@
 
 
 #container { min-width:320px; margin:0px auto 0 auto; background:white; border-radius:0px; padding:0px; overflow:hidden; }
-#tree {  min-width:319px; border:0px; overflow:auto; padding:0px 0;font-size:$size }
+#tree {  min-width:319px; border:0px; overflow:hidden; padding:0px 0;font-size:$size }
 #data { margin-left:320px; }
 #data textarea { margin:0; padding:0; height:100%; width:100%; border:0; background:white; display:block; line-height:18px; resize:none; }
 #data, #code { font: normal normal normal 12px/18px 'Consolas', monospace !important; }

@@ -1,6 +1,7 @@
 {
 	"name": "jstree",
-	"version": "3.0.4",
+	"license": "MIT",
+	"version": "3.3.7",
 	"main" : [
 		"./dist/jstree.js",
 		"./dist/themes/default/style.css"
@@ -13,8 +14,6 @@
 		"node_modules",
 		"test",
 		"libs",
-		"src",
-		"*.md",
 		"jstree.jquery.json",
 		"gruntfile.js",
 		"package.json",
