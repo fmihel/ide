@@ -461,6 +461,12 @@ class TApplication{
             
             файлы с расширением php подгружаются командой require_once 
             все остальные файлы сохряняются в массиве EXTENSION
+            
+            Варианты с параметрыми:
+            '[theme:name]filename' - будет использоваться только в dcss теме name Ex: [color:dark]style.css
+            +filename    - будет использоваться как прямая ссылка ( не пойдет в рендеринг) Ex: +index.js
+            Файлы с полным указание url так же непойдут в рендеринг Ex: https://my/build/index.js
+            
         */
         
         $tag = 'project';
@@ -470,7 +476,10 @@ class TApplication{
         }else
             $file=(func_num_args()>0 ? func_get_arg(0) : '');
         
-        
+        $direct_url = (strpos($file,"+")===0);
+        if ($direct_url)
+            $file = substr($file,1);
+
         $have_dcss = strpos($file,"]");
         if ($have_dcss!==false){
             
@@ -479,7 +488,7 @@ class TApplication{
             
             $dcss=str_replace(array('[',']'),'',$dcss);
             $dcss   =   explode(':',$dcss);
-            //error_log(print_r($dcss,true));
+            
             $dcss   =   array('style'=>trim($dcss[0]),'name'=>trim($dcss[1]));
             
         }else
@@ -491,7 +500,6 @@ class TApplication{
         if ($ext=='PHP'){
             $filename = APP::slash($this->LIBS[$tag],false,true).APP::slash($file,false,false);
         }
-
         if(!isset($this->EXTENSION[$ext]))
             $this->EXTENSION[$ext]=array();
         
@@ -509,9 +517,14 @@ class TApplication{
                 $dir    = APP::slash($this->LIBS[$tag],false,true).APP::get_path($file);
                 $dir    = str_replace($this->ROOT,'',APP::abs_path($this->PATH,$dir));
                 $remote   = $this->DOMEN.$dir.APP::get_file($file);
-            $local =  APP::slash($this->LIBS[$tag],false,true).$file;
+                $local =  APP::slash($this->LIBS[$tag],false,true).$file;
             }    
-        }    
+        }
+
+        if ($direct_url)
+            $local = '';
+
+        
         $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss));
             
         if ($ext=='PHP')
