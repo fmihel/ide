@@ -544,7 +544,7 @@ Tjnavigate.prototype.attr = function(n/*v*/){
     var t=this,p=t.param,v,r=(arguments.length===1);
     if (!r) 
         v=arguments[1];
-
+    
     /*-----------------------------------*/
     /** example
     
@@ -561,12 +561,15 @@ Tjnavigate.prototype.attr = function(n/*v*/){
             return p.scrollObject;
         else{
             if (p.scrollObject!==null)
-                p.scrollObject.off('scroll')
-            
+                p.scrollObject.off('scroll',p._scrollFunc);
+
             p.scrollObject = v;
 
-            if (p.scrollObject!==null)
-                p.scrollObject.on('scroll',function(){ t._doScroll(); });
+            if (p.scrollObject!==null){
+                p._scrollFunc = function(){ t._doScroll(); };
+                p.scrollObject.on('scroll',p._scrollFunc);
+            }    
+                
         }    
     }
     /*-----------------------------------*/
