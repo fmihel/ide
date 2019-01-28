@@ -39,7 +39,7 @@ class DCSS{
     
         // расчет списка css файлов привязанных к текущим стилям        
         $files = array(); 
-        $css = $Application->EXTENSION['CSS'];
+        $css = isset($Application->EXTENSION['CSS'])?$Application->EXTENSION['CSS']:array();
         
         
         for($i=0;$i<count($css);$i++){

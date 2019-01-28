@@ -204,6 +204,8 @@ class APP{
     */
     static function ward($_dir_,$file=''){ 
         global $Application;
+        $_dir_ = str_replace(array("\\",'/'),_DIRECTORY_SEPARATOR,$_dir_);
+        
         $res = trim(self::rel_path(self::slash($Application->PATH,true,true),self::slash($_dir_,true,true)));
         
         return ($res!==''?APP::slash($res,false,true):'').($file!==''?APP::slash($file,false,false):'');
