@@ -46,33 +46,56 @@ class WS_CONF{
         global $_ws_conf;
         return $_ws_conf->def($name,$default);
     }
-    
+    static function LOAD($file='',$merge=true){
+        global $_ws_conf;
+        return $_ws_conf->load($file,$merge);
+    }
+    static function debug_info($br='<br>')
+    {
+        global $_ws_conf;
+        return $_ws_conf->debug_info($br);
+    }
 };
 
 class _WS_CONF{
-    public $param;
+    public $param = array();
     
     function __construct(){
-        $this->param = array();
         $this->load();
     }
-    
-    function load(){
+    /**
+     * загрузка настроек
+     * @param string $file имя файла в котором храняться параметры по умоляанию
+     * @param bool $mereg  true - текущие данные будут смешаны,false - текущие данные будут перезаписаны
+     * 
+     */
+    public function load($file='',$merge = true){
+        $conf = false;
         
-        $file = 'ws_conf.php';
-        if (file_exists($file)){
-            
+        if ($file===''){
+            $file = 'ws_conf.php';
+            $file = file_exists($file)?$file:'ws_conf.json';
+        }
+
+        if (!file_exists($file)) return;
+
+        $ext =  pathinfo($file);
+        $ext = $ext['extension'];
+
+        if ($ext ==='php'){
+
             require_once $file;
-            $this->param = ARR::extend($this->param,$ws_conf);
+            //$ws_conf defined in $file
+            $conf = ARR::extend($this->param,$ws_conf);
             
-        }else{    
+        }else{
             
-            $file = 'ws_conf.json';
-            if (file_exists($file)){
-                $cont = file_get_contents($file);
-                $this->param = ARR::extend($this->param,$cont);
-            }
-        };    
+            $cont = file_get_contents($file);
+            $conf = ARR::extend($this->param,$cont);
+
+        };
+        
+        $this->param = $merge?ARR::extend($conf,$ws_conf):$conf;
     }
     
     function def($name,$mean){
@@ -89,9 +112,19 @@ class _WS_CONF{
         $this->def($name,$default);
         return $this->param[$name];
     }
+
+    function debug_info($br){
+        $out = '';
+        foreach($this->param as $key=>$val)
+            $out.=($out!==''?$br:'').$key.''.'['.$val.']';
+        
+        return $out;
+    }
+    
     
 };
 
 $_ws_conf = new _WS_CONF();
+
 
 ?>

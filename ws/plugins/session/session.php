@@ -47,6 +47,7 @@ class session{
     public static function start($data = false){
         global $REQUEST;
         $out = array('res'=>0);
+        $share = false;
 
         if (!self::$autorize)
             return $out;
@@ -60,16 +61,18 @@ class session{
                     $out = self::$autorize->fromToken($share['token'],$share['dev']);
             };
             
-        }else if (isset($data['data']))
+        }elseif (isset($data['data'])){
+        
             $out = self::$autorize->fromData($data['data'],$data['dev']);
             
-        else if (isset($data['token']))
+        }elseif (isset($data['token'])){
+            
             $out = self::$autorize->fromToken($data['token'],$data['dev']);
-
+        }
         self::$enable = $out['res']==1?true:false;
         if (self::$enable){
             self::$token = $out['token'];
-            self::$dev   = $data?$share['dev']:$data['dev'];
+            self::$dev   = !$data?$share['dev']:$data['dev'];
             $REQUEST->SHARE['session']['enable']=1;            
         }else
             $REQUEST->SHARE['session']['enable']=0;            

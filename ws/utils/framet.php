@@ -457,7 +457,7 @@ class FRAMET{
     public static function RENDER($template,$own,$group,$toAll){
         
         // загружаем переменные ( переменные хранятся в упорядоченном массиве self::$vars = array("var_name"=>"mean",....)
-
+        $i = 0;
         self::_vars($template);
 
         if (count(self::$vars)>0)
