@@ -811,7 +811,7 @@ class WS_DCSS{
         /*выделяем кусок с dcss*/
         preg_match($re, $str, $matches);
         
-        $dcss = $this->_split('/\$dcss\s*=\s*/', $matches[0]);
+        $dcss = count($matches)>0?$this->_split('/\$dcss\s*=\s*/', $matches[0]):'';
         $this->dcss = ARR::from_json($dcss);
 
         /*остаток возрвщаем*/

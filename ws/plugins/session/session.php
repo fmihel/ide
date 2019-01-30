@@ -67,12 +67,12 @@ class session{
             
         }elseif (isset($data['token'])){
             
-            $out = self::$autorize->fromToken($data['token'],$data['dev']);
+            $out = self::$autorize->fromToken($data['token'],isset($data['dev'])?$data['dev']:'');
         }
         self::$enable = $out['res']==1?true:false;
         if (self::$enable){
             self::$token = $out['token'];
-            self::$dev   = !$data?$share['dev']:$data['dev'];
+            self::$dev   = !$data?$share['dev']:(isset($data['dev'])?$data['dev']:'');
             $REQUEST->SHARE['session']['enable']=1;            
         }else
             $REQUEST->SHARE['session']['enable']=0;            

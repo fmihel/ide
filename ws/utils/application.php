@@ -552,6 +552,7 @@ class TApplication{
     /** возвращает весь контент ресурса одним файлом */
     public function getExtConcat($ext,$delim){
         $res = '';
+        if (isset($this->EXTENSION[$ext]))
         for($i=0;$i<count($this->EXTENSION[$ext]);$i++){
             $file = trim($this->EXTENSION[$ext][$i]['local']);
             if (($file!=='')&&(file_exists($file)))
