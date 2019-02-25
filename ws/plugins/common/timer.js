@@ -31,15 +31,15 @@ DateToStr:function(delim){
     if (delim===undefined)
         delim = '/';
         
-    var h = d.getDay()+'';
+    var h = d.getDate()+'';
     if (h.length<2) h='0'+h;
     
-    var m = d.getMonth()+'';
-    
+    var m = (d.getMonth()+1)+'';
     if (m.length<2) m='0'+m;
     
-    var s = d.getYear()+'';
-    if (s.length<2) s='0'+s;
+    var s = d.getFullYear()+'';
+    s = s.substr(2,2);
+    
     
     return h+delim+m+delim+s;
     
