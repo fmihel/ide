@@ -367,11 +367,11 @@ class TWS extends WS{
 
         /*c:base::select -------------------------------------------------*/
         $q = base::select(array(
-            K_TOVAR_TABLE=>"myData",
-            K_TOVAR_DETAIL_TABLE,
-            K_COLOR_TABLE
+            'K_TOVAR_TABLE'=>"myData",
+            'K_TOVAR_DETAIL_TABLE',
+            'K_COLOR_TABLE'
             ),
-            K_TOVAR_TABLE::join(K_TOVAR_DETAIL,'ID_K_TOVAR','ID_K_TOVAR')->leftOuter(K_COLOR_TABLE,K_TOVAR_DETAIL_TABLE,'ID_K_COLOR','ID_K_COLOR'),
+            K_TOVAR_TABLE::join('K_TOVAR_DETAIL','ID_K_TOVAR','ID_K_TOVAR')->leftOuter('K_COLOR_TABLE','K_TOVAR_DETAIL_TABLE','ID_K_COLOR','ID_K_COLOR'),
             "where K_TOVAR_TABLE::ARCH=K_TOVAR_DETAIL_TABLE::ARCH"
         );
         $this->out('<b>base::select</b>: select с использованием нескольких таблиц',
@@ -390,9 +390,9 @@ class TWS extends WS{
         
         /*c:base::select_short -------------------------------------------------*/
         $result = base::select(array(
-            K_TOVAR_TABLE,
-            K_TOVAR_DETAIL_TABLE),
-            K_TOVAR_TABLE::join(K_TOVAR_DETAIL),
+            'K_TOVAR_TABLE',
+            'K_TOVAR_DETAIL_TABLE'),
+            K_TOVAR_TABLE::join('K_TOVAR_DETAIL'),
             "where K_TOVAR_TABLE::ARCH=K_TOVAR_DETAIL_TABLE::ARCH");
         $this->out('<b>base::select(short)</b>: select с использованием нескольких таблиц и join',
         '
@@ -415,11 +415,11 @@ class TWS extends WS{
         /*c:base::select_leftOuter -------------------------------------------------*/
         
         $q = base::select(array(
-            K_TOVAR_TABLE,
-            K_TOVAR_DETAIL_TABLE,
-            K_COLOR_TABLE
+            'K_TOVAR_TABLE',
+            'K_TOVAR_DETAIL_TABLE',
+            'K_COLOR_TABLE'
             ),
-            K_TOVAR_TABLE::join(K_TOVAR_DETAIL)->leftOuter(K_COLOR_TABLE),
+            K_TOVAR_TABLE::join('K_TOVAR_DETAIL')->leftOuter('K_COLOR_TABLE'),
             "where K_TOVAR_TABLE::ARCH=K_TOVAR_DETAIL_TABLE::ARCH"
         );
         $this->out('<b>base::select</b>: select с использованием нескольких таблиц и leftOuter',

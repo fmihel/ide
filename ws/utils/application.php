@@ -648,6 +648,8 @@ class TApplication{
             $i=0;
             if ($p['assLimit']>0)
                 $cnt = min($all,$p['assLimit']-1);
+            else 
+                $cnt = $all;    
             
             
             $out.=$L[$type].$cr;
