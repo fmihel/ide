@@ -549,7 +549,10 @@ class TApplication{
     
     /** возвращает весь контент ресурса одним файлом */
     public function getExtConcat($ext,$delim){
+        if(!isset($this->EXTENSION[$ext]))
+            $this->EXTENSION[$ext]=array();
         $res = '';
+
         for($i=0;$i<count($this->EXTENSION[$ext]);$i++){
             $file = trim($this->EXTENSION[$ext][$i]['local']);
             if (($file!=='')&&(file_exists($file)))
@@ -561,7 +564,7 @@ class TApplication{
     private function _add_to_extension($ext,$dat){
         if(!isset($this->EXTENSION[$ext]))
             $this->EXTENSION[$ext]=array();
-            
+        
         for($i=0;$i<count($this->EXTENSION[$ext]);$i++){
             $exist = $this->EXTENSION[$ext][$i];
             if ($exist['remote']==$dat['remote']) return;
