@@ -39,7 +39,7 @@ class DCSS{
     
         // расчет списка css файлов привязанных к текущим стилям        
         $files = array(); 
-        $css = $Application->EXTENSION['CSS'];
+        $css = (isset($Application->EXTENSION['CSS'])?$Application->EXTENSION['CSS']:array());
         
         
         for($i=0;$i<count($css);$i++){
@@ -807,11 +807,12 @@ class WS_DCSS{
     private function _extract_dcss(&$str){
         /*получаем dcss блок*/
         $re = '/\$dcss\s*=\s*{[\s\S]*}\s*;/U';
-        
+        $dcss = '';
         /*выделяем кусок с dcss*/
         preg_match($re, $str, $matches);
         
-        $dcss = $this->_split('/\$dcss\s*=\s*/', $matches[0]);
+        if (count($matches)>0)
+            $dcss = $this->_split('/\$dcss\s*=\s*/', $matches[0]);
         $this->dcss = ARR::from_json($dcss);
 
         /*остаток возрвщаем*/

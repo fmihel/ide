@@ -489,7 +489,11 @@ Tgrid.prototype.init = function(o){
         id:{
             header:ut.id('hdr'),
             frameCells:ut.id('fcls'),
-            cells:ut.id('cls')
+            cells:ut.id('cls'),
+            flyingPanel:{
+                selected:ut.id('fps'),
+                hover:ut.id('fps'),
+            }
         },
         jq:{
             header      :null, 
@@ -498,6 +502,10 @@ Tgrid.prototype.init = function(o){
             cells       :null,
             all         :null,
             trs         :null,
+            flyingPanel :{
+                selected:null,
+                hover:null,
+            },
         },
         
         lock:new jlock(),
@@ -524,6 +532,8 @@ Tgrid.prototype.init = function(o){
         flyingHeader:false,
         /*flyParent:o.plugin.parent(),*/
         marginHeaderFrame:{left:0,right:0,top:0,bottom:0},
+        
+        flyingPanel:true,
         /** отложенная перерисовка */
         alignDelay:0,
         /**при клике на элементае в ячейке, будет выбрана соотв строка */   
@@ -593,7 +603,9 @@ Tgrid.prototype.init = function(o){
             headerFrame_left:'grid_header_frame_left',
             headerFrame_right:'grid_header_frame_right',
             headerFrame_top:'grid_header_frame_top',
-            headerFrame_bottom:'grid_header_frame_bottom'
+            headerFrame_bottom:'grid_header_frame_bottom',
+            flyingPanelSelected:'grid_flying_panel',
+            flyingPanelHover:'grid_flying_panel',
 
         }
         
@@ -995,18 +1007,26 @@ Tgrid.prototype._createFrames=function(){
     c+= ut.tag('<',{id:id.frameCells,css:css.cells_frame+' '+p.cssScroll,style:"position:absolute;overflow-x:hidden;overflow-y:auto"});
     c+= ut.tag({id:id.cells,tag:'table',css:css.cells,style:"position:absolute;border-collapse: collapse;table-layout: fixed;",attr:{border:0,cellspacing:0,cellpadding:0}});
     c+= ut.tag('>');
+
+    // плавающая панель ----------------------------------------------------
+    c+= ut.tag('<',{id:id.flyingPanel.selected,css:css.flyingPanelSelected,style:"background:red;width:100px;position:absolute;overflow:none"});
+    c+= ut.tag('>');
+    c+= ut.tag('<',{id:id.flyingPanel.hover,css:css.flyingPanelHover,style:"background:green;width:100px;position:absolute;overflow:none"});
+    c+= ut.tag('>');
+    // ----------------------------------------------------------------------
+
     c+= ut.tag({id:id.header,tag:'table',css:css.header,
         style:"position:absolute;border-collapse: collapse;table-layout: fixed;overflow:hidden",attr:{border:0,cellspacing:0,cellpadding:0}});
-    
     p.plugin.append(c);
     
     p.jq.header = p.plugin.find('#'+id.header);
     p.jq.frameCells = p.plugin.find('#'+id.frameCells);
     p.jq.cells = p.plugin.find('#'+id.cells);
+    p.jq.flyingPanel.selected = p.plugin.find('#'+id.flyingPanel.selected);
+    p.jq.flyingPanel.hover = p.plugin.find('#'+id.flyingPanel.hover);
     
     
     id.headerFrame={left:ut.id('hFl'),right:ut.id('hFr'),top:ut.id('hFt'),bottom:ut.id('hFb')};
-    
     c=ut.tag({id:id.headerFrame.left,style:'position:absolute',css:css.headerFrame_left});
     c+=ut.tag({id:id.headerFrame.right,style:'position:absolute',css:css.headerFrame_right});
     c+=ut.tag({id:id.headerFrame.top,style:'position:absolute',css:css.headerFrame_top});
@@ -1019,6 +1039,7 @@ Tgrid.prototype._createFrames=function(){
         top:p.plugin.find('#'+id.headerFrame.top),
         bottom:p.plugin.find('#'+id.headerFrame.bottom)
     };
+    
     
 };
 
@@ -1782,6 +1803,7 @@ Tgrid.prototype.doSelect=function(o){
         p.onSelect(o);
     };
     t.notify('select',o);
+    t._alignFlyingPanel();
 };
 /**
  * @function
@@ -2863,6 +2885,19 @@ Tgrid.prototype._alignHeader=function(tt){
     
 };    
 
+Tgrid.prototype._alignFlyingPanel=function(tt){
+    let t=this,p=t.param,jq = p.jq,pos;
+    let select = t.map('selected');
+    
+    if (select.length){
+        select = select[0];
+        pos = JX.abs(select[0]);
+        JX.abs(jq.flyingPanel.selected,{x:pos.x+pos.w-100,y:pos.y,w:100,h:pos.h});
+    }
+    
+};
+
+
 Tgrid.prototype._align=function(){
     var t=this,p=t.param,jq=p.jq,pos,bound=JX.pos(p.plugin),mf=p.marginHeaderFrame;
 
@@ -2901,7 +2936,9 @@ Tgrid.prototype._align=function(){
 
     t._alignGroups(bound);    
     
-    t._alignHeader();      
+    t._alignHeader();
+    
+    t._alignFlyingPanel();
     
     t.updateGroupInView();
 };
