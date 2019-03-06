@@ -28,9 +28,10 @@
  *          <footer {height:32px}>
  *      page>
  * ',$own,'WIN');
- * 
- * 
+ *  * 
  * Ф-ция FRAMET ( интерфейс для FRAMET::RENDER() ) возвращает ссылку на объект FRAME - первый созданный из шаблона объект
+ * 
+ * 
  * 
 */ 
 if(!isset($Application)){
