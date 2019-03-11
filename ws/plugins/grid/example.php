@@ -52,8 +52,12 @@ class TWS extends WS{
             
             fields :[
                 {name:"ID",caption:"id",width:50},
-                {name:"NAME",caption:"name wekf kwjehrf kj hkwerkjhf kjhw kwjhf kjwherf khkhwkerhf ",width:100},
+                {name:"NAME",caption:"Name ",width:100},
                 {name:"HIDDEN",caption:"hidden ",visible:false},
+                {name:"ADD1",caption:"Add1 ",visible:true},
+                {name:"ADD2",caption:"Add2 ",visible:true},
+                {name:"ADD3",caption:"Add3 ",visible:true,width:400},
+                
                 {name:"DATE",caption:"date"},
                 {name:"PANEL",caption:"panel",width:200},
             ],
@@ -156,6 +160,9 @@ class TWS extends WS{
                 data.push({
                     ID:max_id,
                     NAME:ut.random_str(5),
+                    ADD1:ut.random_str(10),
+                    ADD2:ut.random_str(5)+""+ut.random_str(5),
+                    ADD3:ut.random_str(100),
                     DATE:ut.random(10,99)+"/"+ut.random(10,99)+"/"+ut.random(10,99)
                 })
             }
@@ -228,7 +235,7 @@ class TWS extends WS{
         );        
 
     
-        /*c:add10 */
+        /*c:add5 */
         $this->item(
             'add5',                   //id
             'add5',                  //caption
