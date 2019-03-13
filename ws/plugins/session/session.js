@@ -192,13 +192,15 @@ _start:function(o){
 
 },
 _fromAjax:function(from,id){
-    var t=session;
+    var t=session,h=t._handler;
     if ((t.enable)&&(from.enable!=1)){
         
         if (t._events.indexOf(id)==-1){
             t._clearData();
             if (t.onStop) 
                 t.onStop();
+            h.do('stop');
+            h.do('change');
         }    
         
     }
