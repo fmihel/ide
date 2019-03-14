@@ -122,7 +122,7 @@ class _WS_CONF{
         if (!$reopen){
 
             if (array_search($abs,$this->loadedFiles)!==false){
-                $this->log($file,'already opened, call _WS_CONF::loadFromFile($file,true) for reopen file!');
+                // $this->log('already opened '.$file,'',__FILE__,__LINE__,'all:0');
                 return false;
             }
         }    
