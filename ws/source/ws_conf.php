@@ -54,12 +54,14 @@ class WS_CONF{
         return $_ws_conf->debug_info($cr);
     }
     
-    static function LOAD($file,$reopen=false){
+    static function LOAD($__DIR__,$file='',$reopen=false){
         global $_ws_conf;
-        $_ws_conf->loadFromFile($file,$reopen);
+        $_ws_conf->loadFromFile($__DIR__,$file,$reopen);
     }    
     
 };
+
+
 
 class _WS_CONF{
     public $param;
@@ -82,9 +84,33 @@ class _WS_CONF{
                 $this->loadFromFile($file);
         };    
     }
-    /** загрузка конфига из файла ( объединяется с текущей конфигурацией) */
-    function loadFromFile($file,$reopen=false){
+    /** 
+     * загрузка конфига из файла ( объединяется с текущей конфигурацией) 
+     * Возможно ипользовать в двух вариантах
+     * 1. loadFromFile(file,[reopen]) тогда file - путь к конфигу относительно папки запускаемого скрипта
+     * 2. loadFromFile(dir,file,[reopen]) тогда file - путь относительно абсолютного пути dir ( dir = __DIR__ - то относительно файла который вызывает loadFromFile)
+     * 
+    */
+    function loadFromFile($__DIR__,$file='',$reopen=false){
         global $Application;
+        
+        if ($file===''){
+            
+            $file = $__DIR__;
+            $dirname = false;
+            
+        }else{
+            if (gettype($file)==='boolean'){
+                $reopen = $file;
+                $file = $__DIR__;
+            }else{
+                
+                $abs =  APP::abs_path($__DIR__,$file);
+                $file = APP::rel_path($Application->PATH,$abs);                
+            }    
+        };    
+        
+
         
         if (!class_exists('APP')){
             $this->log('class APP not defined, use require_once "...application.php" first','',__FILE__,__LINE__);
