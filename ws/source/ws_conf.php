@@ -34,7 +34,7 @@
 
 
 class WS_CONF{
-    static function GET($name,$default=''){
+    static function GET($name,$default=null){
         global $_ws_conf;
         return $_ws_conf->get($name,$default);
     }
@@ -159,10 +159,15 @@ class _WS_CONF{
         $this->param[$name] = $mean;
     }
     
-    function get($name,$default){
-
-        $this->def($name,$default);
-        return $this->param[$name];
+    function get($name,$default=null){
+        
+        if ( !isset($this->param[$name]) && is_null($default) ){
+            $this->log('get undefined var ['.$name.'] ','warn',__FILE__,__LINE__);    
+            return null;
+        } else {
+            $this->def($name,$default);
+            return $this->param[$name];
+        }    
     }
     function clear(){
         $this->param = array();
