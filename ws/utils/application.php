@@ -388,6 +388,7 @@ class TApplication{
     
     public $ADDR;        //  путь к проекту  http://site.ru/project/test/index.php
     public $REQUEST;     //  полная строка запроса http://domen.ru/path/file.php?param=78&...
+    public $FILENAME;     // имя скрипта (без пути) с которого идет запуск
     
     public $LIBS;       // относительные пути (по отношению к проекту) к ресурсам (php,js,css,...) по умолчанию есть ws и root 
     
@@ -421,6 +422,7 @@ class TApplication{
         $this->HTTP         =$this->HTTP_TYPE.'://'.$this->URL;
         $this->ADDR         = $this->HTTP.APP::get_file($_SERVER['SCRIPT_FILENAME']);
         $this->REQUEST      = $this->ADDR.($_SERVER['QUERY_STRING']!==''?'?'.$_SERVER['QUERY_STRING']:'');
+        $this->FILENAME     = APP::get_file($_SERVER['SCRIPT_NAME']);
         
         $this->LIBS = array();
         $this->lib('ws',        APP::rel_path($this->PATH,APP::abs_path($this->CLASS_PATH,'../source/')));
@@ -760,7 +762,7 @@ class TApplication{
         if ($this->LOG_TO_ERROR_LOG)
             $out = " ".trim($from).$cr;
         else    
-            $out = "[$date $time $from]".$cr;
+            $out = "[$date $time {".$this->FROM_ROOT.$this->FILENAME."} $from ]".$cr;
         
         if (is_string($msg))
             $out.=trim($msg).$cr;
@@ -803,6 +805,7 @@ class TApplication{
         $res.='HTTP ['.$this->HTTP.']'.$cr;
         $res.='ADDR ['.$this->ADDR.']'.$cr;
         $res.='REQUEST ['.$this->REQUEST.']'.$cr;
+        $res.='FILENAME ['.$this->FILENAME.']'.$cr;
         $res.=$cr;        
         foreach($this->LIBS as $ext=>$path)
             $res.='LIBS['.$ext.']='.$path.$cr;                        
