@@ -133,6 +133,7 @@ _browserName:function(){
     var agent = navigator.userAgent;    
 
     if ((agent.search(/MSIE/) > -1)||(agent.search(/\.NET/) > -1)) t.browserName = 'ie';
+    else if ((agent.search(/Edge/) > -1)) t.browserName = 'edge';
     else if ((agent.search(/Firefox/) > -1)) t.browserName = 'firefox';
     else if ((agent.search(/Opera/) > -1)||(agent.search(/OPR\//) > -1)) t.browserName = 'opera';
     else if ((agent.search(/Chrome/) > -1)) t.browserName = 'chrome';

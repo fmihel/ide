@@ -204,7 +204,8 @@ scroll:function(param){
     o.scroll(param);
     return this;
 },
-inViewPort:function(tr,strong=false){
+inViewPort:function(tr,strong){
+    if (strong===undefined) strong = false;
     var o = m.obj(this);
     return o.inViewPort(tr,strong);
 },
@@ -1065,6 +1066,7 @@ Tgrid.prototype._createHeader=function(){
 */
 Tgrid.prototype._setColsWidthStyle=function(){
     var t=this,p=t.param,i,f,first=true,l=p.lock,w,last;
+    let edge = (dvc.browserName==='edge');
     
     if (!l.can('style')) return;
     
@@ -1097,8 +1099,14 @@ Tgrid.prototype._setColsWidthStyle=function(){
             first=false;
             
             w = '';
-            if (f.width)
-                w = f.width+(typeof(f.width)==='number'?'px':'');
+            if (f.width){
+                let tn = (typeof(f.width)==='number');
+                if (tn&&edge)
+                    w = f.width+1;
+                else
+                    w = f.width;
+                w = w+(tn?'px':'');
+            }    
             c.css('width',w);
             
             last={h:h,c:c};
@@ -2068,7 +2076,8 @@ Tgrid.prototype.scrollVisible=function(){
     return (JX.pos(jq.frameCells).h<JX.pos(jq.cells).h);
 };
 /** признак того, что строка находится в области видимости */
-Tgrid.prototype.inViewPort=function(tr,strong=false){
+Tgrid.prototype.inViewPort=function(tr,strong){
+    if (strong===undefined) strong = false;
     var t=this,p=t.param,
     a=JX.abs(p.plugin),b= JX.abs(tr);
     
@@ -2715,7 +2724,7 @@ Tgrid.prototype._alignCols=function(){
                 //w = JX.pos(up[i]).w+1;
                 //w = up.eq(i).width()+(dvc.isIE?0:1);
                 w = JX.pos(up[i]).w;
-                if (dvc.isIE){
+                if ((dvc.isIE)||(dvc.browserName==='edge')){
                     w=Math.ceil(w)-1;
                 }
                 
