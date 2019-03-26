@@ -481,17 +481,26 @@ class TApplication{
         $direct_url = (strpos($file,"+")===0);
         if ($direct_url)
             $file = substr($file,1);
-
+        
+        $params = strpos($file,"?");
+        
+        if ($params!==false){
+            $pos    = $params;
+            $params = substr($file,$pos);
+            $file   = substr($file,0,$pos);
+        }else
+            $params = '';
+        
         $have_dcss = strpos($file,"]");
         if ($have_dcss!==false){
             
             $dcss = substr($file,0,$have_dcss);
             $file = trim(substr($file,$have_dcss+1));
             
-            $dcss=str_replace(array('[',']'),'',$dcss);
-            $dcss   =   explode(':',$dcss);
+            $dcss = str_replace(array('[',']'),'',$dcss);
+            $dcss = explode(':',$dcss);
             
-            $dcss   =   array('style'=>trim($dcss[0]),'name'=>trim($dcss[1]));
+            $dcss = array('style'=>trim($dcss[0]),'name'=>trim($dcss[1]));
             
         }else
             $dcss=false;
@@ -527,14 +536,14 @@ class TApplication{
             $local = '';
 
         
-        $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss));
+        $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss,'params'=>$params));
             
         if ($ext=='PHP')
             return $filename;
         else
             return $local;
+         
             
-
     }
 
     /** возвращает хеш сумму md5 по заданному расширению (для проверки появился ли новый файл в списке) 
