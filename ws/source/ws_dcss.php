@@ -39,7 +39,7 @@ class DCSS{
     
         // расчет списка css файлов привязанных к текущим стилям        
         $files = array(); 
-        $css = isset($Application->EXTENSION['CSS'])?$Application->EXTENSION['CSS']:array();
+        $css = (isset($Application->EXTENSION['CSS'])?$Application->EXTENSION['CSS']:array());
         
         
         for($i=0;$i<count($css);$i++){
@@ -694,7 +694,7 @@ class WS_DCSS{
             $i++;
         }
         
-        $out =  implode($arr,"\n");
+        $out =  implode("\n",$arr);
         
     }    
     private function _fill_css2(&$out){
@@ -807,7 +807,7 @@ class WS_DCSS{
     private function _extract_dcss(&$str){
         /*получаем dcss блок*/
         $re = '/\$dcss\s*=\s*{[\s\S]*}\s*;/U';
-        
+        $dcss = '';
         /*выделяем кусок с dcss*/
         preg_match($re, $str, $matches);
         

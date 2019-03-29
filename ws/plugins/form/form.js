@@ -94,6 +94,8 @@ mform.prototype.init = function(o){
         onAfterClose: undefined,/*событие после полного закрытия формы (можно снова открывать)*/
         canClose:   undefined,/*если определено, то должен венрнуть true чтобы форма закрылась*/
         onAlign:    undefined,/* после перерисовки */
+        onClickResize:    undefined,/* клик на кнопке изменения размера */
+        onClickPin:    undefined,/* клик на кнопке прикрепления */
         
         visible:false,/*признак видимости (НЕ вызывает onOpen)*/
         animate:0,
@@ -287,6 +289,7 @@ mform.prototype._event=function(){
 
     p.jq.pin.on('click',function(){
         t.pinDown('toggle');
+        if (p.onClickPin) p.onClickPin({sender:t});    
     });
  
     p.jq.header.on('mousedown',function(){
@@ -308,6 +311,7 @@ mform.prototype._event=function(){
             p._resizable = {
                 mouse:JX.mouse()
             };
+        if (p.onClickResize) p.onClickResize({sender:t});    
     });
     
     JX.window().on('mousemove',function(){

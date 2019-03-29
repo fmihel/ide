@@ -204,7 +204,8 @@ scroll:function(param){
     o.scroll(param);
     return this;
 },
-inViewPort:function(tr,strong=false){
+inViewPort:function(tr,strong){
+    if (strong===undefined) strong = false;
     var o = m.obj(this);
     return o.inViewPort(tr,strong);
 },
@@ -418,9 +419,12 @@ moveColumn:function(a){
     return this;
 },
 /** пересчет ориентации и расположения */
-align:function(){
+align:function(ev){
     var o = m.obj(this);
-    o.align();
+    if (ev==='flyingPanel')
+        o._alignFlyingPanel();
+    else
+        o.align();
     return this;
 },
 refresh:function(){
@@ -489,7 +493,8 @@ Tgrid.prototype.init = function(o){
         id:{
             header:ut.id('hdr'),
             frameCells:ut.id('fcls'),
-            cells:ut.id('cls')
+            cells:ut.id('cls'),
+            flyingPanel:ut.id('fps')
         },
         jq:{
             header      :null, 
@@ -498,6 +503,7 @@ Tgrid.prototype.init = function(o){
             cells       :null,
             all         :null,
             trs         :null,
+            flyingPanel :null,
         },
         
         lock:new jlock(),
@@ -524,6 +530,9 @@ Tgrid.prototype.init = function(o){
         flyingHeader:false,
         /*flyParent:o.plugin.parent(),*/
         marginHeaderFrame:{left:0,right:0,top:0,bottom:0},
+        
+        visibleFlyingPanel:false, // отображать или нет плавающую панель
+        onCulcFlyingPanelPos:undefined,// пересчет позиции панели
         /** отложенная перерисовка */
         alignDelay:0,
         /**при клике на элементае в ячейке, будет выбрана соотв строка */   
@@ -593,7 +602,8 @@ Tgrid.prototype.init = function(o){
             headerFrame_left:'grid_header_frame_left',
             headerFrame_right:'grid_header_frame_right',
             headerFrame_top:'grid_header_frame_top',
-            headerFrame_bottom:'grid_header_frame_bottom'
+            headerFrame_bottom:'grid_header_frame_bottom',
+            flyingPanel:'grid_flying_panel',
 
         }
         
@@ -995,18 +1005,23 @@ Tgrid.prototype._createFrames=function(){
     c+= ut.tag('<',{id:id.frameCells,css:css.cells_frame+' '+p.cssScroll,style:"position:absolute;overflow-x:hidden;overflow-y:auto"});
     c+= ut.tag({id:id.cells,tag:'table',css:css.cells,style:"position:absolute;border-collapse: collapse;table-layout: fixed;",attr:{border:0,cellspacing:0,cellpadding:0}});
     c+= ut.tag('>');
+
+    // плавающая панель ----------------------------------------------------
+    c+= ut.tag('<',{id:id.flyingPanel,css:css.flyingPanel,style:"position:absolute;overflow:none"});
+    c+= ut.tag('>');
+    // ----------------------------------------------------------------------
+
     c+= ut.tag({id:id.header,tag:'table',css:css.header,
         style:"position:absolute;border-collapse: collapse;table-layout: fixed;overflow:hidden",attr:{border:0,cellspacing:0,cellpadding:0}});
-    
     p.plugin.append(c);
     
     p.jq.header = p.plugin.find('#'+id.header);
     p.jq.frameCells = p.plugin.find('#'+id.frameCells);
     p.jq.cells = p.plugin.find('#'+id.cells);
-    
+    p.jq.flyingPanel = p.plugin.find('#'+id.flyingPanel);
+
     
     id.headerFrame={left:ut.id('hFl'),right:ut.id('hFr'),top:ut.id('hFt'),bottom:ut.id('hFb')};
-    
     c=ut.tag({id:id.headerFrame.left,style:'position:absolute',css:css.headerFrame_left});
     c+=ut.tag({id:id.headerFrame.right,style:'position:absolute',css:css.headerFrame_right});
     c+=ut.tag({id:id.headerFrame.top,style:'position:absolute',css:css.headerFrame_top});
@@ -1020,9 +1035,9 @@ Tgrid.prototype._createFrames=function(){
         bottom:p.plugin.find('#'+id.headerFrame.bottom)
     };
     
+    
 };
-
-/** сосздаем кол-во колонок указанное в fields */
+/** создаем кол-во колонок указанное в fields */
 Tgrid.prototype._createHeader=function(){
     var t=this,p=t.param,css=p.css,i,c='',f=p.fields;
 
@@ -1051,6 +1066,7 @@ Tgrid.prototype._createHeader=function(){
 */
 Tgrid.prototype._setColsWidthStyle=function(){
     var t=this,p=t.param,i,f,first=true,l=p.lock,w,last;
+    let edge = (dvc.browserName==='edge');
     
     if (!l.can('style')) return;
     
@@ -1083,8 +1099,14 @@ Tgrid.prototype._setColsWidthStyle=function(){
             first=false;
             
             w = '';
-            if (f.width)
-                w = f.width+(typeof(f.width)==='number'?'px':'');
+            if (f.width){
+                let tn = (typeof(f.width)==='number');
+                if (tn&&edge)
+                    w = f.width+1;
+                else
+                    w = f.width;
+                w = w+(tn?'px':'');
+            }    
             c.css('width',w);
             
             last={h:h,c:c};
@@ -1782,6 +1804,7 @@ Tgrid.prototype.doSelect=function(o){
         p.onSelect(o);
     };
     t.notify('select',o);
+    t._alignFlyingPanel();
 };
 /**
  * @function
@@ -2053,7 +2076,8 @@ Tgrid.prototype.scrollVisible=function(){
     return (JX.pos(jq.frameCells).h<JX.pos(jq.cells).h);
 };
 /** признак того, что строка находится в области видимости */
-Tgrid.prototype.inViewPort=function(tr,strong=false){
+Tgrid.prototype.inViewPort=function(tr,strong){
+    if (strong===undefined) strong = false;
     var t=this,p=t.param,
     a=JX.abs(p.plugin),b= JX.abs(tr);
     
@@ -2247,6 +2271,7 @@ Tgrid.prototype.attr = function(n/*v*/){
         v=arguments[1];
 
     /*-----------------------------------*/
+    
     if (n==='fields'){
         if (r) 
             return p.fields;
@@ -2291,6 +2316,20 @@ Tgrid.prototype.attr = function(n/*v*/){
             p.flyingHeader = v?true:false;
         }    
     }
+    /*-----------------------------------*/
+    if (n==='visibleFlyingPanel'){
+        if (r) 
+            return p.flyingPanel;
+        else{
+            p.visibleFlyingPanel = v?true:false;
+        }    
+    }
+    /*-----------------------------------*/
+    if (n==='flyingPanel'){
+        if (r) 
+            return p.jq.flyingPanel;
+    }
+    /*-----------------------------------*/
     if (n==='flyParent'){
         if (r)
             return p.flyParent;
@@ -2326,6 +2365,14 @@ Tgrid.prototype.attr = function(n/*v*/){
             return p.scrollWidth;
         else
             p.scrollWidth = v;
+    }
+    /*-----------------------------------*/
+    
+    if (n==='onCulcFlyingPanelPos'){
+        if (r) 
+            return p.onCulcFlyingPanelPos;
+        else
+            p.onCulcFlyingPanelPos = v;
     }
     /*-----------------------------------*/
     if (n==='onChange'){
@@ -2677,7 +2724,7 @@ Tgrid.prototype._alignCols=function(){
                 //w = JX.pos(up[i]).w+1;
                 //w = up.eq(i).width()+(dvc.isIE?0:1);
                 w = JX.pos(up[i]).w;
-                if (dvc.isIE){
+                if ((dvc.isIE)||(dvc.browserName==='edge')){
                     w=Math.ceil(w)-1;
                 }
                 
@@ -2848,9 +2895,7 @@ Tgrid.prototype._alignHeader=function(tt){
         pos = JX.pos(jq.header);
         JX.pos(jq.headerFrame.left,{x:0-mf.left,y:0-mf.top,h:pos.h+mf.top+mf.bottom,w:1});
         JX.pos(jq.headerFrame.right,{x:bound.w-1+mf.right,y:0-mf.top,h:pos.h+mf.top+mf.bottom,w:1});
-        
         JX.pos(jq.headerFrame.top,   {x:0-mf.left,  y:pos.y-mf.top,         h:1,    w:pos.w+mf.left+mf.right});
-        
         JX.pos(jq.headerFrame.bottom,{x:0-mf.left,  y:pos.y+pos.h+mf.bottom,    h:1,    w:pos.w+mf.left+mf.right});
         
     }else{
@@ -2862,6 +2907,44 @@ Tgrid.prototype._alignHeader=function(tt){
     }    
     
 };    
+
+Tgrid.prototype._alignFlyingPanel=function(){
+    let t=this,p=t.param,jq = p.jq,pos,fpos,size,res,
+    select = t.map('selected');
+    
+    if (p.visibleFlyingPanel){
+        if (JX.visiblex(p.plugin)){
+            if (select.length){
+                JX.visible(jq.flyingPanel,true);
+                select = select[0];
+                fpos    = JX.abs(p.plugin);
+                pos     = JX.abs(select[0]);
+                size    = JX.pos(jq.flyingPanel);
+                res = {x:fpos.x+fpos.w-size.w,y:pos.y,w:size.w,h:pos.h};
+                if (p.onCulcFlyingPanelPos){
+                    p.onCulcFlyingPanelPos({
+                        res,
+                        sender:t,
+                        panel:jq.flyingPanel,
+                        row:select,
+                        plugin:p.plugin,
+                        size,
+                        rowPos:pos,
+                        pluginPos:fpos
+                    });
+                }
+                //if (t.scrollVisible())
+                //    res.x-=ut.get(Dcss,'vars','scrollBarSizeW',20);
+                JX.abs(jq.flyingPanel,res);
+            }else
+                JX.visible(jq.flyingPanel,false);
+        }            
+    }else
+        JX.visible(jq.flyingPanel,false);
+    
+    
+};
+
 
 Tgrid.prototype._align=function(){
     var t=this,p=t.param,jq=p.jq,pos,bound=JX.pos(p.plugin),mf=p.marginHeaderFrame;
@@ -2901,7 +2984,9 @@ Tgrid.prototype._align=function(){
 
     t._alignGroups(bound);    
     
-    t._alignHeader();      
+    t._alignHeader();
+    
+    t._alignFlyingPanel();
     
     t.updateGroupInView();
 };

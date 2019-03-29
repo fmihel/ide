@@ -28,9 +28,10 @@
  *          <footer {height:32px}>
  *      page>
  * ',$own,'WIN');
- * 
- * 
+ *  * 
  * Ф-ция FRAMET ( интерфейс для FRAMET::RENDER() ) возвращает ссылку на объект FRAME - первый созданный из шаблона объект
+ * 
+ * 
  * 
 */ 
 if(!isset($Application)){
@@ -437,6 +438,7 @@ class FRAMET{
     static private $space = array('"'=>' ','{'=>';','['=>';','|'=>' ','~'=>';');
     static private $blocks = array('"','{','[','<','>','|','~');
     static private $root = false;
+    static private $randID = '#';
     static private $jx_short = array(
         'wp'=>'workplace',
         'a'=>'arrange',
@@ -469,7 +471,7 @@ class FRAMET{
 
         
         self::$len = strlen($template);
-        
+        $i = 0;
         self::$struct = self::_get_struct($template,$i);
         
     
@@ -534,6 +536,9 @@ class FRAMET{
         }
 
     }
+    private static function _get_random_id($count = 9){
+        return  'id_'.STR::random($count);    
+    }
     /** парсинг шаблона
      * Ф-ция последовательно перебирает сроку шаблоны, формируя на выходе массив-дерево php, структуры
      *  array(
@@ -561,6 +566,7 @@ class FRAMET{
                 if ($find['res'])
                     $tag['id']=substr($template,$i+1,$find['pos']-$i-1);
 
+
                 while($i<self::$len){
 
                     if ($find['res']){
@@ -578,7 +584,7 @@ class FRAMET{
                         
                             if (!isset($tag['child']))
                                 $tag['child'] = array();
-                            $tag['child'] = array_merge($tag['child'],$child);    
+                            $tag['child'] = array_merge($tag['child'],$child);
                     
                         }else{
                     
@@ -626,6 +632,14 @@ class FRAMET{
                 $tag['id'] = trim($id);
                 $tag['tag'] = trim($tg);
                 
+                if ($tag['id']==='')
+                    $tag['id'] = self::_get_random_id();
+
+                    // замена явно указанного генератора id 
+                $posId = strpos($tag['id'],self::$randID);   
+                if ($posId!==false)
+                    $tag['id'] = str_replace(self::$randID,self::_get_random_id(),$tag['id']);
+
 
                 $parent = strpos($tag['id'],'^');
                 if ($parent!==false){

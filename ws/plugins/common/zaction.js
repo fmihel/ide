@@ -74,6 +74,7 @@ zAction.define=function(o){
         action:undefined,
         state:undefined,
         prevState:undefined,
+        done:undefined,
         on:{
             action:[],
             state:[],
@@ -96,6 +97,8 @@ zAction.define=function(o){
             g._firstCallState = false;
             g.state = a.state;
         }    
+        if ((a.done!==undefined)&&(g.done===undefined))
+            g.done = a.done;
         
         g.prevState = a.prevState;
         
@@ -194,12 +197,17 @@ zAction.unbind=function(actionName,on,funcName){
                 g.on[on].splice(_on,1);
         
         }
-    };    
+    }    
 };
 
 /** пооечередно вызывает все определенные ф-ции state , и если состояние изменилось, то вызываются все приаттаченные (bind) обработчики*/
-zAction.update=function(name){
+zAction.update=function(name,done){
     var t=zAction,p=t.param,a=p.action,newState,updNeed=false,updActions=[];
+    
+    if (typeof name==='function'){
+        done = name;
+        name = undefined;
+    }
     
     if (t._lock('update')){
         
@@ -216,15 +224,20 @@ zAction.update=function(name){
                     v.on.state.forEach(function(vv){
                         if (vv.func) try{ vv.func(newState);}catch(e){}    
                     });
+                    
+                    if (v.done) v.done();
                 }
             }
         });
         
         
         p.update.forEach((f)=>{try{f({change:updNeed,list:updActions});}catch(e){}});
-        
     }
+    if (typeof done==='function') 
+        done();
+        
     t._unlock('update');
+    
 };
 /** полное удаление action? c соотв state и bind */
 zAction.undefine=function(name){

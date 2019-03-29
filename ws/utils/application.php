@@ -390,6 +390,7 @@ class TApplication{
     
     public $ADDR;        //  путь к проекту  http://site.ru/project/test/index.php
     public $REQUEST;     //  полная строка запроса http://domen.ru/path/file.php?param=78&...
+    public $FILENAME;     // имя скрипта (без пути) с которого идет запуск
     
     public $LIBS;       // относительные пути (по отношению к проекту) к ресурсам (php,js,css,...) по умолчанию есть ws и root 
     
@@ -423,6 +424,7 @@ class TApplication{
         $this->HTTP         =$this->HTTP_TYPE.'://'.$this->URL;
         $this->ADDR         = $this->HTTP.APP::get_file($_SERVER['SCRIPT_FILENAME']);
         $this->REQUEST      = $this->ADDR.($_SERVER['QUERY_STRING']!==''?'?'.$_SERVER['QUERY_STRING']:'');
+        $this->FILENAME     = APP::get_file($_SERVER['SCRIPT_NAME']);
         
         $this->LIBS = array();
         $this->lib('ws',        APP::rel_path($this->PATH,APP::abs_path($this->CLASS_PATH,'../source/')));
@@ -481,17 +483,26 @@ class TApplication{
         $direct_url = (strpos($file,"+")===0);
         if ($direct_url)
             $file = substr($file,1);
-
+        
+        $params = strpos($file,"?");
+        
+        if ($params!==false){
+            $pos    = $params;
+            $params = substr($file,$pos);
+            $file   = substr($file,0,$pos);
+        }else
+            $params = '';
+        
         $have_dcss = strpos($file,"]");
         if ($have_dcss!==false){
             
             $dcss = substr($file,0,$have_dcss);
             $file = trim(substr($file,$have_dcss+1));
             
-            $dcss=str_replace(array('[',']'),'',$dcss);
-            $dcss   =   explode(':',$dcss);
+            $dcss = str_replace(array('[',']'),'',$dcss);
+            $dcss = explode(':',$dcss);
             
-            $dcss   =   array('style'=>trim($dcss[0]),'name'=>trim($dcss[1]));
+            $dcss = array('style'=>trim($dcss[0]),'name'=>trim($dcss[1]));
             
         }else
             $dcss=false;
@@ -527,14 +538,14 @@ class TApplication{
             $local = '';
 
         
-        $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss));
+        $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss,'params'=>$params));
             
         if ($ext=='PHP')
             return $filename;
         else
             return $local;
+         
             
-
     }
 
     /** возвращает хеш сумму md5 по заданному расширению (для проверки появился ли новый файл в списке) 
@@ -551,6 +562,8 @@ class TApplication{
     
     /** возвращает весь контент ресурса одним файлом */
     public function getExtConcat($ext,$delim){
+        if(!isset($this->EXTENSION[$ext]))
+            $this->EXTENSION[$ext]=array();
         $res = '';
         if (isset($this->EXTENSION[$ext]))
         for($i=0;$i<count($this->EXTENSION[$ext]);$i++){
@@ -564,7 +577,7 @@ class TApplication{
     private function _add_to_extension($ext,$dat){
         if(!isset($this->EXTENSION[$ext]))
             $this->EXTENSION[$ext]=array();
-            
+        
         for($i=0;$i<count($this->EXTENSION[$ext]);$i++){
             $exist = $this->EXTENSION[$ext][$i];
             if ($exist['remote']==$dat['remote']) return;
@@ -762,7 +775,7 @@ class TApplication{
         if ($this->LOG_TO_ERROR_LOG)
             $out = " ".trim($from).$cr;
         else    
-            $out = "[$date $time $from]".$cr;
+            $out = "[$date $time {".$this->FROM_ROOT.$this->FILENAME."} $from ]".$cr;
         
         if (is_string($msg))
             $out.=trim($msg).$cr;
@@ -805,6 +818,7 @@ class TApplication{
         $res.='HTTP ['.$this->HTTP.']'.$cr;
         $res.='ADDR ['.$this->ADDR.']'.$cr;
         $res.='REQUEST ['.$this->REQUEST.']'.$cr;
+        $res.='FILENAME ['.$this->FILENAME.']'.$cr;
         $res.=$cr;        
         foreach($this->LIBS as $ext=>$path)
             $res.='LIBS['.$ext.']='.$path.$cr;                        

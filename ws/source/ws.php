@@ -232,10 +232,13 @@ class WS extends WS_CONTENT{
                         $js_script_file = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
                     }    
                 }
+                
+                $url_params  = $Application->EXTENSION['JS'][$i]['params'];
 
                 $res.='<script type="text/javascript" src="';
-                $res.=$js_script_file;
-                $res.=($version!==''?'?'.$version:'');
+                $res.=$js_script_file.$url_params;
+                
+                $res.=($version!==''?($url_params!==''?'&':'?').$version:'');
             
                 $res.='"></script>'.DCR;
             }

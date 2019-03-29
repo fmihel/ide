@@ -1,6 +1,11 @@
 <?php
-define('WSI_DEV_VERSION','241218_1');
-define('WSI_GIT_VERSION','1.0.4');
+
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+
+define('WSI_DEV_VERSION','260319_1');
+define('WSI_GIT_VERSION','1.0.5');
 
 error_reporting(0);
 /*
