@@ -973,26 +973,27 @@ class ARR{
             return is_array(self::from_json($str));
         
     }
-    public static function to_php_code($arr,$formated=false,$level=0){
+    public static function to_php_code($arr,$formated=false,$level=1){
         //S: преобразует в код php
-        
-        $tab = ($formated?STR::repeat('    ',$level):'');
+        $div = "    ";
+        $tab = ($formated?STR::repeat($div,$level):'');
+        $tab_0 = ($formated?STR::repeat($div,$level-1):'');
         $cr = $formated?"\n":'';
         
         if (is_array($arr)){
             $res = '';
             
             if (ARR::is_assoc($arr)){
-                
+
                 foreach($arr as $k=>$v)
-                    $res.=($res!=''?',':'').$cr.$tab."'".$k."'=>".ARR::to_php_code($v,$formated,$level+1);
+                    $res.=($res!=''?',':'').$cr.$tab."'".$k."'"."=>".ARR::to_php_code($v,$formated,$level+1);
                 
             }else{
                 for($i=0;$i<count($arr);$i++){
                     $res.=($res!=''?',':'').$cr.$tab.ARR::to_php_code($arr[$i],$formated,$level+1);
                 }
             }
-            return 'array('.$res.')';
+            return 'array('.$res.$cr.$tab_0.')';
             
         }else
             return "'".$arr."'";
@@ -1363,5 +1364,6 @@ class EMAIL{
         return (!preg_match("/^([a-zA-Z0-9~\._-]{2,})(@{1}[a-zA-Z0-9~\._-]{2,})(\.{1}[a-zA-Z]{2,4})$/i",$email)) ? false : true ;
     }
 };
+
 
 ?>

@@ -153,10 +153,11 @@ class USERS {
             $begin = true;
             $code = '';
             
-            foreach($user_data as $k=>$v)
-                $code.=($code==''?'':",\n")."'".$k."'=>".ARR::to_php_code($v);    
+            //foreach($user_data as $k=>$v)
+            //    $code.=($code==''?'':",\n")."'".$k."'=>".ARR::to_php_code($v,true);    
+            $code = ARR::to_php_code($user_data,true);
                 
-            $code = "<?php\n\$user_data=array(\n$code\n);\n?>";
+            $code = "<?php\n\$user_data=$code;\n?>";
             
             return (file_put_contents($file,$code)!==false);
         }
