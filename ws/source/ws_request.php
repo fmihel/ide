@@ -172,7 +172,50 @@ class WS_REQUEST
             
         return '[{"ID":"'.$ID.'","DATA":'.$DATA.'},{"SHARE":'.ARR::to_json($this->SHARE).'}]';
     }
+    /**
+     * альтернативный доступ к переменной VALUE,
+     * WS_REQUEST::GET('x',0);
+     * если не указать второй параметр, то GET создаст Exception
+     */
+    public static function GET($name,$default = null){
+        global $REQUEST;
+
+        if (isset($REQUEST->VALUE[$name]))
+            return $REQUEST->VALUE[$name];
+        else{    
+            if (is_null($default))
+                throw new Exception("WS_REQUEST::GET $name  is not exists, and default is not defined");
+            return $default;
+        }    
+    }
     
+    /**
+     * Проверка соотвествия ID
+     *  if (WS_REQUEST::IS("load_info")){
+     *      try{
+     *          $len = WS_REQUEST::GET("len");
+     * 
+     *      }catch(Exception $e){
+     *          error_log($e->getMessage());      
+     *      }
+     *      return true;
+     *  }
+     *  return false;
+     */
+    public static function IS($ID){
+        global $REQUEST;
+        return ($REQUEST->ID == $ID);
+    }
+    
+    public static function OK($data){
+        return array('res'=>1,'data'=>$data);
+    }
+    
+    public static function ERROR($msg,$res=0){
+        return array('res'=>$res,'msg'=>$msg);
+    }
+
+
 };
 //----------------------------------------------------------------------
 

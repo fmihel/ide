@@ -1019,7 +1019,7 @@ class ARR{
                     };
                 };
                 
-                if ((TYPE::is($to[$key.$addType],'array'))||(count($val)>0))
+                if ((isset($to[$key.$addType])&&(TYPE::is($to[$key.$addType],'array')))||(count($val)>0))
                     $to[$key.$addType] = $val;
 
             }else if (TYPE::is($val,'assoc,object')){

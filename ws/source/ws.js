@@ -10,7 +10,7 @@ Ws.ajax = function (o) {
         id: -1,
         value: '',
         url: this.url,
-        timeout: 1000000,
+        timeout: 3600000,
         done: Ws.done,
         error: Ws.error,
         method: 'POST',
