@@ -181,7 +181,7 @@ class GJX{
         
         $enableBuffer = ($enableBuffer==='global'?self::$enableBuffer:($enableBuffer?true:false));
     
-        if ((count($param2)>2)&&($param[2]!=='global'))
+        if ((count($param)>2)&&($param[2]!=='global'))
             $enableBuffer = $param[2];
         
         if (self::isEmptyArr($param[0])){
@@ -459,7 +459,7 @@ class FRAMET{
     public static function RENDER($template,$own,$group,$toAll){
         
         // загружаем переменные ( переменные хранятся в упорядоченном массиве self::$vars = array("var_name"=>"mean",....)
-
+        $i = 0;
         self::_vars($template);
 
         if (count(self::$vars)>0)

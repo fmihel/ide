@@ -204,6 +204,8 @@ class APP{
     */
     static function ward($_dir_,$file=''){ 
         global $Application;
+        $_dir_ = str_replace(array("\\",'/'),_DIRECTORY_SEPARATOR,$_dir_);
+        
         $res = trim(self::rel_path(self::slash($Application->PATH,true,true),self::slash($_dir_,true,true)));
         
         return ($res!==''?APP::slash($res,false,true):'').($file!==''?APP::slash($file,false,false):'');
@@ -563,7 +565,7 @@ class TApplication{
         if(!isset($this->EXTENSION[$ext]))
             $this->EXTENSION[$ext]=array();
         $res = '';
-
+        if (isset($this->EXTENSION[$ext]))
         for($i=0;$i<count($this->EXTENSION[$ext]);$i++){
             $file = trim($this->EXTENSION[$ext][$i]['local']);
             if (($file!=='')&&(file_exists($file)))
@@ -659,6 +661,8 @@ class TApplication{
             $i=0;
             if ($p['assLimit']>0)
                 $cnt = min($all,$p['assLimit']-1);
+            else 
+                $cnt = $all;    
             
             
             $out.=$L[$type].$cr;

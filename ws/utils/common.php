@@ -777,6 +777,7 @@ class ARR{
         $i = 0;
         // на всякий случай ели нет, то обернем в фигурные скобки
         $str = ltrim($str);
+        if ($str==='') $str='{}';
         if (($str[0]!=='{')&&($str[0]!=='[')) 
             $str='{'.$str.'}';
             
@@ -1019,7 +1020,7 @@ class ARR{
                     };
                 };
                 
-                if ((TYPE::is($to[$key.$addType],'array'))||(count($val)>0))
+                if ((isset($to[$key.$addType])&&(TYPE::is($to[$key.$addType],'array')))||(count($val)>0))
                     $to[$key.$addType] = $val;
 
             }else if (TYPE::is($val,'assoc,object')){

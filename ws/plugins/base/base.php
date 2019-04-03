@@ -961,13 +961,15 @@ class base{
                 if ($short)
                     array_push($out,$row['Field']);
                 else{
-                    
+                    $out[]=$row;
+                    /*
                     array_push($out,array(
                         'Field'=>$row['Field'],
                         'Type'=>$row['Type'],
                         'Key'=>$row['Key'],
                         'Extra'=>$row['Extra']
                     ));
+                    */
                     
                 }
                 

@@ -694,7 +694,7 @@ class WS_DCSS{
             $i++;
         }
         
-        $out =  implode($arr,"\n");
+        $out =  implode("\n",$arr);
         
     }    
     private function _fill_css2(&$out){
@@ -811,8 +811,7 @@ class WS_DCSS{
         /*выделяем кусок с dcss*/
         preg_match($re, $str, $matches);
         
-        if (count($matches)>0)
-            $dcss = $this->_split('/\$dcss\s*=\s*/', $matches[0]);
+        $dcss = count($matches)>0?$this->_split('/\$dcss\s*=\s*/', $matches[0]):'';
         $this->dcss = ARR::from_json($dcss);
 
         /*остаток возрвщаем*/
