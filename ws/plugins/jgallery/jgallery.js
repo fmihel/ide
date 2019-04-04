@@ -144,7 +144,12 @@ prev:function(){
 addPlugin:function(param){
     var o = m.obj(this);
     o.pluginsAdd(param);
-}
+},
+clear:function(){
+    var o = m.obj(this);
+    o.clear();
+},
+
 
 };
 
@@ -202,6 +207,7 @@ Tjgallery.prototype.init = function(o){
         onChangeView:undefined,
         onLoading:undefined,
         onLoad:undefined,
+        onClear:undefined,
         /** отступ между изображениями */
         gap:10,
         /** отступ при вписывании в видимую область */
@@ -238,15 +244,20 @@ Tjgallery.prototype.done=function(){
     this.clear();
 };
 /** полная очистка галлереи */
-Tjgallery.prototype.clear=function(){
-    var t=this,p=t.param;
+Tjgallery.prototype.clear=function(o){
+    var t=this,p=t.param,
+    a=$.extend(true,{
+        callOnClear:true,
+    },o);
+    
     p.data = [];
     p._images=[];
     p.plugin.html("");
     p.plugin.scrollTop(0);
     p._view = undefined;
     p._current     = undefined;
-    
+    if ((a.callOnClear)&&(p.onClear))
+        p.onClear({sender:t});
     t.pluginsDo('clear');
     
 };    
@@ -640,7 +651,7 @@ Tjgallery.prototype.put = function(o){
     
     if (o.data!==undefined){
         var data = $.extend(true,[],o.data);
-        t.clear();
+        t.clear({callOnClear:false});
         p.data = t._dataNormal(data);
         t._create();
     }
@@ -741,6 +752,13 @@ Tjgallery.prototype.attr = function(n/*v*/){
             return p.onLoad;
         else    
             p.onLoad = v;
+    }
+    /*-----------------------------------*/
+    if (n==='onClear'){
+        if (r) 
+            return p.onClear;
+        else    
+            p.onClear = v;
     }
     /*-----------------------------------*/
     if (n==='gap'){
