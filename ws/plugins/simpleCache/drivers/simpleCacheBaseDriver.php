@@ -1,14 +1,14 @@
 <?php
 
-$driverBaseUnitPath = dirname(__FILE__).'/';
-require_once $driverBaseUnitPath.'idriverBuffer.php';
-require_once $driverBaseUnitPath.'../bufferUtils.php';
+$simpleCacheBaseDriverPath = dirname(__FILE__).'/';
+include_once $simpleCacheBaseDriverPath.'iSimpleCacheDriver.php';
+include_once $simpleCacheBaseDriverPath.'../simpleCacheUtils.php';
 
-class DriverBufferBase implements IDriverBuffer{
+class SimpleCacheBaseDriver implements iSimpleCacheDriver{
     private $param = array();
     
     public function __construct($o=array()){
-        $this->param = BufferUtils::extend(array(
+        $this->param = SimpleCacheUtils::extend(array(
             'base'=>'deco',
             'table'=>'buffer',
             'timeout'=>600,
@@ -21,7 +21,7 @@ class DriverBufferBase implements IDriverBuffer{
     }
 
     public function get($key,$o=array()){
-        $a = BufferUtils::extend($this->param,$o);
+        $a = SimpleCacheUtils::extend($this->param,$o);
 
         $q = 'select *,CURRENT_TIMESTAMP-`'.$a['lastField'].'` `delta` from '.$a['table'].' where '.$a['keyField']." = '".$key."'";
         if ($row = base::row($q,$a['base'])){
@@ -30,9 +30,8 @@ class DriverBufferBase implements IDriverBuffer{
         };
         return false;
     }
-
     public function set($key,$data,$o=array()){
-        $a = BufferUtils::extend($this->param,$o);
+        $a = SimpleCacheUtils::extend($this->param,$o);
 
         try{
         
@@ -67,13 +66,20 @@ class DriverBufferBase implements IDriverBuffer{
 
     }
     public function clear($key = '',$o=array()){
-        $a = BufferUtils::extend($this->param,$o);
+        $a = SimpleCacheUtils::extend($this->param,$o);
         if($key===''){
             $q = 'delete from '.$a['table'].' where CURRENT_TIMESTAMP-`'.$a['lastField'].'` >  `'.$a['timeoutField'].'`';
         }else{
             $q = 'delete from '.$a['table'].' where `'.$a['keyField']."`='".$key."'";
         }
         return base::query($q,$a['base']);
+    }
+    public function reset($o=array()){
+
+        $a = SimpleCacheUtils::extend($this->param,$o);
+        $q = 'delete from '.$a['table'].' where 1>0';
+        return base::query($q,$a['base']);
+        
     }
 }
 

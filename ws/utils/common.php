@@ -525,7 +525,7 @@ class ARR{
             $count = count($a);
             if ($count!==count($b)) return false;
             
-            for($i=0;$i<count();$i++){
+            for($i=0;$i<count;$i++){
                 if ($soft){
                     if ($a[$i]!=$b[$i])
                         return false;

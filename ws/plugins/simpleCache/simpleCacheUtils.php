@@ -1,9 +1,10 @@
 <?php
-class BufferUtils{
+
+
+class SimpleCacheUtils{
     public static function is_assoc($array){
         return count(array_filter(array_keys($array), 'is_string')) > 0;
     }
-    
     public static function extend($a = array(), $b = array()){
         
         if ((is_array($a)) && (is_array($b))) {
@@ -25,20 +26,19 @@ class BufferUtils{
             return $res;
         };
         return $a;
-    
-    
     }
     /**
      * преобразуем массив списка параметров в ключь для записи в буффер
+     * Ex:
+     * class B{
+     *      function a(){
+     *          $key = SimpleCacheUtils::toKey(func_get_args(),__CLASS__,__FUNCTION__);
+     *      }
+     * }
      */
-    public static function toKey($args,$o=array()){
-        $a = self::extend(array(
-            'convertToMd5'=>true,
-        ),$o);
-        
-        $ret = serialize($args);
-
-        if ($a['convertToMd5'] && (strlen($ret)>32))
+    public static function toKey(/**$...args*/){
+        $ret = serialize(func_get_args());
+        if (strlen($ret)>32)
             $ret = md5($ret);
 
         return $ret;

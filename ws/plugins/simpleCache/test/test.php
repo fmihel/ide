@@ -9,8 +9,8 @@ if(!isset($Application)){
     require_once UNIT('ws','ws.php'); 
 };
 
-require_once '../buffer.php';
-require_once '../driverBuffer/driverBufferBase.php';
+require_once '../simpleCache.php';
+require_once '../drivers/simpleCacheBaseDriver.php';
 require_once UNIT('plugins','base/base.php');
 
 define ('SERVER_NAME2', WS_CONF::GET('deco_server'));
@@ -21,12 +21,13 @@ define ('BASE_NAME2',   WS_CONF::GET('deco_base'));
 base::connect(SERVER_NAME2,SERVER_USER2,SERVER_PASS2,BASE_NAME2,'deco');
 base::charSet('cp1251','deco');
 
-$buffer = new Buffer('DriverBufferBase',array('timeout'=>60));
+
+$buffer = new SimpleCache('SimpleCacheBaseDriver',array('timeout'=>60));
 
 function test($arg1,$arg2,$arg3=''){
     global $buffer;
     
-    $key = BufferUtils::toKey(func_get_args());
+    $key = $buffer->toKey(__FUNCTION__,func_get_args());
     if ($data = $buffer->get($key)){
         echo 'read : '.count($data).'<hr>';
         return $data;
@@ -43,10 +44,14 @@ function test($arg1,$arg2,$arg3=''){
 
 
 
-//$buffer->clear();
-//exit;
+$buffer->reset();
+exit;
 
 
-test(0,5000,0);
+test(0,4000,0);
+
+
+
+
 
 ?>
