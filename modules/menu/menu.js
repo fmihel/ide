@@ -29,8 +29,8 @@ menu_action.run=function(){
 menu_action.run_opened=function(){
     var c=editors.current();
     if(!c) return;
-    var url=c.panel_content.input.urlLight('get','url');
-
+    var url=ut.url_nocache(c.panel_content.input.urlLight('get','url'));
+    
     if ((bottom_panel)&&(!bottom_panel.close())&&(log_panel)&&(log_panel.frame().enable))
         log_panel.frame({url:url});
     else

@@ -235,10 +235,14 @@ save:function(){
                 
         });
         
-        v = d.log_name.mselect('data');
-        for(j=0;j<v.length;j++){
-            if (files.indexOf(v[j].value)==-1)
-                files.push(v[j].value);
+        if (d.log_name!==undefined){
+            
+            v = d.log_name.mselect('data');
+            for(j=0;j<v.length;j++){
+                if (files.indexOf(v[j].value)==-1)
+                    files.push(v[j].value);
+            }        
+            
         }    
         
     }
