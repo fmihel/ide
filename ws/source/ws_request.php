@@ -177,13 +177,14 @@ class WS_REQUEST
      * WS_REQUEST::GET('x',0);
      * если не указать второй параметр, то GET создаст Exception
      */
-    public static function GET($name,$default = null){
+    public static function GET($name,$default){
         global $REQUEST;
 
         if (isset($REQUEST->VALUE[$name]))
             return $REQUEST->VALUE[$name];
         else{    
-            if (is_null($default))
+            // если не определен параметр default то формируем исключение
+            if (func_num_args()<2)
                 throw new Exception("WS_REQUEST::GET $name  is not exists, and default is not defined");
             return $default;
         }    
