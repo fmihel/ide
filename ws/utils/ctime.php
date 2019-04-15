@@ -10,7 +10,7 @@ class CT{
     
     public static function STOP($name){
         global $_CT;
-        $delta = round(microtime(true)-$_CT[$name]['start'],$_CT['round']);
+        $delta = round(microtime(true)-$_CT[$name]['start'],$_CT[$name]['round']);
         
         if ($delta>$_CT[$name]['limit']){
             $msg = "$name time:".$delta.'[s]';

@@ -23,7 +23,6 @@ init:function(o){
             process_frame:'find_process_frame',
             process:'find_process',
             select:'find_select'
-            
         }
     },o);
     
@@ -225,6 +224,7 @@ _event:function(){
     p.clear.on("click",t._clear);
     
     p.input.keypress(function(e){if(e.which == 13) t._go();}); 
+    p.path.keypress(function(e){if(e.which == 13) t._go();}); 
     p.exts.keypress(function(e){if(e.which == 13) t._go();}); 
     
     p.item.panel.on("click",function(e){
