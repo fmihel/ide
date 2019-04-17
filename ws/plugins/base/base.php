@@ -372,8 +372,12 @@ class _table{
     public static function val(&$data,$field/**/){
         if (func_num_args()>2)
             $data[self::pref($field)]=func_get_arg(2);
-        else
-            return $data[self::pref($field)];
+        else{
+            if (isset($data[self::pref($field)]))
+                return $data[self::pref($field)];
+            else    
+                return null;    
+        }    
     }
     /** формирует запрос update/insert с учетом полей из data*/
     

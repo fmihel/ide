@@ -1002,6 +1002,36 @@ class ARR{
     }
     
     
+    private static function _union($a = array(), $b = array(),$deep,$_level=0){
+        
+        if ((is_array($a)) && (is_array($b))) {
+            
+            if (($a===[])||(self::is_assoc($a))) {
+                $res = $b;    
+                foreach ($a as $k => $v) {
+                    if (!isset($b[$k])) {
+                        $res[$k] = $v;
+                    } else {
+                        if (($deep) && ((is_array($v)) && (is_array($b[$k])))) {
+                            $res[$k] = self::_union($v, $b[$k],$_level+1);
+                        } else 
+                            $res[$k] = $b[$k];
+                    }
+                }
+                return $res;
+            }
+            
+        };
+        return $a;
+    }    
+    public static function union($a = array(), $b = array(),$deep=true){
+        
+        if ( (!is_array($a)) || (!is_array($b)) ){
+            $msg = 'union params must be array';
+            throw new Exception($msg);
+        }
+        return self::_union($a,$b,$deep,0);
+    }
     public static function _extend(&$to,$from){
 
         $types =array('@boolean','@numeric','@double','@integer','@int','@float','@real','@num','@bool','@string');
@@ -1088,7 +1118,8 @@ class ARR{
             
         });
 
-    }  
+    }
+
     /** 
      * 
      * дополнение массива $to массивом $from
@@ -1265,7 +1296,7 @@ class ARR{
         
 };
     
-    class MATH{
+class MATH{
         
         public static function translate($y,$y1,$y2,$x1,$x2){
       if (($y2-$y1) === 0)
@@ -1366,6 +1397,7 @@ class EMAIL{
         return (!preg_match("/^([a-zA-Z0-9~\._-]{2,})(@{1}[a-zA-Z0-9~\._-]{2,})(\.{1}[a-zA-Z]{2,4})$/i",$email)) ? false : true ;
     }
 };
+
 
 
 ?>

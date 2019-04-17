@@ -14,6 +14,7 @@ include_once $simpleCachePath.'simpleCacheUtils.php';
 class SimpleCache {
     private $driver;
     private $_enable;
+    private $preload = array();
     /**
      * Создание экземпляра
      * @param string $classDriver строка с именем класса драйвера (см. iSimpleCacheDriver и папку drivers)
@@ -36,6 +37,10 @@ class SimpleCache {
     public function get($key,$o=array()){
         if (!$this->_enable)
             return false;
+        
+        if (isset($this->preload[$key]))
+            return $this->preload[$key];
+
         if ($data = $this->driver->get($key,$o))
             return unserialize($data);
         else    
@@ -52,7 +57,8 @@ class SimpleCache {
     public function set($key,$data,$o=array()){
         if (!$this->_enable)
             return true;
-        return $this->driver->set($key,serialize($data),$o);
+         $this->preload[$key] = $data;
+         return $this->driver->set($key,serialize($data),$o);
     }
     /** 
      * Выборочная очистка кеша
@@ -64,7 +70,12 @@ class SimpleCache {
     public function clear($key='',$o=array()){
         if (!$this->_enable)
             return true;
-
+        
+        if ($key==='')
+            $this->preload=[];
+        else 
+            unset($this->preload[$key]);    
+            
         return $this->driver->clear($key,$o);
     }
     /**
@@ -85,6 +96,7 @@ class SimpleCache {
     public function reset($o=array()){
         if (!$this->_enable)
             return true;        
+        $this->preload = array();    
         return $this->driver->reset($o);        
     }
     
