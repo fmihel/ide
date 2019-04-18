@@ -72,7 +72,7 @@ class SimpleCache {
             return true;
         
         if ($key==='')
-            $this->preload=[];
+            $this->preload=array();
         else 
             unset($this->preload[$key]);    
             

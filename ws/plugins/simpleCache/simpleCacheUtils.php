@@ -9,14 +9,14 @@ class SimpleCacheUtils{
         
         if ((is_array($a)) && (is_array($b))) {
             
-            if (($a===[])||(self::is_assoc($a))) {
+            if (($a===array())||(self::is_assoc($a))) {
                 $res = $b;    
                 foreach ($a as $k => $v) {
                     if (!isset($b[$k])) {
                         $res[$k] = $v;
                     } else {
                         if ((is_array($v)) && (is_array($b[$k]))) {
-                            $res[$k] = self::extends($v, $b[$k]);
+                            $res[$k] = self::extend($v, $b[$k]);
                         } else 
                             $res[$k] = $b[$k];
                     }
