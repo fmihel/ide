@@ -1006,7 +1006,7 @@ class ARR{
         
         if ((is_array($a)) && (is_array($b))) {
             
-            if (($a===[])||(self::is_assoc($a))) {
+            if (($a===array())||(self::is_assoc($a))) {
                 $res = $b;    
                 foreach ($a as $k => $v) {
                     if (!isset($b[$k])) {
