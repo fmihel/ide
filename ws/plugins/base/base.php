@@ -1538,6 +1538,13 @@ class base{
         
         return $out;
     }
+    public static function real_escape($string,$base=null){
+        $db = self::db($base);
+        if (!$db) 
+            return $string;
+        else    
+            return $db->real_escape_string($string);
+    }
     
     public static function esc($string,$base=null){
         //$db = self::db($base);

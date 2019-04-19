@@ -71,7 +71,7 @@ class SimpleCache {
         if (!$this->_enable)
             return true;
         
-        if ($key==='')
+        if (($key==='')||(gettype($key)==='array'))
             $this->preload=array();
         else 
             unset($this->preload[$key]);    

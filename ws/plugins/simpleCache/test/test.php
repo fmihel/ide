@@ -28,6 +28,7 @@ function test($arg1,$arg2,$arg3=''){
     global $buffer;
     
     $key = $buffer->toKey(__FUNCTION__,func_get_args());
+
     if ($data = $buffer->get($key)){
         echo 'read : '.count($data).'<hr>';
         return $data;
@@ -38,18 +39,21 @@ function test($arg1,$arg2,$arg3=''){
         $data[] = $arg1.STR::random(10).$arg2;
         
     
-    $buffer->set($key,$data);
-    echo 'write : '.count($data).'<hr>';
+   if ($buffer->set($key,$data,array('group'=>'alpha','notes'=>'func test ')))
+        echo 'write : '.count($data).'<hr>';
+    else
+        echo base::error('deco');
+        
 }
 
-
-
-$buffer->reset();
-exit;
-
-
-test(0,4000,0);
-
+if(true){
+    //$buffer->reset();
+    //$buffer->clear(array('group'=>'more'));
+    $buffer->clear(array('where'=>' :group LIKE "price%"'));
+    echo 'reset..';
+}else{
+    test(11,2);
+}
 
 
 
