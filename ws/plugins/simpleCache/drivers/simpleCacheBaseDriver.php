@@ -18,7 +18,7 @@ class SimpleCacheBaseDriver implements iSimpleCacheDriver{
                 'buffer'=>'BUFFER',
                 'date'=>'LAST_UPDATE',
                 'time'=>'timeout_sec',
-                'group'=>'group',
+                'group'=>'part',
                 'notes'=>'notes'
             ),
             
