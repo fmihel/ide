@@ -293,6 +293,8 @@ class WS_DCSS{
         
         $out = $this->source;
         
+        $this->_ws_conf($out);
+
         $this->_extract_string($out);
 
         $this->_extract_vars($out);
@@ -313,7 +315,26 @@ class WS_DCSS{
         $out = '';
         return $out;   
     }
-    
+
+    private function _ws_conf(&$out){
+        global $_ws_conf;
+        // замена переменных конфигурации ( заменяются только переменные с простыми данными string и number)
+        $param = $_ws_conf->param;
+        krsort($param);
+        $from = array();
+        $to = array();
+        foreach($param as $k=>$v){
+            $type = gettype($v);
+            if (($type!=='array')&&($type!=='object')){
+                $code = 'WS_CONF::'.$k;
+                $from[] =$code;
+                $to[]   =$v;
+            }
+        }
+        if (count($to)>0)
+            $out = str_replace($from,$to,$out);
+    }
+
     private function _set_nocache(){
         global $_WS;    
 
