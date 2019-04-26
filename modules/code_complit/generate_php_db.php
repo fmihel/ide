@@ -199,7 +199,7 @@ class CODE_COMPLIT_UTILS{
                     else
                     {
                         
-                        if (TYPE::is_numeric($Value))
+                        if (TYPE::is_numeric($Value,true))
                         {
                             $res.= '"'.$Name.'":'.$Value;
                         }
@@ -226,7 +226,7 @@ class CODE_COMPLIT_UTILS{
                             $res.= '"'.$Name.'":true';
                         else
                             $res.= '"'.$Name.'":false';
-                    }else if (TYPE::is_numeric($arr[$i]))
+                    }else if (TYPE::is_numeric($arr[$i],true))
                         $res.= $arr[$i];
                     else
                         $res.= '"'.$arr[$i].'"';         

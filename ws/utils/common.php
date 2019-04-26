@@ -92,7 +92,7 @@ class COMMON{
         for($i=0;$i<$count;$i++){
 
             $param = $params[$i];
-            if ((is_string($param))&&(STR::is_numeric($param)))
+            if ((is_string($param))&&(TYPE::is_numeric($param)))
                 $param = intval($param);
                 
             $type = TYPE::info($var);    
@@ -135,16 +135,33 @@ class TYPE{
         $v=strtolower(trim($v));
         return (($v==='1')||($v==='true')); 
     }
-    public static function toNum($v,$default=0){
+    public static function toNum($v,$default=0,$forced = 1){
+        
         if (is_float($v)) return $v;
         if (is_int($v))   return $v;
+            
+        $v = trim(str_replace(',','.',$v));
         
-        $v = trim($v);
-        $v = str_replace(',','.',$v);
-        $num = floatval($v);
+        $check = '';
         
-        return ($num.''===$v)?$num:$default;
+        if($forced === 1){
+            // простая проверка, на то что в строке только данные относящиеся к числу
+            $check  = str_replace(array(1,2,3,4,5,6,7,8,9,0,'.','-','+'),'',$v);
+        }elseif($forced === 2){
+            // подробная проверка, на то что в строке только данные относящиеся к числу
+            $check  = str_replace(array(1,2,3,4,5,6,7,8,9,0),'',$v);
+            $check = STR::str_replace_once('.','',$check);
+            $check = STR::str_replace_once('-','',$check);
+            $check = STR::str_replace_once('+','',$check);
+        }else
+            return floatval($v);
 
+        
+        if ($check==='')
+            return floatval($v);
+        else
+            return $default;
+    
     }    
     public static function is_assoc($arr)
     {
@@ -158,13 +175,16 @@ class TYPE{
 				}
 				return false;	 
     }
-    public static function is_numeric($val)
+    public static function is_numeric($val,$forced = false)
     {
+        $val = trim($val);
+        $is_num = is_numeric($val);  
+        if($forced){
         //S:Проверка на то что значение цифра ( с учетом json-кого 0 впереди)
-        if (!is_numeric($val))
-            return false;
-        return ((strlen($val.'')==1) ||((strlen($val.'')>1) && (strpos($val,'0')!==0)));
-        
+            if ($is_num)
+                $is_num = ((strlen($val.'')==1) ||((strlen($val.'')>1) && (strpos($val,'0')!==0)));
+        }        
+        return $is_num;
     }
     /** возвращает расширенную информацию о типе */ 
     public static function info($v){
@@ -621,7 +641,8 @@ class ARR{
             $res = '{';
             foreach($arr as $Name=>$Value)
             {
-                if ($res !=='{') $res.=',';        
+                if ($res !=='{') 
+                    $res.=',';        
 
                 if (is_array($Value))
                     $res.= '"'.$Name.'":'.ARR::to_json($Value).'';          
@@ -636,7 +657,7 @@ class ARR{
                     }
                     else
                     {
-                        if (TYPE::is_numeric($Value))
+                        if (TYPE::is_numeric($Value,true))
                             $res.= '"'.$Name.'":'.$Value;
                         else{
                             
@@ -666,7 +687,7 @@ class ARR{
                             $res.= '"'.$Name.'":true';
                         else
                             $res.= '"'.$Name.'":false';
-                    }else if (TYPE::is_numeric($arr[$i]))
+                    }else if (TYPE::is_numeric($arr[$i],true))
                         $res.= $arr[$i];
                     else
                         $res.= '"'.COMMON::pre_json($arr[$i]).'"';         
