@@ -862,14 +862,15 @@ class base{
     
     private static function _storyError($base){
         $_base = self::getbase($base);
-        if ($_base===false) return;
+        if ($_base===false) 
+            return;
         $err = $_base->db->error;
         if ($err!==''){
             if ($_base->error!==$err){
                 $_base->error = $err;
                 $_base->errors[]=$err;
             }
-        }    
+        }
     }
     
     public static function error($base){
@@ -904,7 +905,10 @@ class base{
     public static function assign($ds){
         return ($ds!==false);    
     }
-    
+    /**
+     * @return  false - если ошибка
+     * @return object - если запрос выполнен
+     */
     public static function ds($sql,$base=null,$coding=null){
 
         $db = self::db($base);
@@ -935,6 +939,43 @@ class base{
     public static function isEmpty($ds){
         return ( ($ds===false) || ($ds->num_rows===0) );
     }
+    /**
+     * Возвращает кол-во записей запроса sql или в ds
+     * если задать countFieldName, то будет искать соответсвтвующее поле и выдаст его значение
+     * можно задать countFieldName как число, тогда это будет номер необходимого поля
+     */
+    public static function count($sqlOrDs,$base=null,$countFieldName=''){
+        
+        $ds = gettype($sqlOrDs)==='string'?self::ds($sqlOrDs,$base,null):$sqlOrDs;
+        if (!$ds)
+            throw new Exception('Error in ds');
+        $type = gettype($countFieldName);
+
+        if (($countFieldName!='')||($type==='integer')){
+            $fields = self::fields($ds);
+
+            if ($type === 'integer'){
+                $row = base::row($ds);
+                return intval($row[$fields[$countFieldName]]);
+            }else{
+                $fields = self::fields($ds);
+                $countFieldName = strtoupper(trim($countFieldName));
+                foreach($fields as $name){
+                    if (
+                        (strtoupper(trim($name)) === $countFieldName) 
+                        || 
+                        (strpos(strtoupper(trim($name)),$countFieldName.'(')===0)
+                    ){
+                        $row = base::row($ds);
+                        return intval($row[$name]);
+                    }
+                }
+            }   
+        }
+        
+        return $ds->num_rows;        
+    }
+
     /** список таблиц */
     public static function tables($base=null){
         $res = array();
