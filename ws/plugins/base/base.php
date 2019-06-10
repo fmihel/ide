@@ -66,7 +66,7 @@ class baseSetup{
         self::$removeEscape = $bool?true:false;
     }
     
-}
+};
 class _db{
     public $db;
     public $transaction;
@@ -233,7 +233,7 @@ class _join{
         return $this->str;
     }
     
-}
+};
 class _table{
     
     public static function __callStatic($name,$arguments){
@@ -859,23 +859,34 @@ class base{
         return  $base===false?false:$base->db;
         
     }
+    private static function dbE($base){
+        $result = self::db($base);
+        if (!$result)
+            throw new \Exception(" not exists basename = '$base'");
+        return $result;
+    }
     
     private static function _storyError($base){
         $_base = self::getbase($base);
         if ($_base===false) 
             return;
-        $err = $_base->db->error;
-        if ($err!==''){
-            if ($_base->error!==$err){
-                $_base->error = $err;
-                $_base->errors[]=$err;
+        else{    
+            $err = $_base->db->error;
+            if ($err!==''){
+                if ($_base->error!==$err){
+                    $_base->error = $err;
+                    $_base->errors[]=$err;
+                }
             }
         }
     }
     
     public static function error($base){
         $_base = self::getbase($base);
-        return $_base->error;
+        if ($_base)
+            return $_base->error;
+        else
+            return "not exists base='$base'";
     }
     public static function query($sql,$base=null,$coding=null){
         $db = self::db($base);
@@ -900,6 +911,12 @@ class base{
         return $res;
 
     }
+    /** выполняет запрс, в случае ошибки вызывает исключение с описанием ошибки */
+    public static function queryE($sql,$base=null,$coding=null,$error_msg=''){
+
+        if (!self::query($sql,$base,$coding))
+            throw new \Exception($error_msg.' '.self::error($base));
+    }
 
 
     public static function assign($ds){
@@ -912,14 +929,16 @@ class base{
     public static function ds($sql,$base=null,$coding=null){
 
         $db = self::db($base);
-        
+        if (!$db)
+            return false;
+
         if (!is_null($coding)){
             $story  =   self::charSet(null,$base);
             self::charSet($coding,$base);
             self::_storyError($base);
         }
         
-
+        
         $ds = $db->query($sql);
         self::_storyError($base);
         
@@ -934,6 +953,12 @@ class base{
             $ds->data_seek(0);
             return $ds;    
         }                    
+    }
+    public static function dsE($sql,$base=null,$coding=null,$error_msg=''){
+        $ds = self::ds($sql,$base,$coding);
+        if (!$ds)
+            throw new \Exception($error_msg.' '.self::error($base));
+        return $ds;
     }
     
     public static function isEmpty($ds){
@@ -1149,6 +1174,13 @@ class base{
         else
             return false;
     }
+    public static function rowE($sqlOrDs,$base=null,$coding=null,$error_msg=''){
+        
+        $ds = gettype($sqlOrDs)==='string'?self::dsE($sqlOrDs,$base,$coding,$error_msg):$sqlOrDs;
+        if (!$ds)
+            throw new \Exception( $error_msg.' '.self::error($base) );
+        return $ds->fetch_assoc();
+    }
     
     public static function rows($sqlOrDs,$base=null,$coding=null){
 
@@ -1156,14 +1188,28 @@ class base{
 
         if ($ds){
             $out = array();
-            while(base::by($ds,$row)){
+            while(base::by($ds,$row))
                 array_push($out,$row);
-            }
+
             return $out;
         }
         
         return array();    
     
+    }
+    public static function rowsE($sqlOrDs,$base=null,$coding=null,$error_msg=''){
+
+        $ds = gettype($sqlOrDs)==='string'?self::dsE($sqlOrDs,$base,$coding,$error_msg):$sqlOrDs;
+
+        if ($ds){
+            $out = array();
+            while(base::by($ds,$row))
+                array_push($out,$row);
+
+            return $out;
+        }else
+            throw new \Exception($error_msg.' '.self::error($base));
+
     }
     
     public static function by($ds,&$row){
@@ -1231,10 +1277,13 @@ class base{
 
 
     public static function val($sql,$default='',$base=null,$coding=null){
-        
         return self::value($sql,'',$default,$base,$coding); 
-        
     }
+
+    public static function valE($sql,$default='',$base=null,$coding=null,$error_msg=''){
+        return self::valueE($sql,'',$default,$base,$coding,$error_msg); 
+    }
+
     public static function value($sql,$field='',$default='',$base=null,$coding=null){
         
         $ds = self::ds($sql,$base,$coding);
@@ -1255,6 +1304,24 @@ class base{
             return $row[$field];
         };    
         
+    }    
+    public static function valueE($sql,$field='',$default='',$base=null,$coding=null,$error_msg=''){
+        
+        $ds = self::dsE($sql,$base,$coding,$error_msg);
+        
+        $fields = self::fields($ds);
+        
+        if ($field === '')
+            $field = $fields[0];
+        else if (array_search($field,$fields)===false) 
+            throw new \Exception($error_msg." field ='$field' not exists");
+        
+        if (self::isEmpty($ds))
+            return $default;
+        else{    
+            $row = self::rowE($ds,null,null,$error_msg);
+            return $row[$field];
+        };    
         
     }    
     
@@ -1404,7 +1471,7 @@ class base{
             
         
           
-        if ($param['refactoring']===true){
+        if (@$param['refactoring']===true){
             $DCR = "\n\t";
             $CR = "\n";
         }else{
@@ -1460,7 +1527,7 @@ class base{
             if ($need){
                 
                 $tab ='';
-                if ($param['refactoring']===true){
+                if (@$param['refactoring']===true){
                     $sl = strlen($field)+2+($queryType!=='insert'?1:0);
                     $tab = ($sl<8?"\t\t":($sl<17?"\t":""));
                     
@@ -1469,7 +1536,7 @@ class base{
                     
                 $left.=($left!==''?',':'').$DCR."`$field`".($queryType==='insert'?'':'='.$tab.$value);
                 if ($queryType==='insert'){
-                    if ($param['refactoring']===true)
+                    if (@$param['refactoring']===true)
                         $left.=$tab.'/*'.$value.'*/';
                     
                     $right.=($right!==''?',':'').$value; 
@@ -1713,5 +1780,5 @@ class base{
             error_log('['.date("d-M-Y").' '.date("H:i:s").' '.__FILE__.$line.']'."\n".$msg);
     }
     
-}
+};
 ?>
