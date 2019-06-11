@@ -557,6 +557,16 @@ Tjedit.prototype._event = function(){
         t.end('draw');
         t.changed(t.changed());
     });
+    jq.input.on('paste',()=>{
+        if (p.readOnly) return;
+        // ставлю задержку на реакцию вставки paste, так как событие срабатывает до того как меняется атрибут attr
+        setTimeout(()=>{
+            t.begin('draw');
+            t.put({value:jq.input.val()});
+            t.end('draw');
+            t.changed(t.changed());
+        },1000);
+    });
 
     jq.input.on('mouseup',()=>{
         if (p.readOnly) return;

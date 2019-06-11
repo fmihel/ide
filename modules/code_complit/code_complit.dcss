@@ -18,7 +18,7 @@
 }
 
 .cc_obj,.cc_func,.cc_var{
-    //text-indent:10px;
+    /* text-indent:10px; */
 }
 .cc_obj{
     color:$cc_obj;

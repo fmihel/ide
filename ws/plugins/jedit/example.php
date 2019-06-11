@@ -880,10 +880,10 @@ class TWS extends WS{
                 padding:0px;
                 font-family:arial, sans-serif;
                 font-size:13px;
-                /*
+                
                 background:#242424;
                 color:gray;
-                */
+                
             }
             
             /*c:layout */
@@ -1080,8 +1080,8 @@ class TWS extends WS{
     private function item($id,$caption,$code='',$click=''){
         $own = FRAME('left');
         $code = $this->refactoring($code);
-
-        $code = str_replace(array("\n",'"',"'"),array('<#enter#>','<#quot#>','<#apos#>'),$code);
+        
+        $code = str_replace(array("\n\r","\n",'"',"'","\r"),array('<#enter#>','<#enter#>','<#quot#>','<#apos#>',''),$code);
 
         $item = FRAME($id,$own)
             ->CLASSES('menu')

@@ -65,7 +65,7 @@
     line-height:18px;
     text-align:left;
     border:0px solid ;
-    //border-bottom:1px solid $border;
+    /* border-bottom:1px solid $border; */
     outline:0px;
     background-color:$fone;
     color:$font;

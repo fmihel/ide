@@ -135,7 +135,7 @@ $vthumb = $panel;
 .menu_item{
     min-height:$menu_height;
     line-height:$menu_height;
-//    background-color:$menu_item;
+/*  background-color:$menu_item; */
 }
 
 

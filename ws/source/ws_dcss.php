@@ -315,7 +315,6 @@ class WS_DCSS{
         $out = '';
         return $out;   
     }
-
     private function _ws_conf(&$out){
         global $_ws_conf;
         // замена переменных конфигурации ( заменяются только переменные с простыми данными string и number)
@@ -397,8 +396,8 @@ class WS_DCSS{
     }
     
     private function _uplotnyem(&$css){
-        $from= array("\n",'|','{ ',' }','; ',' ;',': ',' :','  ');
-        $to = array(' ','','{','}',';',';',':',':',' ');
+        $from= array(   "\n\r", "\n",   "\r",   '|',    '{ ',   ' }',   '; ',   ' ;',   ': ',   ' :',   '  ');
+        $to = array(    ' ',    ' ',    ' ',    '',     '{',    '}',    ';',    ';',    ':',    ':',    ' ');
         //$from= array("\n\n",'|');
         //$to = array("\n",'');
         
@@ -523,18 +522,17 @@ class WS_DCSS{
                 if (is_array($mean)){
                     
                     $style = array_keys($mean);
-                    $style = $style[0];
                     
-                    if (isset($this->styles[$style]))
-                        $mean_name = $this->styles[$style];
-                    else
-                        $mean_name = $this->dcss['styles'][$style][0];
+                    // if (count($style)>0){
+                        $style =$style[0];
                     
+                        if (isset($this->styles[$style]))
+                            $mean_name = $this->styles[$style];
+                        else
+                            $mean_name = $this->dcss['styles'][$style][0];
                     
-                    //error_log('vars='.print_r($this->vars[$name],true));
-                    $this->vars[$name][$style][$mean_name] = $new_mean;
-                    //error_log('new_mean='.print_r($new_mean,true));
-                    //error_log('mean_name='.print_r($mean_name,true));
+                        $this->vars[$name][$style][$mean_name] = $new_mean;
+                    //}
                     
                 }else
                     $this->vars[$name] = $new_mean;    
@@ -811,6 +809,10 @@ class WS_DCSS{
     private function _extract_comments(&$text){
         /*удаляем комментарии*/
         $text = preg_replace('#/\*(?:[^*]*(?:\*(?!/))*)*\*/#','',$text);
+        //$text = preg_replace('/\/\/.*$/m', "\n", $text);
+        //$text = preg_replace('!/\*.*?\*/!s', '', $text);
+        //$text = preg_replace('/\n\s*\n/', "\n", $text);
+
     }
    
     private function _split($re,$str){

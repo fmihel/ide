@@ -9,7 +9,7 @@
     font-size:$size;
 }
 .jm_item{
-    //height:$menu_height; 
+    /* height:$menu_height; */
     line-height:$menu_height; 
     text-indent:5px;
     cursor:pointer;

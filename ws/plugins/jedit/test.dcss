@@ -1,0 +1,32 @@
+$rgb0 = rgba(0,0,0,0);
+
+$jeColorCaption = gray;
+$jeColorText    = gray;
+$jeColorEdit    = navy;
+$jeColorChanged  = blue;
+
+$jeBorder       = silver;
+
+$jeFone = $rgb0;
+$jeFoneCombo    = #FFF8E5;
+$jeFoneEdit     = #F3F3F3;
+$jeFoneText     = white;
+
+$jeWidthCaption = 100;
+$jeWidthEdit    = 100;
+$jeHeight       = 23;
+$jeBtnSize      = $jeHeight;
+$jeFontSize     = 13;
+$jeIndent = 5;
+$jeDimW     = 20;
+
+.je_label{
+    height:$jeHeight|px;
+    line-height:$jeHeight|px;
+    overflow:hidden;
+    width:$jeWidthCaption|px;
+    color:$jeColorCaption;
+    font-size:$jeFontSize|px;
+    text-indent:$jeIndent|px;
+    
+}
