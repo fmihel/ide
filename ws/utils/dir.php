@@ -43,7 +43,8 @@ class DIR{
         $ext = DIR::_exts($exts);    
         //------------------------------------------------
         // add directory
-        $dir = scandir($path);
+        $dir = @scandir($path);
+        if ($dir)
         for($i=0;$i<count($dir);$i++){
             $item = $dir[$i];
             if (($item!=='.')&&($item!=='..')){
