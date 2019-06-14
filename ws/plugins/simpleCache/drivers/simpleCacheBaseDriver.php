@@ -19,10 +19,12 @@ class SimpleCacheBaseDriver implements iSimpleCacheDriver{
                 'date'=>'LAST_UPDATE',
                 'time'=>'timeout_sec',
                 'group'=>'part',
-                'notes'=>'notes'
+                'notes'=>'notes',
+                'group_id'=>'part_id'
             ),
             
             'group'=>'common',
+            'group_id'=>0,
             'notes'=>'',
         ),$o);
     }
@@ -50,6 +52,7 @@ class SimpleCacheBaseDriver implements iSimpleCacheDriver{
             $q.= ',`'.$fields['date'].'`';
             $q.= ',`'.$fields['time'].'`';
             $q.= ',`'.$fields['group'].'`';
+            $q.= ',`'.$fields['group_id'].'`';
             $q.= ',`'.$fields['notes'].'`';
             $q.=' )';
             $q.=' values';
@@ -59,6 +62,7 @@ class SimpleCacheBaseDriver implements iSimpleCacheDriver{
             $q.= ",CURRENT_TIMESTAMP";
             $q.= ",".$a['timeout'];
             $q.= ",'".$a['group']."'";
+            $q.= ",".$a['group_id'];
             $q.= ",'".$a['notes']."'";
 
             $q.=' )';
@@ -68,10 +72,12 @@ class SimpleCacheBaseDriver implements iSimpleCacheDriver{
             $q.=',`'.$fields['date']."`= CURRENT_TIMESTAMP";
             $q.=',`'.$fields['time']."`= ".$a['timeout'];
             $q.=',`'.$fields['group']."`= '".$a['group']."'";
+            $q.=',`'.$fields['group_id']."`= ".$a['group_id'];
             $q.=',`'.$fields['notes']."`= '".$a['notes']."'";
 
             if (!base::query($q,$this->param['base']))
-                return false;
+                throw new \Exception(base::error($this->param['base']).' ['.$q.']');
+
             return true;
 
         }catch(Exception $e){
