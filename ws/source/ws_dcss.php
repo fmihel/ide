@@ -444,9 +444,19 @@ class WS_DCSS{
     }
     
     private function _mm($mean){
-        
+
+        if (mb_strpos($mean,'maxWmm')!==false){
+            $s = DEVICE::GET();
+            $mean = str_replace('maxWmm',$s['browser']['w'],$mean); 
+        };
+        if (mb_strpos($mean,'maxHmm')!==false){
+            $s = DEVICE::GET();
+            $mean = str_replace('maxHmm',$s['browser']['h'],$mean); 
+        };
+
         if (mb_strpos($mean,'mm')!==false) {
-        
+            //_LOGF(DEVICE::GET(),'device',__FILE__,__LINE__);
+    
             $re = '/[0-9]*[\.\,]?[0-9]+mm/';
             preg_match_all($re, $mean, $match, PREG_SET_ORDER, 0);
             
