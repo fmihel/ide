@@ -91,6 +91,7 @@ Set path to `$user_data` array. Example:
 
 ```
 __xml struct__:
+
 |tag|note|example|
 |----|----|----|
 |info|msg show in right list templates|function user|
