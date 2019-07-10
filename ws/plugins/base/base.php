@@ -911,11 +911,15 @@ class base{
         return $res;
 
     }
+    
+    private static function doThrow($sql,$base,$error_msg=''){
+        throw new \Exception($error_msg.($error_msg!==''?' ':'').self::error($base).' in "'.$sql.'"');
+    }
     /** выполняет запрс, в случае ошибки вызывает исключение с описанием ошибки */
     public static function queryE($sql,$base=null,$coding=null,$error_msg=''){
 
         if (!self::query($sql,$base,$coding))
-            throw new \Exception($error_msg.' '.self::error($base));
+            self::doThrow($sql,$base,$error_msg);
     }
 
 
@@ -957,7 +961,7 @@ class base{
     public static function dsE($sql,$base=null,$coding=null,$error_msg=''){
         $ds = self::ds($sql,$base,$coding);
         if (!$ds)
-            throw new \Exception($error_msg.' '.self::error($base));
+            self::doThrow($sql,$base,$error_msg);
         return $ds;
     }
     
@@ -980,7 +984,7 @@ class base{
             $fields = self::fields($ds);
 
             if ($type === 'integer'){
-                $row = base::row($ds);
+                $row = self::row($ds);
                 return intval($row[$fields[$countFieldName]]);
             }else{
                 $fields = self::fields($ds);
@@ -991,7 +995,7 @@ class base{
                         || 
                         (strpos(strtoupper(trim($name)),$countFieldName.'(')===0)
                     ){
-                        $row = base::row($ds);
+                        $row = self::row($ds);
                         return intval($row[$name]);
                     }
                 }
@@ -1005,10 +1009,10 @@ class base{
     public static function tables($base=null){
         $res = array();
         $q = 'SHOW TABLES';
-        $ds = base::ds($q,$base);
+        $ds = self::ds($q,$base);
         if ($ds){
             
-            while(base::by($ds,$row))
+            while(self::by($ds,$row))
                 foreach($row as $field => $table)
                     array_push($res,$table);    
         }
@@ -1024,9 +1028,9 @@ class base{
     public static function fieldsInfo($tableName,$short=true,$base=null){
         $out = array();
         $q = 'SHOW COLUMNS FROM `'.$tableName.'`';
-        $ds = base::ds($q,$base);
+        $ds = self::ds($q,$base);
         if ($ds){
-            while(base::by($ds,$row)){
+            while(self::by($ds,$row)){
                 
                 if ($short)
                     array_push($out,$row['Field']);
@@ -1178,7 +1182,7 @@ class base{
         
         $ds = gettype($sqlOrDs)==='string'?self::dsE($sqlOrDs,$base,$coding,$error_msg):$sqlOrDs;
         if (!$ds)
-            throw new \Exception( $error_msg.' '.self::error($base) );
+            self::doThrow($sqlOrDs,$base,$error_msg);
         return $ds->fetch_assoc();
     }
     
@@ -1188,7 +1192,7 @@ class base{
 
         if ($ds){
             $out = array();
-            while(base::by($ds,$row))
+            while(self::by($ds,$row))
                 array_push($out,$row);
 
             return $out;
@@ -1203,12 +1207,12 @@ class base{
 
         if ($ds){
             $out = array();
-            while(base::by($ds,$row))
+            while(self::by($ds,$row))
                 array_push($out,$row);
 
             return $out;
         }else
-            throw new \Exception($error_msg.' '.self::error($base));
+            self::doThrow($sqlOrDs,$base,$error_msg);
 
     }
     
@@ -1313,8 +1317,9 @@ class base{
         
         if ($field === '')
             $field = $fields[0];
-        else if (array_search($field,$fields)===false) 
-            throw new \Exception($error_msg." field ='$field' not exists");
+        else if (array_search($field,$fields)===false)
+            self::doThrow($sql,$base,$error_msg." field ='$field' not exists");
+            
         
         if (self::isEmpty($ds))
             return $default;
@@ -1412,9 +1417,23 @@ class base{
 
         $q = 'select `'.$index.'` from `'.$table.'` where `'.$fieldUUID."`='".$uuid."'";
 
-        return base::value($q,$index,false,$base);
+        return self::value($q,$index,false,$base);
         
     }
+    public static function insert_uuidE($table,$index,$base,$fieldUUID='UUID',$countUUID=32,$error_msg=''){
+        
+        $uuid = self::uuid($countUUID);
+
+        $q='insert into `'.$table.'` set `'.$fieldUUID."` = '".$uuid."'";
+        self::queryE($q,$base,null,$error_msg);
+
+        $q = 'select `'.$index.'` from `'.$table.'` where `'.$fieldUUID."`='".$uuid."'";
+
+        return self::valueE($q,$index,false,$base,null,$error_msg);
+        
+    }
+
+
     /** преобоазует значение к представлеию в SQL запросе в зависимости от его типа */
     public static function typePerform($value,$type){
         
@@ -1734,7 +1753,7 @@ class base{
          $aType = TYPE::info($fieldsOrDs);
          
          if ($aType==='object'){
-            $fieldsOrDs = base::fields($fieldsOrDs,false);
+            $fieldsOrDs = self::fields($fieldsOrDs,false);
             $aType = 'array';
          }    
         
