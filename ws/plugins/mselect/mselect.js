@@ -478,10 +478,9 @@ Tmselect.prototype.toData=function(o){
 Tmselect.prototype.step=function(step,need_change){
     var t=this,p=t.param;
     var current = t.selected();
-    //console.info('current',current);
-    
+
     var obj = (step==='prev'?current.prev():current.next());
-    console.info(step,obj);
+    
     if (obj.length>0){
         t.selected(obj);
         if((need_change===undefined)||(need_change === true)){

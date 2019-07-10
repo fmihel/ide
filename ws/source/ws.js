@@ -118,6 +118,100 @@ Ws.before_ajax = function () {
 
 };
 
+Ws.get = function(o){return new Promise((ok,err)=>{
+
+    const p = $.extend(false, {
+        id: -1,
+        value: '',
+        url: this.url,
+        timeout: 3600000,
+        method: 'POST',
+        noAsync: false, /** запрещает выполнять запрос если не обработан запрос с таким же id */
+    }, o);
+
+
+    let dat = { AJAX: 1, ID: p.id, VALUE: p.value, SHARE: this.share };
+
+    const noAsync = (id, bool) => {
+        if (bool === undefined) 
+            return (Ws._noAsync.indexOf(id) >= 0); 
+        
+        if (bool) { 
+            
+            Ws._noAsync.push(id); 
+        
+        } else {
+            
+            const idx = Ws._noAsync.indexOf(id);
+            
+            if (idx >= 0)
+                Ws._noAsync.splice(idx, 1); 
+                
+        }
+    };
+
+    if (p.noAsync) {
+        if (noAsync(p.id)) {
+            err({res:-3, msg:'noAsync `id=${p.id} in process`',data:null});
+            return;
+        }
+        noAsync(p.id, true);
+    }
+
+    const request = $.ajax({
+        url: p.url,
+        method: p.method,
+        timeout: p.timeout,
+        data: dat,
+        recvId: p.id,
+    });
+
+    if (!('context' in p)) 
+        p.context = request;
+
+    request.done(function (_data) {
+        noAsync(this.recvId, false);
+
+        const data = Ws.ajax_response(_data);
+
+        if (data !== null) {
+            /* include session module if session_mod is require */
+            if ((typeof (session) !== 'undefined') && (Ws.share.session !== undefined) && (session._fromAjax)) { 
+                
+                session._fromAjax(Ws.share.session, data[0].ID); 
+            }
+            /*--------------------------------------------------*/
+            let rec = data[0].DATA;
+            //p.done(rec, rec.ID, p.context);
+            if ( ('res' in rec) ){
+                
+                if (rec.res == 1)
+                    ok( ('data' in rec) ? rec.data : null);
+                else
+                    err( { res:rec.res ,msg:('msg' in rec?rec.msg:''), data:rec});
+                
+            }else
+                ok(rec);    
+            
+            /*--------------------------------------------------*/
+            
+            } else {
+                
+                err({res:-2, msg:`parse data [${_data} ]`,data:null });
+                
+                
+            }
+        });
+
+    request.fail(function (jqXHR, textStatus) {
+
+        noAsync(this.recvId, false);
+        err({ res:-1 , msg:`system error: [${textStatus} ]` , data:jqXHR });
+        
+    });
+        
+});};
+
 Ws.done = function (data, id, context) {
 
 };
