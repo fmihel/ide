@@ -721,21 +721,43 @@ class TApplication{
              
             $out.=($horiz?$out2:$out1.$tab0).$R[$type].$len.$cr;
         }else if ($type==='object'){
-            $name = get_class($v); 
+            $name = get_class($v);  
             $out.=$name.$this->_fmtVarLog(get_object_vars($v),$p,$level);
     
         }else{
+            $add_left = '';
             if ($type==='boolean')
                 $v=$v?'true':'false';
             if ($type==='NULL')
                 $v='NULL';
             
             if ($type=='string'){
+                /** отображение кодировки, если кодировка UTF-8 то не отображаем*/
+                $len = mb_strlen($v);
+                $slen = strlen($v);
+                $coding = mb_detect_encoding($v);
+                
+                if ($slen!=$len)
+                    $slen = "<span style='color:#9081F1'>$len/$slen</span>";
+                    
+                if ($coding!=='UTF-8') {
+                    $scolor = 'color:#9081F1';
+                    $ocoding=$coding.','; 
+                }else{
+                    $scolor='';
+                    $ocoding = $coding.',';
+                }
+                $add_left = "<span style='font-size:0.8em;$scolor'>($ocoding$slen)</span>";  
+                // преобразование в UTF-8 тк только в ней отображается 
+                if ($coding!='UTF-8'){
+                    $v=mb_convert_encoding($v,'utf-8',$coding);
+                    $len = mb_strlen($v);
+                }
+                
                 $v = htmlspecialchars($v); 
                 if ($p['strLimit']>0){  
-                    $len = mb_strlen($v);
                     if ($p['strLimit']<$len)
-                        $v = str_replace("\n"," ",substr($v,0,$p['strLimit']).'..');
+                        $v = str_replace("\n"," ",mb_substr($v,0,$p['strLimit']).'..');
                 }
                 
                 
@@ -746,7 +768,7 @@ class TApplication{
                     $v.= ($i>0?$tab:'').$LT[$type].$s[$i].($i<$cnt-1?"\n":'"').$RT[$type];
                 
             }
-            $out.= $LT[$type].$v.$RT[$type];
+            $out.= $add_left.$LT[$type].$v.$RT[$type];
         }     
     
         
