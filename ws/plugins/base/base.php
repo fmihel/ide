@@ -1508,8 +1508,8 @@ class base{
         $bPref    = count($pref)>0;
             
         
-          
-        if (@$param['refactoring']===true){
+        
+        if ( isset($param['refactoring'])  &&  $param['refactoring']===true ){
             $DCR = "\n\t";
             $CR = "\n";
         }else{
@@ -1565,7 +1565,7 @@ class base{
             if ($need){
                 
                 $tab ='';
-                if (@$param['refactoring']===true){
+                if ( isset($param['refactoring']) && $param['refactoring']===true){
                     $sl = strlen($field)+2+($queryType!=='insert'?1:0);
                     $tab = ($sl<8?"\t\t":($sl<17?"\t":""));
                     
