@@ -208,8 +208,8 @@ class WS_REQUEST
         return ($REQUEST->ID == $ID);
     }
     
-    public static function OK($data){
-        return array('res'=>1,'data'=>$data);
+    public static function OK($data = null){
+        return ($data!==null)?['res'=>1,'data'=>$data]:['res'=>1];
     }
     
     public static function ERROR($msg,$res=0){

@@ -757,7 +757,7 @@ class _table{
 };
 class base{
     static private $_base = array();
-    
+    static private $_codings = array();
     public static function connect($server,$user,$pass,$base_name,$base,$die = true){
 
         if (isset(self::$_base[$base]))
@@ -795,10 +795,19 @@ class base{
     }
     /** 
      * set or return charset
+     * 
      * example set default charset
      * base::charSet('UTF-8','mybase');
+     * 
      * example return default charset
      * $v = base::charSet(null,'mybase');
+     *
+     * example: story/restory codings
+     * base::charSet('story','mybase');
+     * base::charSet('UTF-8','mybase');
+     * ...
+     * base::charSet('restory','mybase');
+     * 
     */
     public static function charSet($coding=null,$base=null){
             /** убираем путаницу с UTF-8 и utf8 */ 
@@ -817,7 +826,17 @@ class base{
             }else{
                 if ($coding === '') 
                     return false;
-                if (!$_base->db->set_charset($coding)) {
+                    
+                if ($coding === 'story'){
+                    
+                    if (!isset(self::$_codings[$base]))
+                        self::$_codings[$base]=[]; 
+                    
+                    self::$_codings[$base][]=$_base->db->get_charset()->charset;
+
+                }else if ($coding === 'restory'){
+                    $_base->db->set_charset(array_pop(self::$_codings[$base]));
+                }else if (!$_base->db->set_charset($coding)) {
                     self::_log('error set charSet = '.$coding,__LINE__);
                     return false;
                 }else
@@ -840,7 +859,7 @@ class base{
         
     }
     
-    
+
     public static function debug_info($base=null){
             
     }
@@ -1489,8 +1508,8 @@ class base{
         $bPref    = count($pref)>0;
             
         
-          
-        if (@$param['refactoring']===true){
+        
+        if ( isset($param['refactoring'])  &&  $param['refactoring']===true ){
             $DCR = "\n\t";
             $CR = "\n";
         }else{
@@ -1546,7 +1565,7 @@ class base{
             if ($need){
                 
                 $tab ='';
-                if (@$param['refactoring']===true){
+                if ( isset($param['refactoring']) && $param['refactoring']===true){
                     $sl = strlen($field)+2+($queryType!=='insert'?1:0);
                     $tab = ($sl<8?"\t\t":($sl<17?"\t":""));
                     
