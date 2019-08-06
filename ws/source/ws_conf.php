@@ -51,14 +51,27 @@ class WS_CONF{
     
     static function debug_info($cr='<br>'){
         global $_ws_conf;
-        return $_ws_conf->debug_info($cr);
+        return $_ws_conf->debug_info($cr); 
     }
     
     static function LOAD($__DIR__,$file='',$reopen=false){
         global $_ws_conf;
         $_ws_conf->loadFromFile($__DIR__,$file,$reopen);
-    }    
-    
+    }
+    /**
+     * преобразует массив параметров конфигурации 
+     * в javascript объект.
+     */ 
+    static function toJS($list = 'all'){
+        global $_ws_conf;
+        $code = '';
+        foreach($_ws_conf->param as $name=>$value){
+            if (($list === 'all') || array_search($name,$list)!==false){
+                $code.='"'.$name.'":"'.$value.'",'; 
+            }
+        }
+        return '{'.$code.'}';
+    }
 };
 
 
