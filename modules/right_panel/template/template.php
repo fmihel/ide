@@ -109,7 +109,17 @@ class TEMPLATES{
         for($i=0;$i<count($vars);$i++){
             $name = $LS.$vars[$i]['name'].$RS;
             $value = $vars[$i]['value'];
-            $code = str_replace($name,$value,$code);    
+            // задание первой буквы в верхнем регистре
+            $upper = $LS.'U^'.$vars[$i]['name'].$RS;
+            $uValue = $vars[$i]['value'];
+            $uValue[0] = strtoupper($uValue[0]);
+
+            // задание первой буквы в нижнем регистре
+            $lower = $LS.'l^'.$vars[$i]['name'].$RS;
+            $lValue = $vars[$i]['value'];
+            $lValue[0] = strtolower($lValue[0]);
+
+            $code = str_replace([$name,$upper,$lower],[$value,$uValue,$lValue],$code);    
             
             
         };

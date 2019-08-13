@@ -110,7 +110,6 @@ _step:function (data,th,event){
     }
     else if(ext=='js'){
         
-        
         if (/^\s*var\s.([\s\S]*)\s*=\s*{/.test(str)){
             /*var OBJECT = {...*/        
             if ((str.indexOf(',')==-1)&&(str.indexOf('}')==-1)){        
@@ -137,8 +136,16 @@ _step:function (data,th,event){
                 code=ut.tag({css:t.css.func_block+' '+t.css.func_block_class,value:name});
             else
                 code=ut.tag({css:t.css.func_block+' '+t.css.func_block_func,value:name});
-                        
-        }
+        }else if( /^\s*class\s*/.test(str)){
+            name = str.replace(/\/\/([\s\S]*)$/,"").replace(/\/\*([\s\S]*)\*\//,"").replace(/(\s*|)class(\s*|)/,"").replace(/\s[\s\S]*$/,"").replace('{',"");
+            code = ut.tag({css:t.css.func_block+' '+t.css.func_block_class,value:name});    
+            // \s*(?<!if|while|switch|function)\(                                
+        }else if (/^\s*(\w)+(?<!(if|while|function|switch))\s*\([\w\,\s]*\)\s*\{/.test(str)){
+            name = str.replace(/\([\s\S]*$/,"");
+            code=ut.tag({css:t.css.func_block+' '+t.css.func_block_func,value:name});                                                        
+        }            
+
+
     }else if((ext=='css')||(ext=='dcss')){
          if(/[\S*\s]*{/g.test(str)){
             name = str.replace('{',"")
