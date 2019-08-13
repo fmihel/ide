@@ -753,7 +753,7 @@ mform.prototype.attr = function(n/*v*/){
 
 mform.prototype._visible=function(bool){
     
-    var t=this,p=t.param,f=p.jq.frame;
+    var t=this,p=t.param,f=p.jq.frame,own = p.jq.own;
     if (bool===p._visible) return;
     p._visible = bool;
     
@@ -784,11 +784,12 @@ mform.prototype._visible=function(bool){
     
     p._shadow = (bool&&p.modal);
     
+    if (bool)
+        JX.visible(own,true);
     if (p.animate>0)
         t._fade(!bool);
-    else    
+    else
         JX.visible(f,bool);
-    
 };
 
 mform.prototype._fade=function(bool){
