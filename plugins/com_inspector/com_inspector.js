@@ -158,7 +158,7 @@ comin.prototype.assept=function(event){
 comin.prototype.storyVarLoad=function(to){
     var t=this,p=t.param,story=p.story;
     $.each(to,function(i,o){
-        if (story[o.name]!==undefined){
+        if ((story[o.name]!==undefined) && (o.value==="")){
             to[i].value = story[o.name];
         }
     });
