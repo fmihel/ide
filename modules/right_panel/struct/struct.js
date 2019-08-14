@@ -140,7 +140,7 @@ _step:function (data,th,event){
             name = str.replace(/\/\/([\s\S]*)$/,"").replace(/\/\*([\s\S]*)\*\//,"").replace(/(\s*|)class(\s*|)/,"").replace(/\s[\s\S]*$/,"").replace('{',"");
             code = ut.tag({css:t.css.func_block+' '+t.css.func_block_class,value:name});    
             // \s*(?<!if|while|switch|function)\(                                
-        }else if (/^\s*(\w)+(?<!(if|while|function|switch))\s*\([\w\,\s,=,\"\'\`\{\}\[\]\:\$\_\-\+\/\*\!"]*\)\s*\{/.test(str)){
+        }else if (/^(\s{0,4}|\t{0,1})\w+(?<!(if|while|function|switch))\s*\([\w\,\s,=,\"\'\`\{\}\[\]\:\$\_\-\+\/\*\!"]*\)\s*\{/.test(str)){
             name = str.replace(/\([\s\S]*$/,"");
             code=ut.tag({css:t.css.func_block+' '+t.css.func_block_func,value:name});                                                        
         }            
