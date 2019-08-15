@@ -213,10 +213,11 @@ class WS_REQUEST
     }
     
     public static function ERROR($msg,$res=0){
-        if (gettype($msg)=='string')
+
+        if (gettype($msg)==='string')
             return array('res'=>$res,'msg'=>$msg);
         else
-            return array('res'=>$res,$msg->getMessage());
+            return array('res'=>$res,'msg'=>$msg->getMessage());
     }
 
 
