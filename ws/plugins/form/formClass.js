@@ -39,6 +39,11 @@ class formClass{
         this.childs = [];
         this.$childs = [];
         this.components = {};
+        this._modal = {
+            enable  :false,
+            ok      :false,
+            error   :false
+        };
 
     }
 
@@ -58,24 +63,74 @@ class formClass{
             t.state = 'outer';
         
         this.init(t.$plugin);
+        
+        if (!t.param.onClose)
+            t.storyClose = undefined;
+        else
+            t.storyClose = t.param.onClose;
+            
+        t.param.onClose = function(){
+            t._onClose();
+        };
+        
         t.$plugin.mform(t.param);
+        
     }
 
     init($plugin){
         // abstract
     }
     done(){
-        this.$plugin.remove();
-        this.$plugin.mform('destroy');
+        let t=this;
+        t.$plugin.remove();
+        t.$plugin.mform('destroy');
     }
     open(o={}){
-        this.create();
-        this.$plugin.mform('open',o);
+        let t=this;
+        t._modal={enable:false,ok:false,error:false};
+
+        t.create();
+        t.$plugin.mform('open',o);
     }
     close(){
-        this.create();
-        this.$plugin.mform('close');
+        let t=this;
+        t.create();
+        t.$plugin.mform('close');
     }
+    _onClose(){
+        let t = this;
+        t.modal('_error');
+        if (t.storyClose)
+            t.storyClose();
+    }
+    /** 
+     * возвращает промис нормальное его срабатывание происходи если вызвать метод
+     * modal('ok',{...}) завершит проммис и закроет форму (второй параметр необязателен)
+     * ошибочное срабатывание
+     * modal('error',{...}) завершит проммис блоком catch и закроет форму (второй параметр необязателен)
+     * Любой другой способ закрытия будет считаться ошибочным
+    */
+    modal(o,data = undefined){
+        let t = this;
+        if (o === 'ok'){
+            if (t._modal.enable && t._modal.ok){
+                t._modal.ok(data);
+                t.close();
+            }
+        }else if (o === 'error'){
+            if (t._modal.enable){    
+                t.modal('_error',data);
+                t.close();
+            }
+        }else if (o === '_error'){
+            if (t._modal.enable && t._modal.error)
+                t._modal.error(data);
+        }else return new Promise((ok,error)=>{
+            t.open(o);
+            t._modal={enable:true,ok,error};
+        });
+    }
+    
     /** 
      * создает(если не создан) и возвращает уникальный id для dom элемента и ассоциирует его с name
      * Ex:
