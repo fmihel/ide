@@ -23,6 +23,7 @@ require_once UNIT('ws','ws_dcss.php');
 
 RESOURCE('plugins','jquery/jquery-3.3.1.js');
 RESOURCE('plugins','common/addition.js');
+RESOURCE('plugins','common/byReady.js');
 RESOURCE('plugins','common/ut.js');
 RESOURCE('plugins','common/jhandler.js');
 RESOURCE('plugins','jx/jx.js');
@@ -303,6 +304,7 @@ class WS extends WS_CONTENT{
             $res.='t.body=$("body");'.DCR;
             $res.=$this->root->RENDER('groups');
             $res.=$this->root->RENDER('var');
+            $res.='byReady("Qs");';
         $res.='}'.DCR.'};';
         //---------------------------------------------
 
@@ -326,8 +328,8 @@ class WS extends WS_CONTENT{
             
             $res.='Ws.align();'.DCR;
             $res.='Ws.ready();'.DCR;
-            
-            
+            $res.='byReady("Ws");'.DCR;
+
         if (MODULES::EXIST('SESSION_MOD'))
             $res.='});';
             
