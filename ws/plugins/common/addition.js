@@ -140,7 +140,34 @@ if (!(Array.findByProp)){
 
     };
 }
-
+/**
+ * 
+ */ 
+if (!Array.eq){
+    Array.prototype.eq=function(b,soft = true,ordering = true){
+        let a = this;
+        if ((!Array.isArray(b)) || (a.length!==b.length)) return false;
+        if (a.length === 0)
+            return true;
+        for(let i = 0;i<a.length;i++){
+            if (ordering){
+                if ((soft && (a[i]!=b[i])) || (!soft && (a[i]!==b[i])))
+                    return false;
+            }else{
+                let have = false;
+                for(let j = 0;j<b.length;j++){
+                    if ((soft && (a[i]==b[j])) || (!soft && (a[i]===b[j]))){
+                        have = true;
+                        break;
+                    }    
+                }
+                if (!have) 
+                    return false;
+            }
+        }
+        return true;
+    };
+}
 function $D(o,name){
     try{
         if (name===undefined)

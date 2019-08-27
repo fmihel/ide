@@ -29,7 +29,6 @@ oEq:function(a,b){
         return false;
     }
 },
-
 /** расширяет объект o методами add . Метод не пересоздает объект ( в отличии от jQuery extend, а ссылается на него)*/
 extend:function(add,o){
     for (var key in add) {
