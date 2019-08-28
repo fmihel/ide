@@ -1043,17 +1043,51 @@ class base{
         $list = self::fieldsInfo($tableName,true,$base);
         return (array_search($field,$list)!==false);
     }    
-    /** возвращает либо список имен полей, либо массив ('Field','Type')*/
+    /** 
+     * сокращенное имя типа возвращаемое по SHOW COLUMNS FROM...
+    */
+    
+    private static function shorType($type){
+        $match = [
+            'int'       =>'int',
+            'int('      =>'int',
+            'varchar'   =>'string',
+            'text'      =>'string',
+            'mediumtext'=>'string',
+            'longtext'  =>'string',
+            'text'      =>'string',
+            'float'     =>'float',
+            'decimal'   =>'float',
+            'datetime'  =>'date',
+            'timestamp' =>'date',
+            'blob'      =>'blob',
+            'longblob'  =>'blob',
+            'mediumblob'=>'blob',
+            ];
+        foreach($match as $m=>$ret){
+            if (strpos($type,$m)===0)
+                return $ret;
+        }
+        return 'uncknown';
+    }
+    /** возвращает либо список имен полей
+     *  short = true | 'short'  - список полей
+     *  short = 'types' список [поле=>тип,...]
+     *  short = false|'full' полную информацию [ [Fiel=>'name',Type=>'string',...], ..] ]
+    */
     public static function fieldsInfo($tableName,$short=true,$base=null){
         $out = array();
         $q = 'SHOW COLUMNS FROM `'.$tableName.'`';
         $ds = self::ds($q,$base);
         if ($ds){
+            $row=[];
             while(self::by($ds,$row)){
                 
-                if ($short)
-                    array_push($out,$row['Field']);
-                else{
+                if (($short===true)||($short==='short')){
+                    $out[] = $row['Field'];
+                }elseif($short === 'types'){
+                    $out[$row['Field']] = self::shorType($row['Type']);
+                }else{
                     $out[]=$row;
                     /*
                     array_push($out,array(
@@ -1470,7 +1504,7 @@ class base{
     * Если указывать значение в скобках [VALUE] то его тип будет определяться автоматический
     * Если указать тип значения [VALUE,TYPE] то данный тип будет иметь приоритет над указанным в param->types 
     * @param {array} param =
-    *   types=>array,           - array('NAME'=>'string',..)
+    *   types=>array,           - array('NAME'=>'string',..) для получения списка типов полей, можно воспользоваться base::fieldsInfo(base,'types');
     *   include=>array|string,  = array('')
     *   exclude=>array|string
     *   rename=>array,
@@ -1593,7 +1627,7 @@ class base{
                 $updateBlock.=($updateBlock!==''?',':'').$DCR."`$field`".'='.$tab.$value;
                 $insertBlockLeft.=($insertBlockLeft!==''?',':'').$DCR."`$field`";
                 if (($queryType==='insert')||($queryType==='insertOnDuplicate')){
-                    if (@$param['refactoring']===true)
+                    if ($bRef)
                         $insertBlockLeft.=$tab.'/*'.$value.'*/';
                     
                     $insertBlockRight.=($insertBlockRight!==''?',':'').$value; 
