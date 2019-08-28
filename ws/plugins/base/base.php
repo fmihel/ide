@@ -1464,23 +1464,22 @@ class base{
         
     }    
     /** генерация текста запроса по входным данным 
-    * @param {string} typeQuery insert|update
+    * @param {string} typeQuery insert|update|insertOnDuplicate
     * @param {string} table - имя таблицы
-    * @param {array} param  = array(
+    * @param {array} data  =  [ FIELD_NAME=>VALUE , FIELD_NAME=>[VALUE] , FIELD_NAME=>[VALUE,TYPE],...]
+    * Если указывать значение в скобках [VALUE] то его тип будет определяться автоматический
+    * Если указать тип значения [VALUE,TYPE] то данный тип будет иметь приоритет над указанным в param->types 
+    * @param {array} param =
     *   types=>array,           - array('NAME'=>'string',..)
     *   include=>array|string,  = array('')
     *   exclude=>array|string
     *   rename=>array,
     *   refactoring = true - вывод в удобном для анализа виде
-    *   pref=>array|string|string;string (префексы перед именем поля, перед формированием запроса он удаляется, преобразуя поле 
+    *   alias=>array|string|string;string (префексы перед именем поля, перед формированием запроса он удаляется, преобразуя поле 
     *                 в соотвествующее в таблице
-    *   
-    *   ex: pref = "tab";
+    *   ex: alias = "tab";
     *       "tab_NAME" - > "NAME"
     *   
-    * )
-    *    
-    * )
     * @return string|bool    вернет либо запрос, либо false если ни одного поля не было добавлено в запрос
     */
     
@@ -1501,6 +1500,21 @@ class base{
         $rename     =  isset($param['rename'])?$param['rename']:array();
         $bRename    = count($rename)>0;
 
+        $index     =  isset($param['index'])?$param['index']:'';
+        if (($queryType === 'insertOnDuplicate')&&($index === '')){
+            foreach($data as $f=>$v){
+                if (mb_strpos(strtoupper($f),'ID')!==0){
+                    $index = $f;
+                    break;
+                }
+            }
+        }
+        
+
+        $where      =  trim(isset($param['where'])?$param['where']:'');
+        if ( ($where!=='') && (mb_strpos(strtoupper($where),'WHERE')!==0))
+            $where =  'where '.$where;
+        
 
         $pref     =  isset($param['alias'])?$param['alias']:array();
         if (is_string($pref))
@@ -1509,17 +1523,21 @@ class base{
             
         
         
-        if ( isset($param['refactoring'])  &&  $param['refactoring']===true ){
+        if ( isset($param['refactoring'])  &&  $param['refactoring'] === true ){
+            $bRef = true;
             $DCR = "\n\t";
             $CR = "\n";
         }else{
+            $bRef = false;
             $DCR = '';
             $CR = "";
         }
         
 
-        $left = '';
-        $right = '';
+        $insertBlockLeft = '';
+        $insertBlockRight = '';
+        $updateBlock = '';
+
         $is_empty = true;
         
         foreach($data as $f=>$v){
@@ -1527,7 +1545,8 @@ class base{
             $need = true;
             $field = $f;
             $value = $v;
-            
+            $valType = gettype($value);
+
             if (($need)&&($bPref)){
                 for($i=0;$i<count($pref);$i++){
                     if (strpos($field,$pref[$i].'_')===0){
@@ -1550,13 +1569,14 @@ class base{
         
             if (($need)&&($bExclude))
                 $need = (array_search($field,$exclude)===false);
-        
-            if (($need)&&($bTypes)){
-                if (isset($types[$field])!==false){
-                    
+            
+            if (($need)&&($bTypes || $valType ==='array')){
+                if ($valType === 'array'){
+                    $tp = count($value)>1?$value[1]:gettype($value[0]);
+                    $value = self::typePerform($value[0],$tp);
+                }elseif (isset($types[$field])!==false){
                     $tp = $types[$field];
                     $value = self::typePerform($value,$tp);
-
                 }
             }
         
@@ -1565,19 +1585,18 @@ class base{
             if ($need){
                 
                 $tab ='';
-                if ( isset($param['refactoring']) && $param['refactoring']===true){
+                if ($bRef){
                     $sl = strlen($field)+2+($queryType!=='insert'?1:0);
                     $tab = ($sl<8?"\t\t":($sl<17?"\t":""));
+                };
                     
-                }else 
-                    $tab = '';
-                    
-                $left.=($left!==''?',':'').$DCR."`$field`".($queryType==='insert'?'':'='.$tab.$value);
-                if ($queryType==='insert'){
+                $updateBlock.=($updateBlock!==''?',':'').$DCR."`$field`".'='.$tab.$value;
+                $insertBlockLeft.=($insertBlockLeft!==''?',':'').$DCR."`$field`";
+                if (($queryType==='insert')||($queryType==='insertOnDuplicate')){
                     if (@$param['refactoring']===true)
-                        $left.=$tab.'/*'.$value.'*/';
+                        $insertBlockLeft.=$tab.'/*'.$value.'*/';
                     
-                    $right.=($right!==''?',':'').$value; 
+                    $insertBlockRight.=($insertBlockRight!==''?',':'').$value; 
                 }
                 $is_empty = false;
             }
@@ -1585,9 +1604,19 @@ class base{
     
         if ($is_empty) 
             return false;
-        else    
-            return ($queryType==='insert'?'insert into ':'update ').$DCR."`$table` ".$CR.($queryType==='insert'?"(".$CR."$left".$CR.") ".$CR."values ($right) ":"set $left ").$CR;
+        else{    
+            if ($queryType === 'insert'){
+                return 'insert into '.$DCR."`$table` ".$CR."(".$CR."$insertBlockLeft".$CR.") ".$CR."values ($insertBlockRight) ";
+            }elseif ($queryType === 'update'){
+                return 'update '.$DCR."`$table` ".$CR."set $updateBlock ".$CR.$where.' ';
+            }elseif($queryType === 'insertOnDuplicate'){
+                return 'insert into '.$DCR."`$table` ".$CR."(".$CR."$insertBlockLeft".$CR.") ".$CR."values ($insertBlockRight) ".$CR."on duplicate key update "."$updateBlock ";
+            }
+            //return ($queryType==='insert'?'insert into ':'update ').$DCR."`$table` ".$CR.($queryType==='insert'?"(".$CR."$insertBlockLeft".$CR.") ".$CR."values ($insertBlockRight) ":"set $insertBlockLeft ").$CR;
+        }
     }
+
+
     /** преобразуем данные из $param в список полей для формирования запроса sql */
     public static function fieldsToSQL($param){
 
