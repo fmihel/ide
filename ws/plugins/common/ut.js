@@ -472,9 +472,16 @@ _url_parsing:function(url){
 url_parsing:function(url){
     url = url.trim();
     if (url=='')
-        return{ url:'',protocol:'',host:'',domen:'',path:'',file:'',params:'',param:{}};    
+        return{ url:'',protocol:'',host:'',domen:'',path:'',file:'',params:'',param:{},hash:""};    
 
-    var p=ut._url_parsing(url),
+    let hash = '';
+    let posHash = url.indexOf('#');
+    if (posHash>-1){
+        hash = url.substr(posHash+1);
+        url = url.substr(0,posHash);
+    }
+    
+    let p=ut._url_parsing(url),
     path = ut.extPath(p.pathname),
     params = p.search;
     
@@ -484,7 +491,7 @@ url_parsing:function(url){
         params=params.substr(1);
         
     
-    var res 
+    let res 
     = { 
         /* full url */url:url,               
         /* https:   */protocol:p.protocol,
@@ -493,11 +500,21 @@ url_parsing:function(url){
         /* path1/path2/path3/  */path:path,
         /* file.js   */file:ut.extFileName(p.pathname),
         /* "param1='12'&param2='3'  "*/params:params,
-        /* {param1:'12',param2:'3'} */param:ut.url_params(url)
+        /* {param1:'12',param2:'3'} */param:ut.url_params(url),
+        hash
     };
     
     return res;
-
+},
+/**
+ * возвращает хэш или меняет на новый 
+*/
+url_hash:function(hash=undefined){
+    let p = ut.url_parsing(ut.href());
+    if (hash===undefined)
+        return p.hash;
+    else
+        return window.location.hash = hash;
     
 },
 text_size:function(o){
