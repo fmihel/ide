@@ -514,7 +514,7 @@ url_hash:function(hash=undefined){
     if (hash===undefined)
         return p.hash;
     else
-        return window.location.hash = hash;
+        window.location.hash = hash;
     
 },
 text_size:function(o){
