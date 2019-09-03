@@ -161,7 +161,9 @@ ext:function(f){
     return f.split('.').pop();
 },
 hrefPath:function(){
-    return ut.extPath(ut.href());
+    let p = ut.url_parsing(ut.href());
+    
+    return p.protocol+"//"+p.domen+"/"+p.path;//ut.extPath(ut.href());
 },
 href:function(){
     return window.location.href;
@@ -406,17 +408,20 @@ url_comb:function(url){
 url_add:function(url,keyvals){
     url=ut.url_comb(url);
     
-    var ii = url.indexOf("?");
-    if (ii == -1) 
-        url=url+"?";
-    ii = url.indexOf("?");
+    //var ii = url.indexOf("?");
+    //if (ii == -1) 
+    //    url=url+"?";
+    //ii = url.indexOf("?");
     
     var c='';
     $.each(keyvals,function(k,v){
         c+=(c!==''?'&':'')+k+'='+v;
     });
     
-    return url+(ii < (url.length-1)?'&':'')+c;
+    url = ut.url_parsing(url);
+    return url.url+(url.params.length>0?'&':'')+c+(url.hash.length>0?'#':'')+url.hash;
+    
+    //return url+(ii < (url.length-1)?'&':'')+c;
 },
 url_nocache:function(url){
     var p={};
