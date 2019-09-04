@@ -555,7 +555,8 @@ Tgrid.prototype.init = function(o){
         toggleGroup:false,
         /** смещение заголовка */
         marginGroup:{left:0,right:0,top:0,bottom:0},
-        
+        /** смещение первого заголовка заголовка */
+        marginFirstGroup:{left:0,right:0,top:0,bottom:0},
         /** аниация скроллинга */
         animateScroll:500,
         /** ширина полоски скролла */
@@ -2293,6 +2294,13 @@ Tgrid.prototype.attr = function(n/*v*/){
             p.marginGroup = JX.margin(v);
     }
     /*-----------------------------------*/
+    if (n==='marginFirstGroup'){
+        if (r) 
+            return p.marginFirstGroup;
+        else
+            p.marginFirstGroup = JX.margin(v);
+    }
+    /*-----------------------------------*/
     
     if (n==='marginHeaderFrame'){
         if (r) 
@@ -2784,8 +2792,13 @@ Tgrid.prototype.updateGroupInView=function(o){
  * @param {json} o
 */
 Tgrid.prototype._alignGroups=function(bound){
-    var t=this,p=t.param,css=p.css,mg=p.marginGroup,
-    g=t.groups(),i,d,pos,posd,h,
+    var t=this,
+        p=t.param,
+        css=p.css,
+        mg=p.marginGroup,
+        mfg = p.marginFirstGroup,
+        g=t.groups(),
+        i,d,pos,posd,h,
         scroll = p.jq.frameCells.scrollTop(),
         vs = t.scrollVisible()?p.scrollWidth:0;
     
@@ -2794,11 +2807,11 @@ Tgrid.prototype._alignGroups=function(bound){
     for(i=0;i<g.length;i++){
         d=$.data(g[i][0],'data');
         pos=JX.pos(d.up);
-        pos.x = pos.x+mg.left;
-        pos.w=bound.w-(mg.right+mg.left+vs);
+        pos.x = pos.x+mg.left+(i===0?mfg.left:0);
+        pos.w=bound.w-(mg.right+mg.left+(i===0?mfg.left+mfg.right:0)+vs);
         
-        pos.y+=mg.top;
-        pos.h-=(mg.top+mg.bottom);
+        pos.y+=mg.top+(i===0?mfg.top:0);
+        pos.h-=(mg.top+mg.bottom+(i===0?mfg.top+mfg.bottom:0));
         
         if (p.flyingGroup){
             posd=JX.pos(d.down);
