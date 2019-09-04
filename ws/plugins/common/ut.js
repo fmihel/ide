@@ -406,22 +406,14 @@ url_comb:function(url){
     return url;
 },
 url_add:function(url,keyvals){
+    let c='';
     url=ut.url_comb(url);
     
-    //var ii = url.indexOf("?");
-    //if (ii == -1) 
-    //    url=url+"?";
-    //ii = url.indexOf("?");
-    
-    var c='';
-    $.each(keyvals,function(k,v){
-        c+=(c!==''?'&':'')+k+'='+v;
-    });
+    $.each(keyvals,(k,v)=>{ c+=(c!==''?'&':'')+k+'='+v; });
     
     url = ut.url_parsing(url);
-    return url.url+(url.params.length>0?'&':'')+c+(url.hash.length>0?'#':'')+url.hash;
     
-    //return url+(ii < (url.length-1)?'&':'')+c;
+    return url.url+(url.params==='' && c!==''? '?':'')+(url.params.length>0?'&':'')+c+(url.hash.length>0?'#':'')+url.hash;
 },
 url_nocache:function(url){
     var p={};
