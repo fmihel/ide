@@ -22,6 +22,7 @@ require_once UNIT('ws','ws_dcss.php');
 
 
 RESOURCE('plugins','jquery/jquery-3.3.1.js');
+RESOURCE('plugins','common/dom.js');
 RESOURCE('plugins','common/addition.js');
 RESOURCE('plugins','common/byReady.js');
 RESOURCE('plugins','common/ut.js');
