@@ -239,7 +239,8 @@ Tjedit.prototype.init = function(o){
         attr:{type:"text"},
         /** дополнительные смещения элементов */
         off:{
-            btn_combo:{x:0,y:-1}
+            btn_combo:{x:-1,y:-1,w:0,h:0},
+            btn:{x:-1,y:-1,w:1,h:0},
         },
         prop:{},
         readOnly:false,
@@ -255,7 +256,7 @@ Tjedit.prototype.init = function(o){
             dim:true
         },
         /* размерность */
-        dim:'м',
+        dim:'',
         /** надпись на лейбле */
         caption:'',
         /** значение для установки */
@@ -1231,6 +1232,13 @@ Tjedit.prototype.attr = function(n/*v*/){
            p.margin = $.extend(false,p.margin,JX.margin(v));
     }
     /*-----------------------------------*/
+    if (n==='off'){
+        if (r) 
+            return p.off;
+        else    
+           p.off = $.extend(true,p.off,v);
+    }
+    /*-----------------------------------*/
     if (n==='width'){
         if (r) 
             return JX.pos(p.plugin).w;
@@ -1593,9 +1601,9 @@ Tjedit.prototype._updateArrange=function(){
                 if (!p.topLabel)
                     ar._obj.push(o)    
             }        
-        }else if (or[i]==='icon_tip'){ 
-            if (!p.disables.icon_tip)
-                ar._obj.push(p.jq.icon_tip);        
+        //}else if (or[i]==='icon_tip'){ 
+        //    if (!p.disables.icon_tip)
+        //        ar._obj.push(p.jq.icon_tip);        
         }else if (or[i]==='value'){
             o=p.jq.field;
                 
@@ -1754,6 +1762,7 @@ Tjedit.prototype._align=function(){
     
     if ((p._alignFirst===undefined)&&(!JX.visiblex(p.plugin))) 
         return;
+    let plgn = JX.pos(p.plugin);    
     p._alignFirst = false;
     
 
@@ -1781,7 +1790,7 @@ Tjedit.prototype._align=function(){
     pos=JX.pos(jq.field);
     
     if (!p.disables.btn_combo)
-        pos.w-=JX.pos(jq.btn_combo).w;
+        pos.w-=JX.pos(jq.btn_combo).w-p.off.btn_combo.w;
         
     if (p.type==='edit'){
         
@@ -1808,7 +1817,7 @@ Tjedit.prototype._align=function(){
     }
     else if (p.type==='button'){    
         
-        JX.pos(jq.btn,JX.add(pos,{x:-1,y:-1})); 
+        JX.pos(jq.btn,JX.add(pos,{x:p.off.btn.x,y:p.off.btn.y,w:p.off.btn.w})); 
     }
     else if (p.type==='memo'){    
         JX.pos(jq.memo,JX.set(pos,{dx:-1,h:JX.pos(p.plugin).h-4,dw:-4,dy:-1}));
@@ -1832,8 +1841,19 @@ Tjedit.prototype._align=function(){
             JX.abs(jq.combo,{y:a.y-b.h});
         
     };
+
+    if (!p.disables.icon_tip){
+        //JX.cling(p.plugin,jq.icon_tip,{side:{a:"right",b:"left"},pivot:{a:"center",b:"center"}});    
+        plgn = JX.pos(p.plugin);    
+        let ip = JX.pos(jq.icon_tip);
+        JX.pos(jq.icon_tip,{
+            x:plgn.w,
+            y:(plgn.h-ip.h)/2
+        });
+    }
     
     t._align_tip();
+    
     
 };
   
