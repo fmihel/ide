@@ -3,13 +3,14 @@
 if(!isset($Application))
   require_once '../utils/application.php';
 require_once UNIT('utils','ctime.php'); 
-
+ 
 
 define('DCR',"\n");
 //define('DCR',"");
 
 
 require_once UNIT('utils','common.php');
+require_once UNIT('utils','git.php');
 
 require_once UNIT('ws','ws_conf.php');
 require_once UNIT('ws','ws_conf_def.php');
@@ -18,7 +19,7 @@ require_once UNIT('ws','ws_common.php');
 require_once UNIT('ws','ws_utils.php');
 require_once UNIT('ws','ws_frame.php');
 require_once UNIT('ws','ws_module.php');
-require_once UNIT('ws','ws_dcss.php');
+require_once UNIT('ws','ws_dcss.php'); 
 
 
 RESOURCE('plugins','jquery/jquery-3.3.1.js');
