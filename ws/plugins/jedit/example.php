@@ -76,12 +76,13 @@ class TWS extends WS{
             
             {$plugin}.jedit("on","change",function(o){
                 jconsole(o);
-            });3
+            });
             
             {$plugin}.jedit("on","draw",function(o){
                 if (o.value==0)
                     o.value=""; 
             });
+            
             
             
             
@@ -800,7 +801,7 @@ class TWS extends WS{
             });
             '
         );        
-        /*c:tip_example1 */
+        /*c:tip_example2 */
         $this->item(
             'tip_example2',
             /*------------caption---------------*/
@@ -836,6 +837,26 @@ class TWS extends WS{
             '
         );        
 
+        
+        /*c:hint */
+        $this->item(
+            'hint',
+            /*------------caption---------------*/
+            'hint',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.jedit({hint: true});  - автоматическое отображение текущего значение
+            {$plugin}.jedit({hint: "string"}); - отображение строки
+            {$plugin}.jedit({hint: false}); - не отображать
+
+            ', 
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit({hint: !{$plugin}.jedit("get","hint") ,hintCrop:20  } );
+            
+
+            '
+        );        
         
         /*c:error */
         $this->item(

@@ -263,6 +263,9 @@ Tjedit.prototype.init = function(o){
         value:'',
         /** сохраненное начение для проверки состояния изменения данных */
         _storyValue:'',
+        /** значение хинта */
+        hint:false, // false - не отображать, true - отображать значение компонента, string - отображать строку string
+        hintCrop:0, // переносы строки в длинном hint через hintCrop символов (hintCrop = 0 - отображается как есть)
         /** расположение по вертикали компонента внутри родительского фрейма center,top,bottom*/
         align:'center',
         /** включает перерисовку в зависимости*/
@@ -301,6 +304,7 @@ Tjedit.prototype.init = function(o){
         
         lock:new jlock(),
         handler:new jhandler(),
+
         /** 
          * при использовании свойства text логическое значение будет преобразовано исходя из правила в
          * boolAsText.
@@ -680,7 +684,33 @@ Tjedit.prototype.changed = function(bool){
         jq.memo.removeClass(p.css.changed);
         p._storyValue = t.attr("value");
     }    
-        
+    t._updateHint();            
+};
+
+Tjedit.prototype._updateHint = function(){
+    let t = this,p=t.param,jq=p.jq;
+    let list = [jq.input,jq.text,jq.btn,jq.memo];
+    let value = '';
+    
+    if (typeof p.hint === 'string'){
+        value = p.hint;
+    }if (p.hint === true){
+        value = t.attr('text');
+    };
+    
+    if (p.hintCrop > 0){
+        value = value.replace(/\r?\n/g," ");
+        let out = '';
+        while(value.length){
+            out += value.slice(0,p.hintCrop)+"\r\n";
+            value = value.slice(p.hintCrop);
+        }
+        value = out;
+    }
+    
+    
+    list.forEach(c=>c.prop('title',value));
+    
 };
 Tjedit.prototype._css = function(css){
     var t = this,p=t.param;
@@ -950,6 +980,7 @@ Tjedit.prototype.put = function(o){
         t.attr(n,v);
     });
     
+    t._updateHint();
     if (l.unlock('align')){
         t._updateArrange();
         t.align();
@@ -1026,6 +1057,22 @@ Tjedit.prototype.attr = function(n/*v*/){
            
            
         }   
+    }
+    /*-----------------------------------*/
+    if (n==='hint'){
+        if (r) 
+            return p.hint;
+        else{    
+           p.hint = ( typeof v === 'string'? v : (v === true? true : false ) );
+        }
+    }
+    /*-----------------------------------*/
+    if (n==='hintCrop'){
+        if (r) 
+            return p.hintCrop;
+        else{    
+           p.hintCrop = ( v>0 ? v : 0 ); 
+        }
     }
     /*-----------------------------------*/
 
