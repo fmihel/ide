@@ -4,8 +4,8 @@ header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
 header('Pragma: no-cache'); // HTTP 1.0.
 header('Expires: 0'); // Proxies.
 
-define('WSI_DEV_VERSION','160919_1');
-define('WSI_GIT_VERSION','1.2.5');
+define('WSI_DEV_VERSION','151119_1');
+define('WSI_GIT_VERSION','1.2.6');
 
 error_reporting(0);
 /*
