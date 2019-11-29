@@ -1279,6 +1279,20 @@ class base{
         $row = $ds->fetch_assoc();
         return ($row!==NULL);
     }
+    /**
+     * используется для чтения строки из dataset
+     * 
+     * Ex:
+     * $ds = base::ds(...)l
+     * while($row=base::read($ds)){
+     *    ....
+     * }
+     * @param {dataset} $ds - результат base::ds()
+     * @return array(..) | NULL
+     */
+    public static function read($ds){
+        return $ds->fetch_assoc();
+    }
 
     public static function loop($sqlOrDs,$func,$base=null){
         /*
