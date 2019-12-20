@@ -599,8 +599,7 @@ Tjedit.prototype._event = function(){
         
         // ---------------
         let oe = e.originalEvent;
-        console.info('key',e.which);        
-        
+
         if ([13,38,40,8,37,39,46,36,35,17,16].indexOf(e.which)===-1) {
             if (Array.isArray(p.filter))
                 return (p.filter.indexOf(oe.key)>=0)
