@@ -1,4 +1,13 @@
 /*global ut,$,jQuery,JX,Qs,Ws*/
+var editFilterPreset={
+    float(a){
+        let is_num = ( ["0","1","2","3","4","5","6","7","8","9","."].indexOf(a.key) >= 0 );
+        let next = a.value+a.key;
+        let count = next.split(".").length - 1;                    
+        return ((is_num) && (count<=1));
+    },
+    int:['0','1','2','3','4','5','6','7','8','9']
+};
 (function( $ ){ 
 var m={
 name:"jedit",
@@ -288,6 +297,8 @@ Tjedit.prototype.init = function(o){
             order:['icon','label','value','combo','btn','dim','icon_tip'],
             stretch:"value",
         },
+        /** массив допустимых символов к вводу или функция */
+        filter:undefined,
         
         /** признак что комбо проиницилизирован */
         _initCombo:false,
@@ -586,6 +597,22 @@ Tjedit.prototype._event = function(){
     jq.input.on('keydown',e=>{
         if (p.readOnly) return;
         
+        // ---------------
+        let oe = e.originalEvent;
+        console.info('key',e.which);        
+        
+        if ([13,38,40,8,37,39,46,36,35,17,16].indexOf(e.which)===-1) {
+            if (Array.isArray(p.filter))
+                return (p.filter.indexOf(oe.key)>=0)
+                
+            if (typeof p.filter === 'function'){
+                
+                if (p.filter({ key:oe.key, value:p.jq.input.val(), sender:t, e}) === false)
+                    return false;
+            }
+        }
+        // ---------------
+
         if(e.which == 13){
             if (t.param.changeOnKeyEnter){
                 t.do("change",{enableChange:true});
@@ -1008,6 +1035,13 @@ Tjedit.prototype.attr = function(n/*v*/){
             t._css(newCSS);
            
         }    
+    }
+    /*-----------------------------------*/
+    if (n==='filter'){
+        if (r) 
+            return p.filter;
+        else    
+           p.filter = v;
     }
     /*-----------------------------------*/
     if (n==='css'){

@@ -881,6 +881,80 @@ class TWS extends WS{
             '
         );        
 
+        /*c:filterArray */
+        $this->item(
+            'filterArray',
+            /*------------caption---------------*/
+            'filterArray',                  
+            /*------------code------------------*/
+            '
+            
+            {$plugin}.jedit({
+                filter:["a","b","c"]
+            });
+            
+            ',
+            /*------------event-----------------*/
+            '
+            
+            {$plugin}.jedit({
+                filter:["a","b","c"]
+            });
+            
+            '
+        );        
+
+        /*c:filterFunc */
+        $this->item(
+            'filterFunc',
+            /*------------caption---------------*/
+            'filterFunc',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.jedit({
+                filter(a){
+                    let is_num = ( ["0","1","2","3","4","5","6","7","8","9","."].indexOf(a.key) >= 0 );
+                    let next = a.value+a.key;
+                    let count = next.split(".").length - 1;                    
+                    return ((is_num) && (count<=1));
+                }
+            });
+            
+            ',
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit({
+                filter(a){
+                    let is_num = ( ["0","1","2","3","4","5","6","7","8","9","."].indexOf(a.key) >= 0 );
+                    let next = a.value+a.key;
+                    let count = next.split(".").length - 1;                    
+                    return ( (is_num) && (count<=1) );
+                }
+            });
+            
+            '
+        );        
+        /*c:filterPreset */
+        $this->item(
+            'filterPreset',
+            /*------------caption---------------*/
+            'filterPreset',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.jedit({
+                filter:editFilterPreset.float
+            });
+            
+            ',
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit({
+                filter:editFilterPreset.float
+            });
+            
+            '
+        );        
+
 
     
     
@@ -948,6 +1022,11 @@ class TWS extends WS{
             /*c:item_panel */
             .item_panel{
                 overflow:auto;
+            }
+            
+            
+            #left{
+                overflow:auto;    
             }
         ');
     }
