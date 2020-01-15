@@ -1,10 +1,11 @@
 /*global ut,$,jQuery,JX,Qs,Ws*/
 var editFilterPreset={
     float(a){
-        let is_num = ( ["0","1","2","3","4","5","6","7","8","9","."].indexOf(a.key) >= 0 );
+        let is_num = ( ["0","1","2","3","4","5","6","7","8","9",".",","].indexOf(a.key) >= 0 );
         let next = a.value+a.key;
-        let count = next.split(".").length - 1;                    
-        return ((is_num) && (count<=1));
+        let countT = next.split(".").length - 1;                    
+        let countZ = next.split(",").length - 1;                    
+        return ((is_num) && ( ((countT<=1)&&(countZ===0))  ||  ((countZ<=1)&&(countT===0)) ));
     },
     int:['0','1','2','3','4','5','6','7','8','9']
 };
@@ -299,7 +300,11 @@ Tjedit.prototype.init = function(o){
         },
         /** массив допустимых символов к вводу или функция */
         filter:undefined,
-        
+        /** объект типа {from:[sym,sym,..] | sym ,to:[sym,sym,..] | sym} или функция  - замена символов на лету
+         *  Ex:
+         *  rewrite = {from:'.',to:','}   - замена точки на запятую
+        */
+        rewrite:undefined,
         /** признак что комбо проиницилизирован */
         _initCombo:false,
         
@@ -594,11 +599,61 @@ Tjedit.prototype._event = function(){
         }    
     });
     
+    jq.input.on('keypress',e=>{
+        
+
+        try{
+            let rew = '';            
+            let replace=()=>{
+                
+                let val = jq.input.val();
+                let pos = e.target.selectionStart;
+                let len = val.length;
+                let upset = (pos < len);
+                
+                jq.input.val(val.substr(0,pos)+rew+val.substr(pos));
+                
+                if (upset)
+                    jq.input.setCursorPosition(pos+1);
+            };
+            
+            if (typeof p.rewrite === 'object'){
+                
+                let from =  Array.isArray(p.rewrite.from)?  p.rewrite.from: [p.rewrite.from]; 
+                let to =    Array.isArray(p.rewrite.to)?    p.rewrite.to:   [p.rewrite.to]; 
+                
+                if (from.findIndex((s,i)=>{
+                    if (s === e.key){
+                        rew = to.length === 0? '' : ( i<to.length ? to[i] : to[to.length-1] );
+                        replace();
+                        return true;
+                    }
+                })>=0){
+                    e.preventDefault();
+                }
+            };
+        
+            if (typeof p.rewrite === 'function'){
+                rew = p.rewrite(e.key);
+                if(typeof rew === 'string'){
+                    replace();
+                    e.preventDefault();
+                }
+            }
+            
+        }catch(e){
+            console.error(e);
+            p.rewrite = undefined;
+        }
+        
+    });
+    
     jq.input.on('keydown',e=>{
         if (p.readOnly) return;
         
         // ---------------
         let oe = e.originalEvent;
+        
 
         if ([13,38,40,8,37,39,46,36,35,17,16].indexOf(e.which)===-1) {
             if (Array.isArray(p.filter))
@@ -610,6 +665,8 @@ Tjedit.prototype._event = function(){
                     return false;
             }
         }
+        
+        
         // ---------------
 
         if(e.which == 13){
@@ -1041,6 +1098,13 @@ Tjedit.prototype.attr = function(n/*v*/){
             return p.filter;
         else    
            p.filter = v;
+    }
+    /*-----------------------------------*/
+    if (n==='rewrite'){
+        if (r) 
+            return p.rewrite;
+        else    
+           p.rewrite = v;
     }
     /*-----------------------------------*/
     if (n==='css'){

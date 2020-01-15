@@ -179,7 +179,6 @@ function $D(o,name){
     }
 }
 
-
 (function ($){
     $.fn.finc = function(css){
         return this.find('.'+css);
@@ -224,6 +223,21 @@ function $D(o,name){
              return def!==undefined?def:0;
          return out;
     };
+    
+    $.fn.setCursorPosition = function(pos) {
+        this.each(function(index, elem) {
+        if (elem.setSelectionRange) {
+            elem.setSelectionRange(pos, pos);
+        } else if (elem.createTextRange) {
+            var range = elem.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', pos);
+            range.moveStart('character', pos);
+            range.select();
+        }
+  });
+  return this;
+};
     
     
 })(jQuery);

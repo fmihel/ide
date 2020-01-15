@@ -955,6 +955,28 @@ class TWS extends WS{
             '
         );        
 
+        /*c:rewrite */
+        $this->item(
+            'rewrite',
+            /*------------caption---------------*/
+            'rewrite',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.jedit({
+                rewrite:{from:",",to:"."},
+                filter:editFilterPreset.float
+            });
+            
+            ',
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit({
+                rewrite:{from:",",to:"."},
+                filter:editFilterPreset.float
+            });
+            
+            '
+        );        
 
     
     
