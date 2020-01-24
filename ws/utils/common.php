@@ -462,7 +462,7 @@ class STR{
             }else{
                 
                 if (($code<48)||($code>57)){
-                    if ((!onlyInt)&&($code===46)){
+                    if ((!$onlyInt)&&($code===46)){
                         if ($point===0)
                             $point++;
                         else
@@ -546,7 +546,7 @@ class ARR{
             $count = count($a);
             if ($count!==count($b)) return false;
             
-            for($i=0;$i<count;$i++){
+            for($i=0;$i<$count;$i++){
                 if ($soft){
                     if ($a[$i]!=$b[$i])
                         return false;
