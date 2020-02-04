@@ -1487,6 +1487,13 @@ Tjedit.prototype.attr = function(n/*v*/){
             t.on('change',v);
     }
     /*-----------------------------------*/
+    if (n==='onDraw'){
+        if (r)
+            return t.on('draw');
+        else
+            t.on('draw',v);
+    }
+    /*-----------------------------------*/
     if (n==='onKeyEnter'){
         if (r)
             return t.on('keyEnter');
@@ -1648,7 +1655,21 @@ Tjedit.prototype.eventDefined=function(event){
 };
 
 Tjedit.prototype.do=function(event,param){
-    var t=this,p=t.param,e=p.events,h=p.handler,out,
+    var t=this,p=t.param,e=p.events,h=p.handler,out;
+    if (param == undefined)
+        param = {};
+    if (!('sender' in param))
+        param['sender'] = t;
+    if (!('edit' in param))        
+        param['edit'] = t;
+    if (!('plugin' in param))        
+        param['plugin'] = p.plugin;
+    if (!('event' in param))
+        param['event'] = event;
+    if (!('enableChange' in param))                
+        param['enableChange'] = (!p.changeOnKeyEnter);
+        
+    /*
     prm = $.extend(false,{
         sender:t,
         edit:t,
@@ -1656,15 +1677,17 @@ Tjedit.prototype.do=function(event,param){
         event:event,
         enableChange:(!p.changeOnKeyEnter)
     },param);
-
-    if ((event==='change')&&(!prm.enableChange)&&(p.type==='edit')) return;
+    */
+    
+    if ((event==='change')&&(!param.enableChange)&&(p.type==='edit')) return;
     
     if (!t.can(event)) return true;
     
     t.begin(event);
     
-        out = ((event in e)&&(e[event].func(prm)));
-    
+        //out = ((event in e)&&(e[event].func(prm)));
+        out = ((event in e)&&(e[event].func));
+        
         if (out){
             try{
                 e[event].func(param);
@@ -1672,7 +1695,7 @@ Tjedit.prototype.do=function(event,param){
                 console.error(err);
             }
         }    
-        h.do({group:event,param:prm});    
+        h.do({group:event,param});    
     
     t.end(event);
     

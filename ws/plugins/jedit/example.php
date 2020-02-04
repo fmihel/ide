@@ -68,7 +68,7 @@ class TWS extends WS{
                     jconsole(o);        
                 }
             });
-
+            
             {$plugin}.jedit("on","comboClicks",function(o){
                 jconsole(o);
                 o.edit.combo("close");
@@ -79,6 +79,7 @@ class TWS extends WS{
             });
             
             {$plugin}.jedit("on","draw",function(o){
+                console.info("draw",o.value);
                 if (o.value==0)
                     o.value=""; 
             });
@@ -479,6 +480,25 @@ class TWS extends WS{
             '
             
             {$plugin}.jedit("value",ut.random_str(5));
+            
+            '
+        );        
+
+        /*c:value0 */
+        $this->item(
+            'value0',
+            /*------------caption---------------*/
+            'value0',                  
+            /*------------code------------------*/
+            '
+            
+            {$plugin}.jedit("value",0);
+            
+            ',
+            /*------------event-----------------*/
+            '
+            
+            {$plugin}.jedit("value",0);
             
             '
         );        
@@ -978,7 +998,7 @@ class TWS extends WS{
             '
         );        
 
-    
+
     
 
     
