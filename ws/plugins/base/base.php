@@ -1587,6 +1587,7 @@ class base{
         $updateBlock = '';
 
         $is_empty = true;
+        $whereHaveVar = strpos($where,'::')===false?false:true;        
         
         foreach($data as $f=>$v){
         
@@ -1628,6 +1629,20 @@ class base{
                 }
             }
         
+            if ($whereHaveVar){ 
+                $whereValue = $value;
+                if ( !(( $need)&&($bTypes || $valType ==='array') ) ){
+                    if ($valType === 'array'){
+                        $tp = count($value)>1?$value[1]:gettype($value[0]);
+                        $whereValue = self::typePerform($value[0],$tp);
+                    }elseif (isset($types[$field])!==false){
+                        $tp = $types[$field];
+                        $whereValue = self::typePerform($value,$tp);
+                    }
+                }
+
+                $where = str_replace('::'.$field,$whereValue,$where);
+            }
         
         
             if ($need){
