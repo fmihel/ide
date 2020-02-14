@@ -68,7 +68,7 @@ if (isset($NO_CACHE_APPLICATION)&&($NO_CACHE_APPLICATION===true)){
     
 };
 
-//require_once __DIR__.'/console.php';
+require_once __DIR__.'/console.php';
 
 function UNIT(){
     /*filename  || tag(ws/root),filename */

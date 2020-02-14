@@ -1,9 +1,11 @@
 <?php
 
+
 /** 
  * Класс вывода в log файл, с интерфейсом похожим на интерфейс console для js
  * Для вывода использует Application-LOG
 */
+
 class console{
 
     private static $params= [
@@ -108,9 +110,8 @@ class console{
     }
 
     
-}   
+};   
     
 
 
 ?>
-
