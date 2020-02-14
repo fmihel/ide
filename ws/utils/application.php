@@ -68,6 +68,8 @@ if (isset($NO_CACHE_APPLICATION)&&($NO_CACHE_APPLICATION===true)){
     
 };
 
+//require_once __DIR__.'/console.php';
+
 function UNIT(){
     /*filename  || tag(ws/root),filename */
     global $Application;
@@ -607,17 +609,18 @@ class TApplication{
     */ 
     public function _fmtVarLog($v,$p=array(),$level=1){
     
-        
-        if (!isset($p['assLimit'])) $p['assLimit']=20;
-        if (!isset($p['arrLimit'])) $p['arrLimit']=20;
-        if (!isset($p['strLimit'])) $p['strLimit']=100;
-        if (!isset($p['horiz']))    $p['horiz']=true;
-        if (!isset($p['numColor'])) $p['numColor']='#2D7AF2';
-        if (!isset($p['strColor'])) $p['strColor']='#EB272E';    
-        if (!isset($p['boolColor'])) $p['boolColor']='#58B029';
-        if (!isset($p['nullColor'])) $p['nullColor']='#A074C7';    
-        if (!isset($p['deep']))     $p['deep']=5;
-        
+        $p = array_merge([
+            'assLimit'  =>20,
+            'arrLimit'  =>20,
+            'strLimit'  =>100,
+            'horiz'     =>true,
+            'numColor'  =>'#2D7AF2',
+            'strColor'  =>'#EB272E',    
+            'boolColor' =>'#58B029',
+            'nullColor' =>'#A074C7',    
+            'deep'      =>5,
+        ],$p);
+
         
         $type = TYPE::info($v);
         $space = '&nbsp;';
@@ -721,8 +724,13 @@ class TApplication{
              
             $out.=($horiz?$out2:$out1.$tab0).$R[$type].$len.$cr;
         }else if ($type==='object'){
-            $name = get_class($v);  
-            $out.=$name.$this->_fmtVarLog(get_object_vars($v),$p,$level);
+            if (is_a($v,'Exception') || is_a($v,'\Exception')){
+                $name = '<span style="color:#ff0000">Exception:</span>';  
+                $out.=$name.'"'.$v->getMessage().'"';
+            }else{
+                $name = get_class($v);  
+                $out.=$name.$this->_fmtVarLog(get_object_vars($v),$p,$level);
+            }
     
         }else{
             $add_left = '';
