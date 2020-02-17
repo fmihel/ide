@@ -106,20 +106,6 @@ function _LOGF($msg,$name='',$file='',$line='',$param=array()){
     
     if (gettype($param)==='string')
         $param = APP::extParam($param);    
-    //-----------------------------------------------------------------------
-    // использование коротких имен
-    $short = array('str'=>'strLimit','ass'=>'assLimit','arr'=>'arrLimit');
-    foreach($short as $k=>$v){
-        if (isset($param[$k])){
-            $param[$v] = $param[$k];
-            unset($param[$k]);
-        }    
-    };
-    // использование настройки сразу всем
-    if (isset($param['all'])){
-        foreach($short as $k=>$v)
-            $param[$v] = $param['all'];
-    };
     
     
     //-----------------------------------------------------------------------
@@ -621,8 +607,23 @@ class TApplication{
             'deep'      =>5,
             'showStrEncoding'=>false,
         ],$p);
-
         
+        //-----------------------------------------------------------------------
+        // использование коротких имен
+        $short = array('str'=>'strLimit','ass'=>'assLimit','arr'=>'arrLimit');
+        foreach($short as $k=>$val){
+            if (isset($p[$k])){
+                $p[$val] = $p[$k];
+                unset($p[$k]);
+            }    
+        };
+        // использование настройки сразу всем
+        if (isset($p['all'])){
+            foreach($short as $k=>$val)
+                $p[$val] = $p['all'];
+        };
+        //-----------------------------------------------------------------------
+
         $type = TYPE::info($v);
         $space = '&nbsp;';
         //$space = '..';
