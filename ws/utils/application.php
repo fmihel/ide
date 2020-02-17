@@ -68,7 +68,7 @@ if (isset($NO_CACHE_APPLICATION)&&($NO_CACHE_APPLICATION===true)){
     
 };
 
-require_once __DIR__.'/console.php';
+require_once __DIR__.'/console.php'; 
 
 function UNIT(){
     /*filename  || tag(ws/root),filename */
@@ -619,6 +619,7 @@ class TApplication{
             'boolColor' =>'#58B029',
             'nullColor' =>'#A074C7',    
             'deep'      =>5,
+            'showStrEncoding'=>false,
         ],$p);
 
         
@@ -755,7 +756,8 @@ class TApplication{
                     $scolor='';
                     $ocoding = $coding.',';
                 }
-                $add_left = "<span style='font-size:0.8em;$scolor'>($ocoding$slen)</span>";  
+                
+                $add_left = ( $p['showStrEncoding'] ? "<span style='font-size:0.8em;$scolor'>($ocoding$slen)</span>" : '' );   
                 // преобразование в UTF-8 тк только в ней отображается 
                 if ($coding!='UTF-8'){
                     $v=mb_convert_encoding($v,'utf-8',$coding);

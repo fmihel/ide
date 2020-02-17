@@ -1,6 +1,5 @@
 <?php
 
-
 /** 
  * Класс вывода в log файл, с интерфейсом похожим на интерфейс console для js
  * Для вывода использует Application-LOG
@@ -19,9 +18,11 @@ class console{
         'boolColor' =>'#58B029',
         'nullColor' =>'#A074C7',    
         'deep'      =>5,
+        'showStrEncoding'=>false,        
         
     ];
     
+
     /** 
      * get or set console param
      * @return array of params 
