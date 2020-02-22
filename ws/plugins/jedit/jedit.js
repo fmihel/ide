@@ -355,6 +355,7 @@ Tjedit.prototype.init = function(o){
             onComboClick:undefined,
             onChange:undefined,
             onDraw:undefined,
+            onCanChange ({can:bool}) - реализовано для checkbox, если can = false то  смены состояния не произойдет при клике мышкой, сменить можно только через методы (для иммитации radiogroup) 
         
         */
         events:[],
@@ -563,20 +564,59 @@ Tjedit.prototype._event = function(){
         t.changed(t.changed());
         
     });
+    
+    jq.memo.on('focusout',()=>{
+        if ((t.param.changeOnKeyEnter)&&(t.changed())){
+            t.do("change",{enableChange:true});
+        }
+    });
+    
+    jq.memo.on('keydown',e=>{
+        if (p.readOnly) return;
+        
+        // ---------------
+        let oe = e.originalEvent;
+        
 
+        if(e.which == 13){
+            if (t.param.changeOnKeyEnter){
+                t.do("change",{enableChange:true});
+                t.changed(false);
+            }
 
+            if (t.eventDefined('keyEnter')){
+                t.do('keyEnter')
+                e.preventDefault();
+                return;
+            }    
+        };
+        
+        t.do('keyDown');
+        
+    });
+
+    
     jq.input.on('focusout',()=>{
         if ((t.param.changeOnKeyEnter)&&(t.changed())){
             t.do("change",{enableChange:true});
         }
     });
-    jq.input.on('keyup',()=>{
+ 
+    jq.input.on('keyup',( e ) => {
         if (p.readOnly) return;
         
         t.begin('draw');
         t.put({value:jq.input.val()});
         t.end('draw');
         t.changed(t.changed());
+
+        if(e.which == 8){
+            if (t.eventDefined('keyBackspace')){
+                t.do('keyBackspace');
+                //e.preventDefault();
+                return;
+            }    
+        };
     });
     jq.input.on('paste',()=>{
         if (p.readOnly) return;
@@ -711,20 +751,6 @@ Tjedit.prototype._event = function(){
     });
 
 
-    jq.input.on('keyup',e=>{
-        if (p.readOnly) return;
-        
-        if(e.which == 8){
-            if (t.eventDefined('keyBackspace')){
-                t.do('keyBackspace');
-                //e.preventDefault();
-                return;
-            }    
-        };
-
-    });
-
-
     jq.label.on('click',()=>{
         if (p.readOnly) return;
         
@@ -736,8 +762,13 @@ Tjedit.prototype._event = function(){
     jq.checkbox.on('click',()=>{
         if (p.readOnly) return;
         
-        if (!t.attr('disable'))
-            t.attr("checked",!t.attr("checked"));    
+        if (!t.attr('disable')){
+            let can = {can:true};
+            t.do('canChange',can);
+            if (can.can){
+                t.attr("checked",!t.attr("checked"));    
+            }
+        }
     });
     
     jq.tip.btn.on("click",()=>{
@@ -868,6 +899,18 @@ Tjedit.prototype.combo = function(param,param2){
                     t.put({value:$D(tr)[p.combo.key]});
                 }    
                 
+            }
+        }else if (param==='unselect'){
+            if (c.grid('ready')){
+                t.begin('change');
+                c.grid('unselect');
+                if (p.combo.valueKey!=='')
+                    p.combo.value = undefined;
+                t.put({value:''});    
+                t.put({value:undefined});
+                t.end('change');
+                if (param2!==true)
+                    t.do('change');
             }    
         }else if (param==='selected'){
             return c.grid('selected');
@@ -1480,6 +1523,14 @@ Tjedit.prototype.attr = function(n/*v*/){
             t.on('comboClick',v);
     }
     /*-----------------------------------*/
+    if (n==='onCanChange'){
+        if (r)
+            return t.on('canChange');
+        else
+            t.on('canChange',v);
+    }
+    /*-----------------------------------*/
+
     if (n==='onChange'){
         if (r)
             return t.on('change');
@@ -1679,7 +1730,7 @@ Tjedit.prototype.do=function(event,param){
     },param);
     */
     
-    if ((event==='change')&&(!param.enableChange)&&(p.type==='edit')) return;
+    if ((event==='change')&&(!param.enableChange)&&(['memo','edit'].indexOf(p.type)!==-1)) return;
     
     if (!t.can(event)) return true;
     
