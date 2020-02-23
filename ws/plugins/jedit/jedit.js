@@ -579,10 +579,10 @@ Tjedit.prototype._event = function(){
         
 
         if(e.which == 13){
-            if (t.param.changeOnKeyEnter){
-                t.do("change",{enableChange:true});
-                t.changed(false);
-            }
+            //if (t.param.changeOnKeyEnter){
+            //    t.do("change",{enableChange:true});
+            //    t.changed(false);
+            //}
 
             if (t.eventDefined('keyEnter')){
                 t.do('keyEnter')
