@@ -348,10 +348,13 @@ class WS extends WS_CONTENT{
             if (isset($Application->EXTENSION['JS'])){
                 // определяем build - уникальное имя сборки
                 $build = $Application->getExtHash('JS',$version);
+                
 
                 //$pBuild = '_render/';
                 $pBuild = WS_CONF::GET('renderPath','_render');
                 $nBuild = $pBuild.$build.'.js';
+                $stepFile = $pBuild.'step_file.js'; // файл склейка
+                $existStepFile = file_exists($stepFile); 
                 // проверяем, существует ли сборка
                 $eBuild = true;
                 
@@ -359,10 +362,12 @@ class WS extends WS_CONTENT{
                     $eBuild= false;
                     mkdir($pBuild);
                 };
-                if (!file_exists($nBuild))
+                if (!file_exists($nBuild) || ($existStepFile))
                     $eBuild= false;
                 
+
                 if (!$eBuild){
+                    /*
                     $js_code = $Application->getExtConcat('JS',';').';'.$right;
                     if (WS_CONF::GET('optimizeJS',0)==1){
                         $js_code_opt = self::optimization($js_code);
@@ -371,6 +376,69 @@ class WS extends WS_CONTENT{
                     }
                         
                     file_put_contents($nBuild,$js_code);
+                    */
+                    if ( (gettype($Application->EXTENSION) === 'array') && (isset($Application->EXTENSION['JS'])) ){
+                        
+                        $start = $existStepFile ? file_get_contents($stepFile) : 0 ; // начинаем, либо с 0, либо с того места где закончили
+
+                        $cntJS =count($Application->EXTENSION['JS']);
+                        
+                        error_log('------------------------------------------');
+                        error_log('build start ['.$nBuild.'] count:'.$cntJS);
+                        
+                        $all_code = file_exists($nBuild) ? file_get_contents($nBuild) : '' ;
+
+                        $includeModuleInfo = WS_CONF::GET('includeModuleInfo',0) == 1 ? true : false ;
+                        $optimize =  WS_CONF::GET('optimizeJS',0)==1 ? true : false ;
+                        
+                        $error = false;
+
+                        for($i=$start;$i<$cntJS;$i++){
+                            $file = trim($Application->EXTENSION['JS'][$i]['local']);
+                            
+                            if (($file!=='')&&(file_exists($file))){
+                                $code_js = file_get_contents($file);
+
+                                if ($optimize){
+                                    $code_js_opt = self::optimization($code_js);
+                                    
+                                    if ( ($code_js_opt===false) ||  (mb_strpos($code_js_opt,'java.lang')!==false) || (mb_strpos($code_js_opt,'Error(')===0) ){ 
+                                        error_log(trim(substr($code_js_opt.'',0,200)).'..');
+                                        error_log(($i+1).': ERROR build module, restart build ['.$file.']');
+                                        $error = true;
+                                        file_put_contents($stepFile,''.$i);
+                                        break;
+                                    }
+
+                                    $all_code.=($all_code!==''?';':'');
+                                    if ( $includeModuleInfo )
+                                        $all_code.="\n".'/** MODULE >> ['.$file.'] */'."\n";
+                                    $all_code.=$code_js_opt;
+                                    error_log(($i+1).': build ok ['.$file.']');
+
+                                }else{
+
+                                    $all_code.=($all_code!==''?';':'');
+                                    if ( $includeModuleInfo )
+                                        $all_code.="\n".'/** MODULE >> ['.$file.'] */'."\n";
+                                    $all_code.=$code_js;
+                                }
+                                
+                            }
+                        };// for
+
+                        error_log('build end '.($error ? 'with error':'ok'));
+                        error_log('------------------------------------------');
+
+                        file_put_contents($nBuild,$all_code);
+
+                        // если ошибок не было удаляем файл step
+                        if ((!$error) && ($existStepFile))
+                            unlink($stepFile);
+
+                    }
+                    
+            
                 }    
                 
                 
@@ -394,6 +462,7 @@ class WS extends WS_CONTENT{
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_POST => true,
+                CURLOPT_SSL_VERIFYPEER=> ( WS_CONF::GET('sslVerifyPeer',1) == 1 ? true : false ) ,
                 CURLOPT_POSTFIELDS => http_build_query(array(
                     'compilation_level'=>'SIMPLE_OPTIMIZATIONS',
                     'output_format'=>'text',

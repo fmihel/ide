@@ -146,7 +146,7 @@ class WS_DCSS{
     public function default_style(){
         $out = array();
         
-        if (isset($this->dcss['styles']))
+        if (isset($this->dcss['styles']) && (gettype($this->dcss['styles']) === 'array') )
             foreach($this->dcss['styles'] as $k=>$v)
                 $out[$k]=$v[0];
                 
@@ -221,7 +221,9 @@ class WS_DCSS{
     
         if ($this->_cache_need($file)){
             $this->pre_render();
-            $json = serialize($this->dcss['styles']);
+            
+            $json = isset($this->dcss['styles']) ? serialize($this->dcss['styles']) : '';
+            
             file_put_contents($file,$json);
         }else{
             $json = file_get_contents($file);            
