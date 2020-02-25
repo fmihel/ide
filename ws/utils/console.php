@@ -60,18 +60,21 @@ class console{
 
     public static function error(...$args){
         global $Application;
-
+        $p = array_merge(self::$params,['all'=>0]);
+        
         $trace = self::trace();
         $left = '<span style="color:#ffffff;background:#840000;border-radius:9px;padding-left:5px;padding-right:5px;padding-bottom:2px">';
         $right = '</span>';
+        
         if (count($args) === 1 ){
             
+            
             if (is_a($args[0],'Exception') || is_a($args[0],'\Exception'))
-                $Application->LOG($left.'Exception:'.$right.$Application->_fmtVarLog($args[0]->getMessage(),self::$params),$trace['file'],$trace['line']);
+                $Application->LOG($left.'Exception:'.$right.$Application->_fmtVarLog($args[0]->getMessage(),$p),$trace['file'],$trace['line']);
             else
-                $Application->LOG($left.'Error:'.$right.$Application->_fmtVarLog($args[0],self::$params),$trace['file'],$trace['line']);
+                $Application->LOG($left.'Error:'.$right.$Application->_fmtVarLog($args[0],$p),$trace['file'],$trace['line']);
         }else{
-            $Application->LOG($left.'Error:'.$right.$Application->_fmtVarLog($args,self::$params),$trace['file'],$trace['line']);
+            $Application->LOG($left.'Error:'.$right.$Application->_fmtVarLog($args,$p),$trace['file'],$trace['line']);
         }
     }
 
