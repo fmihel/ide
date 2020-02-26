@@ -341,7 +341,15 @@ class WS extends WS_CONTENT{
     }
     /** проверка возвращенного кода от googly compling на наличие ошибок*/
     private static function isErrorCompiling($code){
-        if ( ($code === false) ||  (mb_strpos($code,'java.lang')!==false) || (mb_strpos($code,'Error(')===0) )
+        if ( 
+            ($code === false) 
+            ||  
+            (mb_strpos($code,'java.lang')!==false) 
+            || 
+            (mb_strpos(trim($code),'Error(')===0) 
+            ||
+            (mb_strpos(trim($code),'<html>')===0) 
+        )
             return true;
         return false;
     }
