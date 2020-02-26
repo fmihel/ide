@@ -468,9 +468,11 @@ class WS extends WS_CONTENT{
 
                         // компилим код из frame
                         if (!$error && $right!==''){
-                            $right = self::optimization($right);
                             
-                            if (self::isErrorCompiling($right)){ 
+                            if ($optimize)
+                                $right = self::optimization($right);
+                            
+                            if (($optimize) && (self::isErrorCompiling($right))){ 
                                 error_log(trim(substr($right.'',0,200)).'..');
                                 error_log(' ERROR build code frame');
                                 $error = true;
