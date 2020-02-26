@@ -339,6 +339,13 @@ class WS extends WS_CONTENT{
          
         return $res; 
     }
+    /** проверка возвращенного кода от googly compling на наличие ошибок*/
+    private static function isErrorCompiling($code){
+        if ( ($code === false) ||  (mb_strpos($code,'java.lang')!==false) || (mb_strpos($code,'Error(')===0) )
+            return true;
+        return false;
+    }
+
     /** создание сборки */
     private function builder($type,$version,$right = ''){
         global $Application;
@@ -367,19 +374,11 @@ class WS extends WS_CONTENT{
                 
 
                 if (!$eBuild){
-                    /*
-                    $js_code = $Application->getExtConcat('JS',';').';'.$right;
-                    if (WS_CONF::GET('optimizeJS',0)==1){
-                        $js_code_opt = self::optimization($js_code);
-                        if ($js_code_opt!==false)
-                            $js_code = $js_code_opt;
-                    }
+
+                    $start = $existStepFile ? file_get_contents($stepFile) : 0 ; // начинаем, либо с 0, либо с того места где закончили
+                    
+                    if ( ($start!=='frame') && (gettype($Application->EXTENSION) === 'array') && (isset($Application->EXTENSION['JS'])) ){
                         
-                    file_put_contents($nBuild,$js_code);
-                    */
-                    if ( (gettype($Application->EXTENSION) === 'array') && (isset($Application->EXTENSION['JS'])) ){
-                        
-                        $start = $existStepFile ? file_get_contents($stepFile) : 0 ; // начинаем, либо с 0, либо с того места где закончили
 
                         $cntJS =count($Application->EXTENSION['JS']);
                         
@@ -402,7 +401,8 @@ class WS extends WS_CONTENT{
                                 if ($optimize){
                                     $code_js_opt = self::optimization($code_js);
                                     
-                                    if ( ($code_js_opt===false) ||  (mb_strpos($code_js_opt,'java.lang')!==false) || (mb_strpos($code_js_opt,'Error(')===0) ){ 
+                                    if (self::isErrorCompiling($code_js_opt)){ 
+
                                         error_log(trim(substr($code_js_opt.'',0,200)).'..');
                                         error_log(($i+1).': ERROR build module, restart build ['.$file.']');
                                         $error = true;
@@ -410,22 +410,36 @@ class WS extends WS_CONTENT{
                                         break;
                                     }
 
-                                    $all_code.=($all_code!==''?';':'');
-                                    if ( $includeModuleInfo )
-                                        $all_code.="\n".'/** MODULE >> ['.$file.'] */'."\n";
-                                    $all_code.=$code_js_opt;
+                                    $code_js = $code_js_opt;
                                     error_log(($i+1).': build ok ['.$file.']');
 
-                                }else{
+                                };
 
-                                    $all_code.=($all_code!==''?';':'');
-                                    if ( $includeModuleInfo )
-                                        $all_code.="\n".'/** MODULE >> ['.$file.'] */'."\n";
-                                    $all_code.=$code_js;
-                                }
-                                
+                                $all_code.=($all_code!==''?';':'');
+                                if ( $includeModuleInfo )
+                                    $all_code.="\n".'/** MODULE >> ['.$file.'] */'."\n";
+                                $all_code.=$code_js;
+                            
                             }
                         };// for
+
+                        // компилим код из frame
+                        if (!$error && $right!==''){
+                            $right = self::optimization($right);
+                            
+                            if (self::isErrorCompiling($right)){ 
+                                error_log(trim(substr($right.'',0,200)).'..');
+                                error_log(' ERROR build code frame');
+                                $error = true;
+                                file_put_contents($stepFile,'frame');
+                            }else{
+                                $all_code.=($all_code!==''?';':'');
+                                if ( $includeModuleInfo )
+                                    $all_code.="\n".'/** FRAME CODE >>  */'."\n";
+                                $all_code.=$right;
+                                error_log('frame : build ok ');
+                            }
+                        };
 
                         error_log('build end '.($error ? 'with error':'ok'));
                         error_log('------------------------------------------');
