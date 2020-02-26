@@ -214,7 +214,12 @@ class WS extends WS_CONTENT{
         }
         
         //--------------------------------------------
-        $js_build = ($this->mode === 'production')?$this->builder('js',$version,(WS_CONF::GET('bildFrameJS')==1?$this->main_js($dcss,$styles,$version):'')):false;
+        $js_build = false;
+        if ($this->mode === 'production'){
+            if (!$this->buildRunLock()){
+                $js_build = $this->builder('js',$version,(WS_CONF::GET('bildFrameJS')==1?$this->main_js($dcss,$styles,$version):''));
+            }
+        }
         //--------------------------------------------
         if ($js_build!==false)
             $res.='<script type="text/javascript" src="'.$js_build.'"></script>'.DCR;
@@ -271,7 +276,17 @@ class WS extends WS_CONTENT{
         $res.='</style>'.DCR;
 
         //---------------------------------------------
-        if (($this->mode==='development')||(WS_CONF::GET('bildFrameJS')==0)){
+        if (
+            (
+                ($this->mode==='development') 
+                || 
+                ($this->buildRunLock())
+            ) 
+            || (
+                WS_CONF::GET('bildFrameJS')==0 
+               )
+            )
+        {
             $res.='<script type='.'"text/javascript"'.'>'.DCR;
             $res.= $this->main_js($dcss,$styles,$version);
             $res.='</script>'.DCR;
@@ -354,6 +369,25 @@ class WS extends WS_CONTENT{
         return false;
     }
 
+    /** запуск/остановка/проверка на то, что процесс компиляции запущен другим процессом */
+    private function buildRunLock($start = ''){
+        $pBuild = WS_CONF::GET('renderPath','_render');
+        $file = $pBuild.'build.start';
+        
+        if ($start === 'begin'){
+            file_put_contents($file,'1');
+            return true;
+        }
+
+        if ($start === 'end'){
+            if (file_exists($file))
+                unlink($file);
+            return false;
+        }
+
+        return file_exists($file);
+    }
+
     /** создание сборки */
     private function builder($type,$version,$right = ''){
         global $Application;
@@ -368,7 +402,7 @@ class WS extends WS_CONTENT{
                 //$pBuild = '_render/';
                 $pBuild = WS_CONF::GET('renderPath','_render');
                 $nBuild = $pBuild.$build.'.js';
-                $stepFile = $pBuild.'step_file.js'; // файл склейка
+                $stepFile = $pBuild.'builder.step'; // файл склейка
                 $existStepFile = file_exists($stepFile); 
                 // проверяем, существует ли сборка
                 $eBuild = true;
@@ -382,6 +416,7 @@ class WS extends WS_CONTENT{
                 
 
                 if (!$eBuild){
+                    $this->buildRunLock('begin');
 
                     $start = $existStepFile ? file_get_contents($stepFile) : 0 ; // начинаем, либо с 0, либо с того места где закончили
                     
@@ -460,7 +495,7 @@ class WS extends WS_CONTENT{
 
                     }
                     
-            
+                    $this->buildRunLock('end'); 
                 }    
                 
                 
