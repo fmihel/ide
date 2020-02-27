@@ -22,7 +22,7 @@ require_once UNIT('ws','ws_module.php');
 require_once UNIT('ws','ws_dcss.php'); 
 
 
-RESOURCE('plugins','jquery/jquery-3.3.1.js');
+RESOURCE('plugins','jquery/jquery-3.3.1.min.js');
 RESOURCE('plugins','common/dom.js');
 RESOURCE('plugins','common/addition.js');
 RESOURCE('plugins','common/byReady.js');
@@ -69,7 +69,7 @@ class WS extends WS_CONTENT{
         $this->icon = '';
 
         $this->version = '';
-        // тип сборки production | development
+        // тип сборки production | development | assembly
         $this->mode         = WS_CONF::GET('mode');
         $this->renderPath   = WS_CONF::GET('renderPath');
     } 
@@ -221,6 +221,12 @@ class WS extends WS_CONTENT{
             }
         }
         //--------------------------------------------
+        if ($this->mode === 'assembly'){
+            // посторение сборки для последующей компиляции ( сам проект будет отображаться в режиме development) 
+            $this->assembly($version,$this->main_js($dcss,$styles,$version));
+        }
+
+        //--------------------------------------------
         if ($js_build!==false)
             $res.='<script type="text/javascript" src="'.$js_build.'"></script>'.DCR;
         
@@ -278,7 +284,11 @@ class WS extends WS_CONTENT{
         //---------------------------------------------
         if (
             (
-                ($this->mode==='development') 
+                (
+                    ($this->mode==='development')
+                    ||
+                    ($this->mode==='assembly')
+                ) 
                 || 
                 ($this->buildRunLock())
             ) 
@@ -507,6 +517,110 @@ class WS extends WS_CONTENT{
         
         return false;
         
+    }
+    /** 
+     * получаем сборку для дальнейшей обработки внешними средствами
+    */
+    private function assembly($version,$frame){        
+        global $Application;
+
+        error_log('------------------------------------------');
+        error_log('assembly start ');
+        
+        if ( (gettype($Application->EXTENSION) === 'array') && (isset($Application->EXTENSION['JS'])) ){
+            // определяем build - уникальное имя сборки
+            $build = $Application->getExtHash('JS',$version);
+            
+            //$pBuild = '_assembly/';
+            $pBuild = APP::slash(WS_CONF::GET('assemblyPath','_assembly'),false,true);
+            $excludes = WS_CONF::GET('assemblyExclude',[]);
+            $excludePath = APP::slash(WS_CONF::GET('assemblyExcludePath',$pBuild.'exclude'),false,true);
+
+            $nBuild = APP::slash($pBuild,false,true).$build.'.js';
+
+            if (!file_exists(APP::slash($pBuild,false,false)))
+                mkdir(APP::slash($pBuild,false,false));
+            if (!file_exists(APP::slash($excludePath,false,false)))
+                mkdir(APP::slash($excludePath,false,false));
+            
+            $cntJS =count($Application->EXTENSION['JS']);
+            error_log('assembly count '.$cntJS);
+
+            $includeModuleInfo = WS_CONF::GET('includeModuleInfo',0) == 1 ? true : false ;
+            $all_code =  '' ;
+
+            for($i=0;$i<$cntJS;$i++){
+                $file = trim($Application->EXTENSION['JS'][$i]['local']);
+                            
+                if (($file!=='')&&(file_exists($file))){
+                    
+                    $exclude = false;
+                    foreach($excludes as $rule){
+                        // полное соотвествие
+                        if ($file === $rule){
+                            $exclude = true;
+                            break;
+                        }else
+                        // *string*  содержит строку
+                        if (($rule[0] === '*') && ($rule[mb_strlen($rule)-1] === '*')){
+                            
+                            $search = mb_substr($rule,1);
+                            $search = mb_substr($search,0,mb_strlen($search)-1);
+                            $exclude = (mb_strpos($file,$search)!==false);
+                            break;
+                        }else
+                        // *string  строка справа
+                        if ($rule[0] === '*'){
+                    
+                            $search = mb_substr($rule,1);
+                            $exclude = (mb_substr($file,mb_strlen($file)-mb_strlen($search)) == $search);
+                            break;
+                        }else
+                        // *string  строка слева
+                        if ($rule[mb_strlen($rule)-1] === '*'){
+                    
+                            $search = mb_substr($rule,0,mb_strlen($rule)-1);
+                            $exclude = (mb_substr($file,0,mb_strlen($search)) == $search);
+                            break;
+                        }
+                    
+                    }
+                    
+                    $code_js = file_get_contents($file);
+
+                    if (!$exclude){
+                        // добавляем код в общую кучу
+                        $all_code.=($all_code!==''?';':'');
+                        if ( $includeModuleInfo )
+                            $all_code.="\n".'/** MODULE >> ['.$file.'] */'."\n";
+                            $all_code.=$code_js;
+                        error_log("$i: assembly add [$file] ok");    
+                    }else{
+                        // файл исключен из сборки и добавляется в отдельную папку
+                        $code_js = file_get_contents($file);
+                        $to = $excludePath.'/'.basename($file);
+                        file_put_contents($to,$code_js);
+                        error_log("$i: assembly exclude [$file] ok");    
+                    }
+
+                }//if (($file!=='')&&(file_exists($file))){
+                
+            };// for
+
+        };// if ( (gettype($Application->EXTENSION) === 'array') && (isset($Application->EXTENSION['JS'])) ){
+        
+        // добавляем код из frame
+        $all_code.=($all_code!==''?';':'');
+        if ( $includeModuleInfo )
+            $all_code.="\n".'/** FRAME CODE >>  */'."\n";
+
+        $all_code.=$frame;
+        error_log("assembly frame ok");    
+
+        file_put_contents($nBuild,$all_code);
+
+        error_log('assembly end ');
+        error_log('------------------------------------------');
     }
     /**
      * Минификация, а также приведения к стандарту ES5
