@@ -161,7 +161,7 @@ class WS_DCSS{
 
         }else{
 
-            if ($this->mode === 'production')
+            if (($this->mode === 'production') || ($this->mode === 'assembly'))
                 $this->_cached_styles();
             else
                 $this->pre_render();
@@ -270,7 +270,7 @@ class WS_DCSS{
     public function render(){
         global $Application;
         
-        if ($this->mode==='production'){
+        if (($this->mode === 'production') || ($this->mode === 'assembly')){
             
             $file = $this->_cached_name('css');
         
@@ -379,7 +379,7 @@ class WS_DCSS{
         /*выделяем dcss из исходников*/
         global $Application;
 
-        if ($this->mode==='production'){
+        if (($this->mode === 'production') || ($this->mode === 'assembly')){
             $file = $this->_cached_name('dat');
             
             if ($this->_cache_need($file)){
