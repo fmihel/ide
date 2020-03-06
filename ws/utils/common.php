@@ -177,7 +177,7 @@ class TYPE{
     }
     public static function is_numeric($val,$forced = false)
     {
-        $val = trim($val);
+        $val = trim($val.'');
         $is_num = is_numeric($val);  
         if($forced){
         //S:Проверка на то что значение цифра ( с учетом json-кого 0 впереди)
