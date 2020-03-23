@@ -72,6 +72,47 @@ class WS_CONF{
         }
         return '{'.$code.'}';
     }
+    /**
+     * добавляет выбранные данные из конфига в отдельный js файл, который подгружается независимо от всей сборки
+     * ( в сборку не войдет )
+     * 
+    */
+    static function AS_RESOURCE(...$list){
+        global $_ws_conf;
+        global $Application;
+        
+        try{
+            
+            $content = 'var WS_CONF = '.WS_CONF::toJS($list).';';
+            $pref = 'wsd4rtp';
+            $name = md5($content).$pref.'.js';
+            //$file = APP::slash($Application->PATH,false,true).$name;
+            $current = false;
+            
+            // поиск предыдущего файла (xxxxxxxxxxxx$pref.js)
+            $files = scandir('.');
+            foreach($files as $file){
+                if (strpos($file,$pref.'.js')!==false){
+                    $current = $file;
+                    break;
+                }
+            }
+            // --------------------------------------
+            if ($current!==$name){
+                if ($current!==false)
+                    unlink($current);
+                file_put_contents($name,$content);
+            };
+            
+            RESOURCE('+'.$name);
+            
+        }catch(Exception $e){
+            console::error($e);
+        }
+        
+        
+    
+    }
 };
 
 
