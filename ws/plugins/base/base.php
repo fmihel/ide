@@ -763,7 +763,7 @@ class base{
         if (isset(self::$_base[$base]))
             return true;
         
-        $db = new mysqli($server,$user,$pass,$base_name);
+        $db = @new mysqli($server,$user,$pass,$base_name);
 
         if ($db->connect_errno){
             $msg = "can`t connect to MySQL: (" . $db->connect_errno . ") " . $db->connect_error;
