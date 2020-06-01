@@ -631,21 +631,28 @@ class ARR{
         
     }
     
-    public static function to_json($arr){
+    public static function to_json($arr,$refactoring=false,$level = 0){
         //SHORT:Преобразует PHP массив в строку, которую можно парсить JSON
         /*DOC: Преобразует PHP массив в строку, для возможности парсить ее JSON на стороне клиента. При этом строки будут кодироваться посредством JUTILS::JSON_CODE.
         Для правильной раскодировки используйте ф-цию javascript [code]JUTILS.JSON_DECODE(str)[/code] Так же bool значения, после парсинга,правильней проверять с помощью ф-ции [code]JUTILS.AsBool(mean)[/code]
         */
+        $left = '';
+        $cr = '';
+        if ($refactoring){
+            $left = str_repeat('    ',$level);
+            $cr = chr(13).chr(10); 
+        }
 
         if (TYPE::is_assoc($arr)){
             $res = '{';
             foreach($arr as $Name=>$Value)
             {
                 if ($res !=='{') 
-                    $res.=',';        
+                    $res.=',';
+                $res.=$cr.$left;            
 
                 if (is_array($Value))
-                    $res.= '"'.$Name.'":'.ARR::to_json($Value).'';          
+                    $res.= '"'.$Name.'":'.ARR::to_json($Value,$refactoring,$level+1).'';          
                 else
                 {
                     if (is_bool($Value))
@@ -676,26 +683,28 @@ class ARR{
             
             $res = '[';
             if (is_array($arr)){
-							for($i = 0;$i<count($arr);$i++){
-                if ($res !=='[') $res.=',';        
-                if (is_array($arr[$i]))
-                    $res.= ARR::to_json($arr[$i]);
-                else{                    
-                    if (is_bool($arr[$i]))
-                    {
-                        if ($arr[$i])
-                            $res.= '"'.$Name.'":true';
+				for($i = 0;$i<count($arr);$i++){
+                    if ($res !=='[') 
+                        $res.=',';     
+                    $res.=$cr.$left;            
+       
+                    if (is_array($arr[$i]))
+                        $res.= ARR::to_json($arr[$i],$refactoring,$level+1);
+                    else{                    
+                        if (is_bool($arr[$i])){
+                            if ($arr[$i])
+                                $res.= '"'.$Name.'":true';
+                            else
+                                $res.= '"'.$Name.'":false';
+                        }else if (TYPE::is_numeric($arr[$i],true))
+                            $res.= $arr[$i];
                         else
-                            $res.= '"'.$Name.'":false';
-                    }else if (TYPE::is_numeric($arr[$i],true))
-                        $res.= $arr[$i];
-                    else
-                        $res.= '"'.COMMON::pre_json($arr[$i]).'"';         
-                }
-							};
-						}else{
-							$res.= '"'.COMMON::pre_json($arr).'"';
-						}	
+                            $res.= '"'.COMMON::pre_json($arr[$i]).'"';         
+                    }
+				};
+			}else{
+				$res.= '"'.COMMON::pre_json($arr).'"';
+			}	
             $res.=']';    
         }
         return $res;
