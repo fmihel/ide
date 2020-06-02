@@ -1415,53 +1415,74 @@ class EMAIL{
         $headers .= 'Content-type: text/html; charset=utf8' . "\r\n";
         return mail($ToMail, $Theme, $Message, $headers);
     }
-    
-    public static function sendEx(
-        $mailTo = 'fmihel76@gmail.com',
-        $fromMail   = "fmihel@windeco.su",
-        $message = 'message for send',
-        $subject    = "Your Subject",
-        $filePath   = "zip.zip"
-    )
+    /**
+     * отправка почты и файла
+     * @returns {bool | Exception}
+    */
+    public static function sendEx($param)
     {
-        $fromName   = $fromMail;
-        $replyTo    = $fromMail;
+        try{
         
-        $LE  = "\r\n";
-        $uid = md5(uniqid(time()));
-        $withAttachment = ($filePath !== NULL && file_exists($filePath));
-    
-        if($withAttachment){
-            $fileName   = basename($filePath);
-            $fileSize   = filesize($filePath);
-            $handle     = fopen($filePath, "r"); 
-            $content    = fread($handle, $fileSize);
-            fclose($handle);
-            $content = chunk_split(base64_encode($content));
-        }
-    
-        $header = "From: ".$fromName." <".$fromMail.">$LE";
-        $header .= "Reply-To: ".$replyTo."$LE";
-        $header .= "MIME-Version: 1.0$LE";
-        $header .= "Content-Type: multipart/mixed; boundary=\"".$uid."\"$LE$LE";
+            $p = array_merge([
+                'mailTo'    =>'',
+                'message'   =>'',
+                'subject'   =>'',
+                'fromMail'  =>'',
+                'fromName'  =>$param['fromMail'],
+                'replyTo'   =>$param['fromMail'],
+                'filePath'  =>''
+            ],$param);
+           
+            $mailTo     = $p['mailTo'];
+            $message    = $p['message'];
+            $subject    = $p['subject'];
+            $fromMail   = $p["fromMail"];
+            $fromName   = $p["fromName"];
+            $replyTo    = $p['replayTo'];
+            $filePath   = $p['filePath'];
         
-        //$header .= "This is a multi-part message in MIME format.$LE";
-        $body = '';
-        $body .= "--".$uid."$LE";
-        $body .= "Content-type:text/html; charset=UTF-8$LE";
-        $body .= "Content-Transfer-Encoding: 7bit$LE$LE";
-        $body .= $message."$LE$LE";
+            $LE  = "\r\n";
+            $uid = md5(uniqid(time()));
+            $withAttachment = ($filePath !== NULL && file_exists($filePath));
+
+            if($withAttachment){
+                $fileName   = basename($filePath);
+                $fileSize   = filesize($filePath);
+                $handle     = fopen($filePath, "r");
+                $content    = fread($handle, $fileSize);
+                fclose($handle);
+                $content = chunk_split(base64_encode($content));
+            }
+
+            $header = "From: ".$fromName." <".$fromMail.">$LE";
+            $header .= "Reply-To: ".$replyTo."$LE";
+            $header .= "MIME-Version: 1.0$LE";
+            $header .= "Content-Type: multipart/mixed; boundary=\"".$uid."\"$LE$LE";
     
-        if($withAttachment){
+            //$header .= "This is a multi-part message in MIME format.$LE";
+            $body = '';
             $body .= "--".$uid."$LE";
-            $body .= "Content-Type: application/octet-stream; name=\"".$fileName."\"$LE";
-            $body .= "Content-Transfer-Encoding: base64$LE";
-            $body .= "Content-Disposition: attachment; filename=\"".$fileName."\"$LE$LE";
-            $body .= $content."$LE$LE";
-            $body .= "--".$uid."--";
+            $body .= "Content-type:text/html; charset=UTF-8$LE";
+            $body .= "Content-Transfer-Encoding: 7bit$LE$LE";
+            $body .= $message."$LE$LE";
+
+            if($withAttachment){
+                $body .= "--".$uid."$LE";
+                $body .= "Content-Type: application/octet-stream; name=\"".$fileName."\"$LE";
+                $body .= "Content-Transfer-Encoding: base64$LE";
+                $body .= "Content-Disposition: attachment; filename=\"".$fileName."\"$LE$LE";
+                $body .= $content."$LE$LE";
+                $body .= "--".$uid."--";
+            }
+ 
+            if (!mail($mailTo, $subject, $body, $header))
+                throw new Exception("cant send "+print_r($param,true));
+
+        }catch(Exception $e){
+            throw new Exception($e->getMessage());
         }
-        return mail($mailTo, $subject, $body, $header);
     }
+
     
 
     /** проверка валидности почты */
