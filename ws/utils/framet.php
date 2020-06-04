@@ -104,7 +104,7 @@ class GJX{
 
         $enableBuffer = ($enableBuffer==='global'?self::$enableBuffer:($enableBuffer?true:false));
     
-        if ((count($param2)>2)&&($param[2]!=='global'))
+        if ((count($param)>2)&&($param[2]!=='global'))
             $enableBuffer = $param[2];
 
         if (self::isEmptyArr($param[0])){
