@@ -541,7 +541,7 @@ class TApplication{
     */
     public function getExtHash($ext,$add=''){
         $files = '';
-            
+        if (isset($this->EXTENSION[$ext]))    
         for($i=0;$i<count($this->EXTENSION[$ext]);$i++)
             $files.= $this->EXTENSION[$ext][$i]['local'];
         $files.=$add;

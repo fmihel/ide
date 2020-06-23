@@ -481,6 +481,31 @@ class STR{
     public static function to_win($str){
         return mb_convert_encoding($str, 'windows-1251','utf-8');
     }
+    /** транслитерация */
+    public static function translit($str,$param=[]){
+        $p = array_merge([ 
+            'lower'=>false
+        ],$param);
+        
+        $RUS_BUK = ['а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я',
+                    'А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'];
+        $ENG_BUK = ['a','b','v','g','d','e','e','j','z','i','i','k','l','m','n','o','p','r','s','t','u','f','h','c','c','s','s','' ,'' ,'' ,'e','u','y',
+                    'A','B','V','G','D','E','E','J','Z','I','I','K','L','M','N','O','P','R','S','T','U','F','H','C','C','S','S','' ,'' ,'' ,'E','U','Y'];
+        
+        $out = trim($str);
+        if ($p['lower'])
+            $out = mb_strtolower($out);
+            
+        while(strpos($out,'  ')!==false)
+            $out = str_replace(['  '],[' '],$out);
+
+        $out = str_replace([' '],['_'],$out);
+        $out = preg_replace('/[^a-zA-Zа-яА-Я0-9\_]/ui', '',$out);
+        $out = str_replace($RUS_BUK,$ENG_BUK,$out);
+        
+        return $out;
+    }
+    
 
 };
 
