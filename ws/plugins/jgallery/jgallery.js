@@ -208,6 +208,7 @@ Tjgallery.prototype.init = function(o){
         onLoading:undefined,
         onLoad:undefined,
         onClear:undefined,
+        prefCache:undefined,// значение переменной (уникальный ключ строка), добавляемой в имя загружаемого файла, чобы отменить кеширование (если переменная имеет значение, то кеш будет сброшен один раз,для следующего сброса, ввести новое значени)
         /** отступ между изображениями */
         gap:10,
         /** отступ при вписывании в видимую область */
@@ -607,7 +608,7 @@ Tjgallery.prototype._create=function(){
         p.data[i].jq.css({"position":"absolute"}).addClass(css.common).hide(0);
         
 
-        img.src = p.data[i].url;
+        img.src = p.data[i].url+(p.prefCache?'?cach='+p.prefCache:'');
 
     }
     
@@ -773,6 +774,13 @@ Tjgallery.prototype.attr = function(n/*v*/){
             return p.animation;
         else    
             p.animation = v;
+    }
+    /*-----------------------------------*/
+    if (n==='prefCache'){
+        if (r) 
+            return p.prefCache;
+        else    
+            p.prefCache = v;
     }
     /*-----------------------------------*/
     
