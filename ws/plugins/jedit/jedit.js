@@ -1,4 +1,4 @@
-/*global ut,$,jQuery,JX,Qs,Ws*
+/*global ut,$,jQuery,JX,Qs,Ws*/
 var editFilterPreset={
     float(a){
         let is_num = ( ["0","1","2","3","4","5","6","7","8","9",".",","].indexOf(a.key) >= 0 );
