@@ -1,4 +1,4 @@
-/*global ut,$,jQuery,JX,Qs,Ws*/
+/*global ut,$,jQuery,JX,Qs,Ws*
 var editFilterPreset={
     float(a){
         let is_num = ( ["0","1","2","3","4","5","6","7","8","9",".",","].indexOf(a.key) >= 0 );
@@ -543,6 +543,9 @@ Tjedit.prototype._event = function(){
     }});
     
     jq.btn.mbtn({click(){
+        // переклик видимости, чтобы успел сброситься hover (если он есть)
+        JX.visible(jq.btn,false);
+        setTimeout(()=>{JX.visible(jq.btn,true);},10);
         if (p.readOnly) return;
         
         if (!t.do('btnClick'))
