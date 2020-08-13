@@ -259,9 +259,8 @@ zAction.getState=function(name){
 */
 zAction.do=function(o){
     var t=zAction,
-        p=t.param,
         g=t._get(o.name),
-        res;
+        res = o.param;
     
     if (g){ 
         try{ 
@@ -275,9 +274,8 @@ zAction.do=function(o){
         }
         
         g.on.action.forEach(function(v){
-            if (v.func)
             try{
-                v.func(res,g.prevState);
+                if (v.func) v.func(res,g.prevState);
             }catch(e){
                 console.error(e,v);    
             }
