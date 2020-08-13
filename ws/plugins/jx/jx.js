@@ -570,6 +570,10 @@ workplace:function(wp,page){
 
 sideLenSum:function(o,wrap){
     /* суммма длин по ширине и высоте  */
+    var p = {
+        inc:wrap?{w:0,h:0,...wrap.inc}:{w:0,h:0},
+        ...wrap
+    };
     var d   = JX._dom(o),i,
         c   = JX._childs(d),
         a   = {w:0,h:0},b;
@@ -577,15 +581,17 @@ sideLenSum:function(o,wrap){
     for(i=0;i<c.length;i++){
         if (JX._visible(c[i])){
             b = JX._pos(c[i]);
-            a.w+=b.w;
-            a.h+=b.h;
+            
+            a.w+=b.w+p.inc.w;
+            a.h+=b.h+p.inc.h;
+            
         }
     }
 
 
-    if (wrap===undefined)
+    if (wrap === undefined){
         return a;
-    else{
+    }else{
         if (wrap.width!==true) delete a.w;
         else if (wrap.dw) a.w+=wrap.dw;
         if (wrap.height!==true) delete a.h;
