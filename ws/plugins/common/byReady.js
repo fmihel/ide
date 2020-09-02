@@ -172,7 +172,8 @@ function byReady(action = undefined,conditions = undefined){
  *      метод init()  - выполнится один раз
  *      свойство loadAfter - условие после которого можно запускать модуль
  * 
- * @param string name - имя модуля
+ * @param {string|array|object} string - имя модуля (var глобальных переменных) ,array - список имен моудлей(var глобальных переменных), object - {name:module,..} name - имя модуля, module - ссылка на модуль
+ * рекомендуется задавать последний вариант, {name:module,..};
  * Ex: 
  *     var mod1 = {
  *          loadAfter:'Qs',
@@ -192,17 +193,30 @@ function byReady(action = undefined,conditions = undefined){
  * 
  */ 
 byReady.load = function(name,loadAfter = undefined){
-    let module = window[name];
-    if (module){
+    let type = Array.isArray(name)?'array':typeof(name);
+    
+    let loadModule = (moduleName,module)=>{
         byReady(()=>{
             try{
                 module.init();
                 module.modLoad = true;
-                byReady(name);
+                byReady(moduleName);
             } catch (e){
-                console.error(name);
+                console.error(moduleName);
             }
         },(loadAfter!==undefined?loadAfter:module.loadAfter));
+        
+    };
+    
+    if (type === 'string'){
+        let module = window[name];
+        if (module)
+            loadModule(name,module);
+    }else if (type === 'object'){
+        const keys = Object.keys(name);
+        keys.map(key=>loadModule(key,name[key]));
+    }else if(type === 'array'){
+        name.map(item=>byReady.load(item,loadAfter));
     }
 };
 
