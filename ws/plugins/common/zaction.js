@@ -212,6 +212,7 @@ zAction.update=function(name,done){
     if (t._lock('update')){
         
         a.forEach(function(v){
+            //console.time('update start '+v.name);
             if (((name===undefined)||(v.name===name))&&(v.state)){
                 
                 newState =v.state(v.prevState);
@@ -228,6 +229,7 @@ zAction.update=function(name,done){
                     if (v.done) v.done();
                 }
             }
+            //console.timeEnd('update start '+v.name);
         });
         
         

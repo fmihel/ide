@@ -1153,7 +1153,7 @@ Tmtree.prototype.setData=function(o){
     /*--------------------------------------*/
     t._reset_margin_left();
     /*--------------------------------------*/
-    
+
     var prm = {sender:t};
     if (p.onAfterLoad) 
         p.onAfterLoad(prm);
@@ -1205,6 +1205,7 @@ Tmtree.prototype.getData=function(o){
     return out;
     
 };
+
 /** пересчет отступа каждого узла от левой границы, для отображения ввиде дерева */
 Tmtree.prototype._reset_margin_left=function(node,level){
     var t=this,p=t.param,css=p.css;
@@ -1212,7 +1213,9 @@ Tmtree.prototype._reset_margin_left=function(node,level){
     
     if (node===undefined){
         $.each(p.plugin.children(),function(i,n){
-            t._reset_margin_left($(n),level+1);
+            setTimeout(()=>{
+                t._reset_margin_left($(n),level+1);
+            },10);
         });
     }else{
         var info = node[0]._info;
@@ -1220,9 +1223,11 @@ Tmtree.prototype._reset_margin_left=function(node,level){
         if (info.off.length>0){
 
             JX.pos(info.off,{w:level*24});
-            $.each(info.childs,function(i,n){
-                t._reset_margin_left($(n),level+1);
-            });
+            setTimeout(()=>{
+                $.each(info.childs,function(i,n){
+                    t._reset_margin_left($(n),level+1);
+                });
+            },10);
         };
         
         //JX.pos(info.off,{w:level*24});
