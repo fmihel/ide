@@ -234,13 +234,78 @@ zAction.update=function(name,done){
         
         
         p.update.forEach((f)=>{try{f({change:updNeed,list:updActions});}catch(e){}});
+        
+        if (typeof done==='function') 
+            done();
     }
-    if (typeof done==='function') 
-        done();
         
     t._unlock('update');
     
 };
+
+zAction.updateAsync=function(name,done){
+    var t=zAction,p=t.param,a=p.action,newState,updNeed=false,updActions=[];
+    
+    if (typeof name==='function'){
+        done = name;
+        name = undefined;
+    }
+    
+    if (t._lock('update')){
+        let countAction = a.length;
+        const countDone = ()=>{
+            countAction--;
+            if (countAction === 0){ 
+                t._unlock('update');
+                if (typeof done==='function') 
+                    done();
+            }
+        };
+        
+        const doit =  (v)=>{
+            
+            setTimeout(()=>{            
+                newState =v.state(v.prevState);
+                v._firstCallState = true;
+                
+                if (!t._eq(newState,v.prevState)){
+                    updNeed = true;
+                    updActions.push(v.name);
+                    v.prevState = (typeof newState === "object")?$.extend(false,newState,{}):newState;
+                    v.on.state.forEach(function(vv){
+                        try{ 
+                            if (vv.func) vv.func(newState);
+                        }catch(e){
+                    
+                        }    
+                    });
+                    
+                    if (v.done) v.done();
+                }
+                countDone();
+            },10);
+            
+        };
+        
+        
+        a.forEach(function(v){
+            if (((name===undefined)||(v.name===name))&&(v.state)){
+                doit(v);
+            }else{
+                countDone();
+            };
+        });
+
+    }else{
+        t._unlock('update');
+    }
+    //if (typeof done==='function') 
+    //    done();
+        
+    //t._unlock('update');
+    
+};
+
 /** полное удаление action? c соотв state и bind */
 zAction.undefine=function(name){
     var t=zAction,p=t.param,a=p.action,
