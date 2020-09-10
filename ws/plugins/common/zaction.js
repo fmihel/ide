@@ -46,7 +46,7 @@
  */ 
 
 function zAction(name,param){
-    zAction.do({name:name,param:param});        
+    return zAction.do({name:name,param:param});        
 }
 
 zAction.param = {
@@ -324,32 +324,41 @@ zAction.getState=function(name){
 };
 /** вызов action
 */
-zAction.do=function(o){
+zAction.do= async function(o){ 
     var t=zAction,
         g=t._get(o.name),
-        res = o.param;
+        res = o.param,
+        error = [];
     
     if (g){ 
         try{ 
             if(g.action){
-                 res = g.action(o.param,g.prevState);
+                 res = await g.action(o.param,g.prevState);
                  if (res===undefined)
                     res = o.param;
             }
         }catch(e){
-            console.error(e);
+            console.warn(e);
+            error.push(e);
         }
         
         g.on.action.forEach(function(v){
             try{
                 if (v.func) v.func(res,g.prevState);
             }catch(e){
-                console.error(e,v);    
+                console.warn(e,v);    
+                error.push(e);
             }
         });
         
     }
     t.update();
+
+    if (error.length)
+        throw error;
+    else
+        return res;
+    
 };
 
 zAction._get=function(name,asIndex,arr){
