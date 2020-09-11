@@ -244,7 +244,10 @@ function $D(o,name){
 
 /** для старого хрома, в котором нет key в событиях originalEvent */
 function fixOriginalEvent(oe){
-    if (!('key' in oe))
-        oe.key = String.fromCharCode(oe.keyCode);
+    if (!('key' in oe)){
+        const chrCode = oe.keyCode - 48 * Math.floor(oe.keyCode / 48);
+        oe.key = String.fromCharCode((96 <= oe.keyCode) ? chrCode: oe.keyCode);    
+        //oe.key = String.fromCharCode(oe.keyCode);
+    }
     return oe;
 }
