@@ -578,9 +578,6 @@ Tjedit.prototype._event = function(){
         if (p.readOnly) return;
         
         // ---------------
-        let oe = e.originalEvent;
-        
-
         if(e.which == 13){
             //if (t.param.changeOnKeyEnter){
             //    t.do("change",{enableChange:true});
@@ -695,7 +692,7 @@ Tjedit.prototype._event = function(){
         if (p.readOnly) return;
         
         // ---------------
-        let oe = e.originalEvent;
+        let oe = fixOriginalEvent(e.originalEvent);
         
 
         if ([13,38,40,8,37,39,46,36,35,17,16].indexOf(e.which)===-1) {

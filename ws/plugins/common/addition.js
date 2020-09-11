@@ -241,3 +241,10 @@ function $D(o,name){
     
     
 })(jQuery);
+
+/** для старого хрома, в котором нет key в событиях originalEvent */
+function fixOriginalEvent(oe){
+    if (!('key' in oe))
+        oe.key = String.fromCharCode(oe.keyCode);
+    return oe;
+}
