@@ -247,8 +247,8 @@ function fixOriginalEvent(oe){
     if (!('key' in oe)){
         if (oe.keyCode === 110){
             oe.key = '.';
-        }else if (oe.keyCode>=96 || oe.keyCode<=105){
-            oe.key = String(oe.keyCode-105);
+        }else if (oe.keyCode>=96 && oe.keyCode<=105){
+            oe.key = String(oe.keyCode-96);
         }else{
             const chrCode = oe.keyCode - 48 * Math.floor(oe.keyCode / 48);
             oe.key = String.fromCharCode((96 <= oe.keyCode) ? chrCode: oe.keyCode);    
