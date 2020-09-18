@@ -548,10 +548,12 @@ class WS extends WS_CONTENT{
 
             $includeModuleInfo = WS_CONF::GET('includeModuleInfo',0) == 1 ? true : false ;
             $all_code =  '' ;
-
+            $lazy_code = '';
+            
             for($i=0;$i<$cntJS;$i++){
-                $file = trim($Application->EXTENSION['JS'][$i]['local']);
-                            
+                $item = $Application->EXTENSION['JS'][$i];
+                $file = trim($item['local']);
+                
                 if (($file!=='')&&(file_exists($file))){
                     
                     $exclude = false;
@@ -589,12 +591,30 @@ class WS extends WS_CONTENT{
                     $code_js = file_get_contents($file);
 
                     if (!$exclude){
-                        // добавляем код в общую кучу
-                        $all_code.=($all_code!==''?';':'');
-                        if ( $includeModuleInfo )
-                            $all_code.="\n".'/** MODULE >> ['.$file.'] */'."\n";
-                            $all_code.=$code_js;
-                        error_log("$i: assembly add [$file] ok");    
+                        if (!$item['lazy_load']){ 
+                            // добавляем код в общую кучу
+                            $all_code.=($all_code!==''?';':'');
+                            if ( $includeModuleInfo )
+                                $all_code.="\n".'/** MODULE >> ['.$file.'] */'."\n";
+                                $all_code.=$code_js;
+                            error_log("$i: assembly add [$file] ok");    
+                        }else{
+                            // подготоаливаем спсиок файлов, для ленивой загрузки
+                            $info = APP::pathinfo($file);
+                            $dest = $pBuild.$info['basename'];
+                            $indexDest = 0;
+                            while(file_exists($dest)){
+                                $indexDest++;
+                                $dest = $pBuild.$info['filename'].$indexDest.$info['extension'];
+                            } 
+                            
+                            if (!@copy($file,$dest)){
+                                error_log("ERROR copy [$file] to [$dest]"); 
+                            }else{
+                                $lazy_code.='"'.$file.'":"'.APP::pathinfo($dest)['basename'].'",';
+                                error_log("lazy_load  [$file] -> [$dest] ok"); 
+                            }
+                        }
                     }else{
                         // файл исключен из сборки и добавляется в отдельную папку
                         $code_js = file_get_contents($file);
@@ -610,7 +630,11 @@ class WS extends WS_CONTENT{
         };// if ( (gettype($Application->EXTENSION) === 'array') && (isset($Application->EXTENSION['JS'])) ){
         
         // добавляем код из frame
+        console::log($lazy_code);
         $all_code.=($all_code!==''?';':'');
+        $all_code.="\n//-------------------------------------------\n";
+        $all_code.="var lazy_module_path={".$lazy_code."};"; 
+        $all_code.="\n//-------------------------------------------\n";
         if ( $includeModuleInfo )
             $all_code.="\n".'/** FRAME CODE >>  */'."\n";
 

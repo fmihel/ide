@@ -471,6 +471,10 @@ class TApplication{
         $direct_url = (strpos($file,"+")===0);
         if ($direct_url)
             $file = substr($file,1);
+
+        $lazy_load = (strpos($file,"%")===0);
+        if ($lazy_load)
+            $file = substr($file,1);
         
         $params = strpos($file,"?");
         
@@ -526,7 +530,7 @@ class TApplication{
             $local = '';
 
         
-        $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss,'params'=>$params));
+        $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss,'params'=>$params,'lazy_load'=>$lazy_load));
             
         if ($ext=='PHP')
             return $filename;
