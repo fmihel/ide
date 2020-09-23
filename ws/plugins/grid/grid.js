@@ -684,6 +684,51 @@ Tgrid.prototype.clear=function(){
     t.align();
 };
 
+Tgrid.prototype._codeGenerateStep=function (o){
+    const {a,i,t,ids,idi,p} = o;
+    let tr;
+    let result = '';
+    const item = a.data[i];
+    //item = a.data[i]; 
+    if ((a.forced)||(!(p.indexField in item)))
+        tr=t._codeTr({item:item,data:a.data});
+    else{
+        tr = t.find({id:item[p.indexField]});
+        if (tr.length>0)
+            t._dataToTr(item,tr);
+        else{
+            
+            tr=t._codeTr({item:item,data:a.data});
+            if (ids.indexOf(tr.id+'')>=0){
+                console.info('duplicate id:'+tr.id+' i:'+i,a.data[i]);
+                tr.code = false;
+            }
+        }
+    }
+    if (tr.code){
+        //c+=tr.code;
+        result = tr.code;
+        ids.push(tr.id+'');
+        idi.push(i);
+    }    
+    return result;
+};
+
+Tgrid.prototype._codeGenerate=function (o){
+    if (o.i<o.a.data.length){
+        o.c+=o.t._codeGenerateStep(o);
+        o.i++;
+        setTimeout(()=>{o.t._codeGenerate(o);},1);
+    }else
+        o.ok(o);
+};
+
+Tgrid.prototype._codeGeneratePromise=function (o){return new Promise((ok,err)=>{
+    o.ok = ok;
+    o.err = err;
+    o.i = 0;
+    o.t._codeGenerate(o);
+})};
 
 /**
  * Добавляет данные в таблицу
@@ -694,7 +739,7 @@ Tgrid.prototype.clear=function(){
  * @function
  * @param {json} o
 */
-Tgrid.prototype.setData=function(o){
+Tgrid.prototype.setData=async function(o){
     
     var t=this,p=t.param,item,css=p.css,trs,tr,all = t.all().length,
     c='',ids=[],idi=[],data,i,group=false,codePanelGroup=false;
@@ -722,7 +767,10 @@ Tgrid.prototype.setData=function(o){
         }    
     }    
     /*---------------------------------------*/
-    
+    let cgp = await t._codeGeneratePromise({c,ids,idi,a,t,p});
+    c = cgp.c;
+        
+    /*
     for(i=0;i<a.data.length;i++){
         item = a.data[i];
         
@@ -747,7 +795,7 @@ Tgrid.prototype.setData=function(o){
             idi.push(i);
         }    
     }    
-    
+    */
     
     /*---------------------------------------*/
     if ((a.group!==false)&&(!group)){
