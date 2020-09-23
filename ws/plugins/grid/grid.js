@@ -40,6 +40,10 @@ put:function(param){
     m.obj(this).put(param);
     return this;
 },
+asyncPut:async function(param){
+    await m.obj(this).asyncPut(param);
+    return this;
+},
 get:function(name){
     return m.obj(this).attr(name);
 },
@@ -718,7 +722,7 @@ Tgrid.prototype._codeGenerate=function (o){
     if (o.i<o.a.data.length){
         o.c+=o.t._codeGenerateStep(o);
         o.i++;
-        setTimeout(()=>{o.t._codeGenerate(o);},1);
+        setTimeout(()=>{o.t._codeGenerate(o);},0);
     }else
         o.ok(o);
 };
@@ -739,7 +743,144 @@ Tgrid.prototype._codeGeneratePromise=function (o){return new Promise((ok,err)=>{
  * @function
  * @param {json} o
 */
-Tgrid.prototype.setData=async function(o){
+Tgrid.prototype.setData = function(o){
+    
+    var t=this,p=t.param,item,css=p.css,trs,tr,all = t.all().length,
+    c='',ids=[],idi=[],data,i,group=false,codePanelGroup=false;
+    
+    if ($.isArray(o)) o = {data:o};
+    
+    var a = $.extend(true,{
+        data:[],
+        forced:false,
+        insertTo:"last", /*first,last, {before:tr} {after:tr} */ 
+        group:false /* {id:string,caption:string}*/
+    },o);
+    
+    
+    if (a.data.length===0) return;
+    
+    t._createDefaultFieldsStruct(a.data);
+    
+    /*---------------------------------------*/
+    if (a.group!==false){
+        group = t.group(a.group);
+        if (!group){
+            c+=t._codeGroup(a.group,'<');
+            codePanelGroup = t._codePanelGroup(a.group);
+        }    
+    }    
+    /*---------------------------------------*/
+    //let cgp = await t._codeGeneratePromise({c,ids,idi,a,t,p});
+    //c = cgp.c;
+        
+    
+    for(i=0;i<a.data.length;i++){
+        item = a.data[i];
+        
+        if ((a.forced)||(!(p.indexField in item)))
+            tr=t._codeTr({item:item,data:a.data});
+        else{
+            tr = t.find({id:item[p.indexField]});
+            if (tr.length>0)
+                t._dataToTr(item,tr);
+            else{
+                
+                tr=t._codeTr({item:item,data:a.data});
+                if (ids.indexOf(tr.id+'')>=0){
+                    console.info('duplicate id:'+tr.id+' i:'+i,a.data[i]);
+                    tr.code = false;
+                }
+            }
+        }
+        if (tr.code){
+            c+=tr.code;
+            ids.push(tr.id+'');
+            idi.push(i);
+        }    
+    }    
+    
+    /*---------------------------------------*/
+    if ((a.group!==false)&&(!group)){
+        c+=t._codeGroup(a.group,'>');
+    }    
+    /*---------------------------------------*/
+
+    //p.jq.cells.append(c);
+    // insert to -----------------------------
+    t.all();
+    trs = p.jq.all;
+    tr = $(c);
+    if ((trs.length===0)||(a.insertTo==='last'))
+        p.jq.cells.append(tr);
+    else{
+        if (a.insertTo==="first")
+            tr.insertBefore(trs.first());
+        else if (a.insertTo.before!==undefined)
+            tr.insertBefore(o.a.insertTo.before);
+        else if (a.insertTo.after!==undefined)
+            tr.insertAfter(a.insertTo.after);
+    }    
+    /*---------------------------------------*/
+
+    if (codePanelGroup){
+        // !!!!!!!!!!!!!!
+        // необходимо втавлять панель группы в соотв с порядком групп в таблице 
+        // найти ближайшую верхнюю группу и вставить поле нее (либо в вверх)
+        
+        var prev = tr.last().next();
+        group = false;
+        while (prev.length>0){
+            if (!t.not_group(prev)){
+                group=t.group(prev);
+                break;
+            }
+            prev=prev.next();
+        }
+        tr = $(codePanelGroup);
+        if (group)
+            tr.insertBefore(group.panel);
+        else
+            p.jq.frameCells.append(tr);
+    }
+    
+    /*---------------------------------------*/
+    /* related data with tr */
+    for(i=0;i<ids.length;i++){
+        var dat = a.data[idi[i]];
+        //dat[p.trRef] = p.jq.cells.find('#'+ids[i].id);
+        //$.data(dat[p.trRef][0],'data',dat);
+        tr = p.jq.cells.find('#'+ids[i]);
+        $.data(tr[0],'data',dat);
+    }
+    
+    
+    /*---------------------------------------*/
+    t.all(true);
+    /* если данных нет, то кол-во видимых равно кол-ву данных , т.к. данные сначала видимы */
+    if (all===0){
+        p.jq.trs = p.jq.all.not('.'+css.group_up).not('.'+css.group_down);
+        p._trs=[];
+        $.each(p._all,function(i,obj){
+            if (t.not_group(obj))
+                p._trs.push(obj);
+        });
+        
+    }else
+        t.trs(true);
+    
+    
+    t.groups(true);
+    /*---------------------------------------*/
+    t._setColsWidthStyle();
+
+    t.align();
+    
+    t.doChange();
+    
+};
+/**  асинхронный вариант ф-ции setData */
+Tgrid.prototype.asyncSetData = async function(o){
     
     var t=this,p=t.param,item,css=p.css,trs,tr,all = t.all().length,
     c='',ids=[],idi=[],data,i,group=false,codePanelGroup=false;
@@ -876,6 +1017,8 @@ Tgrid.prototype.setData=async function(o){
     t.doChange();
     
 };
+
+
 
 
 /**
@@ -2308,7 +2451,30 @@ Tgrid.prototype.put = function(o){
     
     if (l.unlock('align')){
         t.align();
-        
+    }    
+};    
+
+Tgrid.prototype.asyncPut = async function(o){
+    var t=this,p=t.param,l=p.lock;
+    
+    l.lock('align');
+
+    if ('indexField' in o)
+        p.indexField = o.indexField;
+    
+    if ('fields' in o)
+        t._putFields(o.fields);
+
+    if ('data' in o)
+        await t.asyncSetData(o);
+    
+    
+    $.each(o,function(n,v){
+        t.attr(n,v);
+    });
+    
+    if (l.unlock('align')){
+        t.align();
     }    
 };    
 
