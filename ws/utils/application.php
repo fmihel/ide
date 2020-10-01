@@ -70,10 +70,11 @@ if (isset($NO_CACHE_APPLICATION)&&($NO_CACHE_APPLICATION===true)){
 
 require_once __DIR__.'/console.php'; 
 
-function UNIT(){
+function UNIT(...$a){
     /*filename  || tag(ws/root),filename */
     global $Application;
-    
+    return $Application->includes(...$a);
+    /*
     if(func_num_args()>1){
         $tag=(func_num_args()>0 ? func_get_arg(0) : 'project');
         $file=(func_num_args()>1 ? func_get_arg(1) : '');
@@ -82,15 +83,20 @@ function UNIT(){
         $file=(func_num_args()>0 ? func_get_arg(0) : '');
         return $Application->includes($file);
     };
+    */
 };
 
-function RESOURCE(){
-    /*filename  || tag(ws/root),filename */
-    if(func_num_args()>1)
+function RESOURCE(...$a){
+    /*filename,opt=[]  || tag(ws/root),filename,opt=[] */
+    UNIT(...$a);
+    /*if(func_num_args()>2)
         UNIT(func_get_arg(0),func_get_arg(1));
     else
         UNIT(func_get_arg(0));
+    */
 };
+
+
 /** используется для автоматического расчета пути от проекта к ресурсу, 
  * но в случае когда путь задается относительно файла входящего в проект
  * Ex: RESOURCE(WARD(__DIR__,'autorize.js'));
@@ -444,7 +450,7 @@ class TApplication{
         return APP::eq_path($file,$_SERVER['SCRIPT_FILENAME']);
     }
     
-    public function includes(/*filename  || tag(ws/root),filename */){
+    public function includes(/*filename,opt=[]  || tag(ws/root),filename,opt=[] */){
         //S: добавление ресурса в приложение 
         /*D:  
             includes(filename) - добавляет ресурс с использованием пути относительно стартового файла проекта
@@ -462,12 +468,30 @@ class TApplication{
         */
         
         $tag = 'project';
+        $opt = [];
+        if (func_num_args() === 1)
+            $file=(func_num_args()>0 ? func_get_arg(0) : '');
+        elseif (func_num_args() === 2){
+            $type=gettype( (func_num_args()>1 ? func_get_arg(1) : ''));
+            if ($type === 'array'){
+                $file=(func_num_args()>0 ? func_get_arg(0) : '');
+                $opt =(func_num_args()>1 ? func_get_arg(1) : '');
+            }else{
+                $tag=(func_num_args()>0 ? func_get_arg(0) : $tag);
+                $file=(func_num_args()>1 ? func_get_arg(1) : '');
+            }
+        }else{
+            $tag=(func_num_args()>0 ? func_get_arg(0) : $tag);
+            $file=(func_num_args()>1 ? func_get_arg(1) : '');
+            $opt =(func_num_args()>2 ? func_get_arg(2) : '');
+        }
+        /*
         if(func_num_args()>1){
             $tag=(func_num_args()>0 ? func_get_arg(0) : $tag);
             $file=(func_num_args()>1 ? func_get_arg(1) : '');
         }else
             $file=(func_num_args()>0 ? func_get_arg(0) : '');
-        
+        */
         $direct_url = (strpos($file,"+")===0);
         if ($direct_url)
             $file = substr($file,1);
@@ -475,6 +499,8 @@ class TApplication{
         $lazy_load = (strpos($file,"%")===0);
         if ($lazy_load)
             $file = substr($file,1);
+        if (isset($opt['lazy']) && $opt['lazy'])    
+            $lazy_load = true;
         
         $params = strpos($file,"?");
         
@@ -530,7 +556,7 @@ class TApplication{
             $local = '';
 
         
-        $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss,'params'=>$params,'lazy_load'=>$lazy_load));
+        $this->_add_to_extension($ext,array('remote'=>$remote,'local'=>$local,'dcss'=>$dcss,'params'=>$params,'lazy_load'=>$lazy_load,'opt'=>$opt));
             
         if ($ext=='PHP')
             return $filename;

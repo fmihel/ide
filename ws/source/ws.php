@@ -30,6 +30,9 @@ RESOURCE('plugins','common/ut.js');
 RESOURCE('plugins','common/jhandler.js');
 RESOURCE('plugins','jx/jx.js');
 RESOURCE('plugins','common/dvc.js');
+RESOURCE('plugins','common/scriptLoader.js');
+RESOURCE('plugins','common/moduleLoader.js');
+
 RESOURCE('ws','ws.js');
 RESOURCE('ws','dcss.js');
 
@@ -231,32 +234,56 @@ class WS extends WS_CONTENT{
             $res.='<script type="text/javascript" src="'.$js_build.'"></script>'.DCR;
         
         
-        if (isset($Application->EXTENSION['JS']))
-        for($i=0;$i<count($Application->EXTENSION['JS']);$i++){
-            
-            if (($js_build===false)||($Application->EXTENSION['JS'][$i]['local']=='')){
-                $js_script_file = $Application->EXTENSION['JS'][$i]['remote'];
-                if ($this->loadOptimizedResources === true){
-            
-                    $f = APP::pathinfo($Application->EXTENSION['JS'][$i]['local']);
-                    $js_script_file_min = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
-            
-                    if (file_exists($js_script_file_min)){
-                        $f = APP::pathinfo($js_script_file);
-                        $js_script_file = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
-                    }    
+        if (isset($Application->EXTENSION['JS'])){
+            $lazy_reg = '';
+            for($i=0;$i<count($Application->EXTENSION['JS']);$i++){
+                $item = $Application->EXTENSION['JS'][$i];
+                if ((($js_build===false)||($item['local']==''))){
+                    if (!$item['lazy_load']){
+                        $js_script_file = $item['remote'];
+                        if ($this->loadOptimizedResources === true){
+                    
+                            $f = APP::pathinfo($item['local']);
+                            $js_script_file_min = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
+                    
+                            if (file_exists($js_script_file_min)){
+                                $f = APP::pathinfo($js_script_file);
+                                $js_script_file = $f['dirname'].'/'.$f['filename'].'.min.'.$f['extension'];
+                            }    
+                        }
+                        
+                        $url_params  = $item['params'];
+        
+                        $res.='<script type="text/javascript" src="';
+                        $res.=$js_script_file.$url_params;
+                        
+                        $res.=($version!==''?($url_params!==''?'&':'?').$version:'');
+                    
+                        $res.='"></script>'.DCR;
+                    }else{
+                        $file = $item['local'];
+                        $opt = array_merge([],(isset($item['opt'])?$item['opt']:[]));
+                        if (isset($opt['alias'])){
+                            $lazy_common='source:"'.$file.'"';
+                            $lazy_reg.='{source:"'.$file.'", alias:"'.$opt['alias'].'"';
+                            if (isset($opt['varName'])){
+                                $lazy_reg.=',varName:"'.$opt['varName'].'"';
+                            };
+                            $lazy_reg.='},';
+                        }
+                
+                    }
                 }
                 
-                $url_params  = $Application->EXTENSION['JS'][$i]['params'];
-
-                $res.='<script type="text/javascript" src="';
-                $res.=$js_script_file.$url_params;
-                
-                $res.=($version!==''?($url_params!==''?'&':'?').$version:'');
+            };
             
-                $res.='"></script>'.DCR;
+            if (($this->mode === 'development') && ($lazy_reg !== '')){
+                $res.=DCR.'<script type="text/javascript">'.DCR;
+                $res.="moduleLoader.registered(".$lazy_reg.");".DCR; 
+                $res.='</script>'.DCR;
+
             }
-        };
+        }
         
         
         //---------------------------------------------
@@ -549,7 +576,7 @@ class WS extends WS_CONTENT{
             $includeModuleInfo = WS_CONF::GET('includeModuleInfo',0) == 1 ? true : false ;
             $all_code =  '' ;
             $lazy_code = '';
-            
+            $lazy_reg  = '';
             for($i=0;$i<$cntJS;$i++){
                 $item = $Application->EXTENSION['JS'][$i];
                 $file = trim($item['local']);
@@ -608,10 +635,21 @@ class WS extends WS_CONTENT{
                                 $dest = $pBuild.$info['filename'].$indexDest.$info['extension'];
                             } 
                             
+
                             if (!@copy($file,$dest)){
                                 error_log("ERROR copy [$file] to [$dest]"); 
                             }else{
-                                $lazy_code.='"'.$file.'":"'.APP::pathinfo($dest)['basename'].'",';
+                                $opt = array_merge([],(isset($item['opt'])?$item['opt']:[]));
+                                $lazy_common='source:"'.$file.'",path:"'.APP::pathinfo($dest)['basename'].'"';
+                                if (isset($opt['alias'])){
+                                    $lazy_reg.='{'.$lazy_common.', alias:"'.$opt['alias'].'"';
+                                    if (isset($opt['varName'])){
+                                        $lazy_reg.=',varName:"'.$opt['varName'].'"';
+                                    };
+                                    $lazy_reg.='},';
+                                }else{
+                                    $lazy_code.='{'.$lazy_common.'},';
+                                }
                                 error_log("lazy_load  [$file] -> [$dest] ok"); 
                             }
                         }
@@ -633,7 +671,10 @@ class WS extends WS_CONTENT{
         console::log($lazy_code);
         $all_code.=($all_code!==''?';':'');
         $all_code.="\n//-------------------------------------------\n";
-        $all_code.="var lazy_module_path={".$lazy_code."};"; 
+        //$all_code.="var lazy_module_path={".$lazy_code."};"; 
+        $all_code.="moduleLoader.registered(".$lazy_reg.");\n"; 
+        $all_code.="moduleLoader._setPaths([".$lazy_code."]);\n"; 
+        $all_code.="moduleLoader.renderPath = '".$this->renderPath."';\n";
         $all_code.="\n//-------------------------------------------\n";
         if ( $includeModuleInfo )
             $all_code.="\n".'/** FRAME CODE >>  */'."\n";

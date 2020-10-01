@@ -4,6 +4,7 @@
 class ScriptLoader {
     constructor() {
         this.list = [];
+        
     }
 
     /** возвращает признак, что загружен скрипт
@@ -26,7 +27,10 @@ class ScriptLoader {
     get(i) {
         return this.list[i];
     }
+    /** маршрут корректируется  */
+    lazyLoad(){
 
+    }
     /** динамическая загрузка js скрипта
      * @param {string|object} string = "addr" object = {url:"addr"}
      * @param {string} - имя глобальной переменной в загружаемом скрипте, которая будет возвращена в случае удачи
@@ -79,4 +83,4 @@ class ScriptLoader {
     }
 }
 
-var scriptLoader =  new ScriptLoader();
+const scriptLoader =  new ScriptLoader();
