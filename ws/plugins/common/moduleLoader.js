@@ -12,6 +12,8 @@ class ModuleLoader {
         this.paths = []; // [ { source,path,varName,alias},..]
         this.hrefPath = ut.hrefPath();
         this.vars = {};
+        this.cache = false;
+        this.onInitList = {};
     }
     /** загрузка молуля 
      * @param {string|object} - относительный путь к модулю
@@ -21,15 +23,24 @@ class ModuleLoader {
       
         let item = this._item(p) || p;
         let varName = p.varName?p.varName:item.varName;
-        let name;
+        let name = this._getRealName(item);
         
-        if(item!==undefined){
-            if (item.path)
-                name = this.renderPath+item.path;
-            else
-                name = this.hrefPath+item.source;
-        }
+        const is_first_load = !scriptLoader.exist(name);
         const load =  await scriptLoader.load(name);
+
+        // при первой загрузке генерируем событие onInit
+        if (is_first_load && item.alias && item.alias in this.onInitList){
+            
+            this.onInitList[item.alias].map((f)=>{
+                try{    
+                    f(item);
+                }catch(e){
+                    console.warn(e);
+                }
+            })
+            
+        };
+        // если есть связанная переменная, то пытаемся ее выдать
         if (varName){
             if (this.vars[varName])
                 return this.vars[varName]
@@ -46,6 +57,18 @@ class ModuleLoader {
         }else   
             return load;
 
+    }
+    _getRealName(item){
+        if(item!==undefined){
+            if (item.path)
+                return this._cacheName(this.renderPath+item.path);
+            else
+                return this._cacheName(this.hrefPath+item.source);
+        }
+        return undefined;
+    }
+    _cacheName(name){
+        return name+((name && this.cache)?('?'+this.cache):'');    
     }
     registered(...o){
         o.map(p=>{
@@ -105,6 +128,36 @@ class ModuleLoader {
                 this.vars[name] = o[name];
             }
         })
+    }
+    /** 
+     * onInit({mod1(){
+     * }}
+    */
+    onInit(o){
+        let aliases = Object.keys(o);
+        aliases.map(alias=>{
+            let evs = Object.keys(this.onInitList);
+            if (evs.indexOf(alias)===-1)
+                this.onInitList[alias] = [];
+            this.onInitList[alias].push(o[alias]);
+        });
+    }
+    exist(o){
+        try{
+            const item = this._item(o);
+            return item?scriptLoader.exist(this._getRealName(item)):false
+        }catch(e){
+            console.warn(e);
+        }
+        return false;
+    }
+    /** ф-ция несинхронного доступа к данным модуля, в случае
+     * если моудль не загружен то вернет defalt
+     */
+    param(o,paramName,defalt=false){
+        if (this.exist(o))
+            return o[paramName];
+        return defalt;
     }
 }
 

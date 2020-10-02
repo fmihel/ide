@@ -280,6 +280,7 @@ class WS extends WS_CONTENT{
             if (($this->mode === 'development') && ($lazy_reg !== '')){
                 $res.=DCR.'<script type="text/javascript">'.DCR;
                 $res.="moduleLoader.registered(".$lazy_reg.");".DCR; 
+                $res.='moduleLoader.cache = "'.$this->version.'";'.DCR;
                 $res.='</script>'.DCR;
 
             }
@@ -676,9 +677,10 @@ class WS extends WS_CONTENT{
         $all_code.=($all_code!==''?';':'');
         $all_code.="\n//-------------------------------------------\n";
         //$all_code.="var lazy_module_path={".$lazy_code."};"; 
-        $all_code.="moduleLoader.registered(".$lazy_reg.");\n"; 
-        $all_code.="moduleLoader._setPaths([".$lazy_code."]);\n"; 
-        $all_code.="moduleLoader.renderPath = '".$this->renderPath."';\n";
+        $all_code.="moduleLoader.registered(".$lazy_reg.");".DCR; 
+        $all_code.="moduleLoader._setPaths([".$lazy_code."]);".DCR; 
+        $all_code.="moduleLoader.renderPath = '".$this->renderPath."';".DCR;
+        $all_code.='moduleLoader.cache = "'.$this->version.'";'.DCR;        
         $all_code.="\n//-------------------------------------------\n";
         if ( $includeModuleInfo )
             $all_code.="\n".'/** FRAME CODE >>  */'."\n";

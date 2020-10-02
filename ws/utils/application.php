@@ -499,8 +499,17 @@ class TApplication{
         $lazy_load = (strpos($file,"%")===0);
         if ($lazy_load)
             $file = substr($file,1);
-        if (isset($opt['lazy']) && $opt['lazy'])    
-            $lazy_load = true;
+        if (isset($opt['lazy'])) {
+            if (gettype($opt['lazy']) === 'string'){
+                $lazy_load = true;
+                $opt['alias'] = $opt['lazy'];
+                $opt['varName'] = $opt['lazy'];
+                $opt['lazy'] = true;
+            }else{
+                
+                $lazy_load = $opt['lazy']?true:false;
+            }
+        }
         
         $params = strpos($file,"?");
         
