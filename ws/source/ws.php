@@ -577,6 +577,9 @@ class WS extends WS_CONTENT{
             $all_code =  '' ;
             $lazy_code = '';
             $lazy_reg  = '';
+            $lazy_path = $pBuild.'/lazy/';
+            if (!is_dir($lazy_path)) mkdir($lazy_path);
+
             for($i=0;$i<$cntJS;$i++){
                 $item = $Application->EXTENSION['JS'][$i];
                 $file = trim($item['local']);
@@ -627,12 +630,13 @@ class WS extends WS_CONTENT{
                             error_log("$i: assembly add [$file] ok");    
                         }else{
                             // подготоаливаем спсиок файлов, для ленивой загрузки
+                            
                             $info = APP::pathinfo($file);
-                            $dest = $pBuild.$info['basename'];
+                            $dest = $lazy_path.$info['basename'];
                             $indexDest = 0;
                             while(file_exists($dest)){
                                 $indexDest++;
-                                $dest = $pBuild.$info['filename'].$indexDest.$info['extension'];
+                                $dest = $lazy_path.$info['filename'].$indexDest.$info['extension'];
                             } 
                             
 

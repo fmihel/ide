@@ -11,6 +11,7 @@ class ModuleLoader {
         this.renderPath = '_render/';
         this.paths = []; // [ { source,path,varName,alias},..]
         this.hrefPath = ut.hrefPath();
+        this.vars = {};
     }
     /** загрузка молуля 
      * @param {string|object} - относительный путь к модулю
@@ -28,7 +29,23 @@ class ModuleLoader {
             else
                 name = this.hrefPath+item.source;
         }
-        return await scriptLoader.load(name,varName);        
+        const load =  await scriptLoader.load(name);
+        if (varName){
+            if (this.vars[varName])
+                return this.vars[varName]
+            else{
+                const wait = ()=> new Promise((ok)=>{ setTimeout(()=>{ 
+                    if (this.vars[varName])
+                        ok(this.vars[varName])
+                    else
+                        throw "cant find varName="+varName;
+                },100);});
+                return wait();
+            }
+            
+        }else   
+            return load;
+
     }
     registered(...o){
         o.map(p=>{
@@ -77,7 +94,18 @@ class ModuleLoader {
         }
         return undefined;
     }
-
+    /** добавляет ссылку на модуль, для поиска */
+    add(o){
+        let names = Object.keys(this.vars);
+        let in_names = Object.keys(o);
+        in_names.map(name=>{
+            if (names.indexOf(name)>=0){
+                console.warn('module varName='+name+' is exist in moduleLoader, rename this');
+            }else{
+                this.vars[name] = o[name];
+            }
+        })
+    }
 }
 
 const moduleLoader = new ModuleLoader();
