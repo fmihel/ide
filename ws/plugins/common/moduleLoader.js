@@ -154,9 +154,21 @@ class ModuleLoader {
     /** ф-ция несинхронного доступа к данным модуля, в случае
      * если моудль не загружен то вернет defalt
      */
-    param(o,paramName,defalt=false){
-        if (this.exist(o))
-            return o[paramName];
+    param(o,paramName=undefined,defalt=false){
+        if (this.exist(o)){
+            const item = this._item(o);
+            if (item!==undefined){
+
+                if (paramName===undefined)
+                    return this.vars[item.varName]
+
+                if (Array.isArray(paramName))
+                    return ut.get(this.vars[item.varName],...paramName,defalt)
+
+                return this.vars[item.varName][paramName];
+
+            }    
+        }
         return defalt;
     }
 }
