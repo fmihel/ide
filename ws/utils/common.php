@@ -1377,12 +1377,15 @@ class IMG {
          return getimagesize($uri);
     }
     
-    public static function transparent($img,$size,$filter,$level){
-
-        $to = array($level,$level,$level);
+    public static function transparent($img,$size,$filter,$level=false){
+        
+        if ($level !== false)    
+            $to = array($level,$level,$level);
 
         $fone = imagecolorallocate($img, 255, 255, 255); 
-        $wh   = imagecolorallocate($img, $to[0], $to[1], $to[2]);
+        
+        if ($level !== false)
+            $wh   = imagecolorallocate($img, $to[0], $to[1], $to[2]);
         
         for($x=0;$x<$size[0];$x++){
             for($y=0;$y<$size[1];$y++){
@@ -1391,10 +1394,9 @@ class IMG {
                 
                 if (($r>$filter)&&($g>$filter)&&($b>$filter))
                     imagesetpixel($img, $x,$y, $fone);
-                else
+                elseif ($level!==false)
                     imagesetpixel($img, $x,$y, $wh);
-                    
-            }
+            }    
         }
         
         $replace = imagecolorallocate($img, 255,255,255);
