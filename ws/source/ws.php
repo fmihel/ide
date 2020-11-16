@@ -600,21 +600,24 @@ class WS extends WS_CONTENT{
                             $search = mb_substr($rule,1);
                             $search = mb_substr($search,0,mb_strlen($search)-1);
                             $exclude = (mb_strpos($file,$search)!==false);
-                            break;
+                            if ($exclude)
+                                break;
                         }else
                         // *string  строка справа
                         if ($rule[0] === '*'){
                     
                             $search = mb_substr($rule,1);
                             $exclude = (mb_substr($file,mb_strlen($file)-mb_strlen($search)) == $search);
-                            break;
+                            if ($exclude)
+                                break;
                         }else
                         // *string  строка слева
                         if ($rule[mb_strlen($rule)-1] === '*'){
                     
                             $search = mb_substr($rule,0,mb_strlen($rule)-1);
                             $exclude = (mb_substr($file,0,mb_strlen($search)) == $search);
-                            break;
+                            if ($exclude)
+                                break;
                         }
                     
                     }
