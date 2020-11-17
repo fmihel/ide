@@ -578,7 +578,8 @@ class WS extends WS_CONTENT{
             $all_code =  '' ;
             $lazy_code = '';
             $lazy_reg  = '';
-            $lazy_path = $pBuild.'/lazy/';
+            $lazy_path = $pBuild.'lazy/';
+            $lazy_count = 0;
             if (!is_dir($lazy_path)) mkdir($lazy_path);
 
             for($i=0;$i<$cntJS;$i++){
@@ -658,6 +659,7 @@ class WS extends WS_CONTENT{
                                 }else{
                                     $lazy_code.='{'.$lazy_common.'},';
                                 }
+                                $lazy_count++;
                                 error_log("lazy_load  [$file] -> [$dest] ok"); 
                             }
                         }
@@ -674,9 +676,17 @@ class WS extends WS_CONTENT{
             };// for
 
         };// if ( (gettype($Application->EXTENSION) === 'array') && (isset($Application->EXTENSION['JS'])) ){
-        
+        if (($lazy_count>0)){
+            // добавляем 2 файлa с классами, определяющими общий ф-ционал (он храниться в файле require.js)
+            $lazy_dummy_name = 'defClass1_'.STR::random(5); 
+            file_put_contents($lazy_path.$lazy_dummy_name.'.js',
+                $this->_getDefinedCodeForTranspiller($lazy_dummy_name));
+            $lazy_dummy_name = 'defClass2_'.STR::random(5); 
+            file_put_contents($lazy_path.$lazy_dummy_name.'.js',
+                $this->_getDefinedCodeForTranspiller($lazy_dummy_name));
+        }
         // добавляем код из frame
-        console::log($lazy_code);
+        //console::log($lazy_code);
         $all_code.=($all_code!==''?';':'');
         $all_code.="\n//-------------------------------------------\n";
         //$all_code.="var lazy_module_path={".$lazy_code."};"; 
@@ -696,6 +706,18 @@ class WS extends WS_CONTENT{
         error_log('assembly end ');
         error_log('------------------------------------------');
     }
+
+    private function _getDefinedCodeForTranspiller($name){
+        return 
+"class $name{
+    constructor() {
+        this._prop = {n:10};
+    }
+    _func(){
+        consloe.info('in');
+    }
+}";
+    }    
     /**
      * Минификация, а также приведения к стандарту ES5
      */
