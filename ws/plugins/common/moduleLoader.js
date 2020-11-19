@@ -171,6 +171,25 @@ class ModuleLoader {
         }
         return defalt;
     }
+    /** ф-ция несинхронного доступа к ф-циям модуля, в случае
+     * если моудль не загружен то вернет defalt
+     * @param {any} идентификатор модуля
+     * @param {string} имя ф-ции
+     * @param {array} спиок параметров передаваемых в ф-цию
+     * @param {any} значение по умолчанию если модуль не загружен или при выполнении ф-ции произошел сбой
+     */
+    func(o,name,args=[],defalt=false){
+        let param = this.param(o,name);
+        if (typeof(param) === 'function'){
+            try {
+                return param(...args);
+            } catch (error) {
+                console.info(error);    
+            }
+        }
+        return defalt;
+                    
+    }
 }
 
 const moduleLoader = new ModuleLoader();
