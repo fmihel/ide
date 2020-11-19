@@ -710,11 +710,14 @@ class WS extends WS_CONTENT{
     private function _getDefinedCodeForTranspiller($name){
         return 
 "class $name{
-    constructor() {
-        this._prop = {n:10};
+    constructor(o) {
+        this._prop = {
+            name:'text',
+            ...o
+        };
     }
-    _func(){
-        consloe.info('in');
+    _func(p,...a){
+        consloe.info(p,...a);
     }
 }";
     }    
