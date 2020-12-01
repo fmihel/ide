@@ -600,7 +600,41 @@ sideLenSum:function(o,wrap){
         JX.pos(o,a);
     }    
 },
+/** получает размеры области необходимую, чтобы вписать объекты 
+ * @param {Array} список объектов
+*/
+area:function(list){
+    const res = {
+        x:undefined,
+        y:undefined,
+        w:undefined,
+        h:undefined
+    };
+    let xmax=undefined,ymax=undefined;
+    list.map((item,i)=>{
+        if (JX.visible(item)){
+            const pos = JX.pos(item);
+            if (res.x===undefined){
+                res.x = pos.x;
+                res.y = pos.y;
+                xmax = pos.x+pos.w;
+                ymax = pos.y+pos.h;
+            }else{
+                res.x = Math.min(pos.x,res.x);
+                res.y = Math.min(pos.y,res.y);
+                xmax = Math.max(pos.x+pos.w,xmax);                
+                ymax = Math.max(pos.y+pos.h,ymax);                
+            }
+        }
+    });    
 
+    if (xmax!==undefined){
+        res.w = xmax-res.x;
+        res.h = ymax-res.y;
+    }
+
+    return res;
+},
 wrap:function(o/*{width:boolean=true,height:true,off}*/){
     /* растягивает объект, чтобы уместилось все что внутри*/
     var w=JX.wrapper(o);
