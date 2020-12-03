@@ -19,7 +19,7 @@ class console{
         'nullColor' =>'#A074C7',    
         'deep'      =>5,
         'showStrEncoding'=>false,        
-        
+        'only-error-log'    =>false,
     ];
     
 
@@ -32,16 +32,31 @@ class console{
             self::$params = array_merge(self::$params,$params);
         return self::$params;
     }
+    private static function _traceToStr($trace){
+        return '[../'.basename($trace['file']).' : '.$trace['line'].']';
+    }
+
+    private static function _error_log($trace,$pref,...$args){
+        if (count($args)===1)
+            error_log(self::_traceToStr($trace).' '.$pref.' '.print_r($args[0],true));
+        else{
+            error_log(self::_traceToStr($trace).$pref);
+            error_log(print_r($args,true));
+        };
+    }
 
     public static function log(...$args){
         global $Application;
         
         $trace = self::trace();
-        
-        if (count($args) === 1 )
-            $Application->LOG($Application->_fmtVarLog($args[0],self::$params),$trace['file'],$trace['line']);
-        else
-            $Application->LOG($Application->_fmtVarLog($args,self::$params),$trace['file'],$trace['line']);
+        if (self::$params['only-error-log']){
+            self::_error_log($trace,'',...$args);
+        }else{
+            if (count($args) === 1 )
+                $Application->LOG($Application->_fmtVarLog($args[0],self::$params),$trace['file'],$trace['line']);
+            else
+                $Application->LOG($Application->_fmtVarLog($args,self::$params),$trace['file'],$trace['line']);
+        }
     }
 
     public static function all(...$args){
@@ -49,32 +64,46 @@ class console{
         
         $trace = self::trace();
         
-        if (count($args) === 1 )
-            $Application->LOG($Application->_fmtVarLog($args[0],['all'=>0]),$trace['file'],$trace['line']);
-        else
-            $Application->LOG($Application->_fmtVarLog($args,['all'=>0]),$trace['file'],$trace['line']);
+        if (self::$params['only-error-log']){
+            self::_error_log($trace,'',...$args);
+        }else{
+            if (count($args) === 1 )
+                $Application->LOG($Application->_fmtVarLog($args[0],['all'=>0]),$trace['file'],$trace['line']);
+            else
+                $Application->LOG($Application->_fmtVarLog($args,['all'=>0]),$trace['file'],$trace['line']);
+        };
+
     }
     
-
-
 
     public static function error(...$args){
         global $Application;
         $p = array_merge(self::$params,['all'=>0]);
         
         $trace = self::trace();
-        $left = '<span style="color:#ffffff;background:#840000;border-radius:9px;padding-left:5px;padding-right:5px;padding-bottom:2px">';
-        $right = '</span>';
-        
-        if (count($args) === 1 ){
-            
-            
-            if (is_a($args[0],'Exception') || is_a($args[0],'\Exception'))
-                $Application->LOG($left.'Exception:'.$right.$Application->_fmtVarLog($args[0]->getMessage(),$p),$trace['file'],$trace['line']);
-            else
-                $Application->LOG($left.'Error:'.$right.$Application->_fmtVarLog($args[0],$p),$trace['file'],$trace['line']);
+
+        if (self::$params['only-error-log']){
+            if (count($args) === 1 ){
+                if (is_a($args[0],'Exception') || is_a($args[0],'\Exception'))
+                    self::_error_log($trace,'[Exception]',$args[0]->getMessage());
+                else
+                    self::_error_log($trace,'[ERROR]',$args[0]);
+            }else{
+                self::_error_log($trace,'[ERROR]',...$args);
+            }
         }else{
-            $Application->LOG($left.'Error:'.$right.$Application->_fmtVarLog($args,$p),$trace['file'],$trace['line']);
+            $left = '<span style="color:#ffffff;background:#840000;border-radius:9px;padding-left:5px;padding-right:5px;padding-bottom:2px">';
+            $right = '</span>';
+        
+            if (count($args) === 1 ){
+            
+                if (is_a($args[0],'Exception') || is_a($args[0],'\Exception'))
+                    $Application->LOG($left.'Exception:'.$right.$Application->_fmtVarLog($args[0]->getMessage(),$p),$trace['file'],$trace['line']);
+                else
+                    $Application->LOG($left.'Error:'.$right.$Application->_fmtVarLog($args[0],$p),$trace['file'],$trace['line']);
+            }else{
+                $Application->LOG($left.'Error:'.$right.$Application->_fmtVarLog($args,$p),$trace['file'],$trace['line']);
+            }
         }
     }
 
