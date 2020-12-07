@@ -1,5 +1,5 @@
 <?php
-
+define('LAZY_STORY_VAR','_lazy_story_wrapped_dev_tmp_93');
 if(!isset($Application)) 
     require_once '../utils/application.php';
 
@@ -120,6 +120,106 @@ class WS_UTILS{
             return WS_UTILS::code_end($a1).trim($a2);
         else
             return trim($a2);
+    }
+    /** проверка необходимости обернуть файл в модульную обертку */
+    public static function lazyNeedWrapper($filename){
+        $wrapper = WS_CONF::GET('assemblyModuleWrapper',[]);
+        
+        if ($wrapper===true){
+            return true;
+        }else{ 
+            foreach($wrapper as $name){
+                if (strpos($filename,$name)!==false){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    /** оборачиваем код в модульную обертку */
+    public static function lazyWrapper($code_js,$param=[]){
+        return "(()=>{".$code_js."\n})()";
+    }
+    /** возвращает свободное имя файла, для обернутого 
+     * @return {array} ['local'=>string,'short'=">string]
+     * Ex: lazyGetWrapperName('C:\work\ppp\test.js')
+     * ['local'=>'C:\work\ppp\test-dev-02.js','short'=>'test-dec-02.js']
+    */
+    public static function lazyGetWrapperName($local,$param=[]){
+        $p = array_merge([
+            'postfix'=>'dev',
+        ],$param);
+        $info = APP::pathinfo($local);
+        $idx = 0;
+        $short_name = $info['filename'].'-'.$p['postfix'].'.'.$info['extension'];
+        $rename = $info['dirname'].'/'.$short_name;
+        while(file_exists($rename)){
+            $short_name = $info['filename'].'-'.$p['postfix'].'-'.$idx.'.'.$info['extension'];
+            $rename = $info['dirname'].'/'.$short_name;
+            $idx++;
+        }
+        return ['local'=>$rename,'short'=>$short_name];
+    }
+    /** преобразует url в его локальный эквивалент 
+     * @return {array} ['local'=>string,'version'=>string,'httpPath'=>string]
+    */
+    public static function lazyUrlToLocal($url){
+        global $Application;
+        $parse = parse_url($url);
+        $httpPath = $parse['scheme'].":"."/".APP::slash($parse['host'],true,true).APP::slash(APP::get_path($parse['path']),false,true);
+        $local = str_replace($Application->HTTP,$Application->PATH,$url);
+        
+        $pos = strpos($local,"?");
+        $version = '';
+        if ($pos !== false){
+            $version=substr($local,$pos);
+            $local=substr($local,0,$pos);
+        }
+        return ['local'=>$local,'version'=>$version,'httpPath'=>$httpPath];        
+    }
+    /** очистка предыдущих созданных обернутых копий */
+    public static function lazyClearWrappedDev(){
+        global $Application;
+        try {
+            $var = LAZY_STORY_VAR;
+            $name = APP::slash($Application->PATH,false,true).$var.'.php';
+            if (file_exists($name)){
+                include $name;
+                $files = $$var;
+                foreach($files as $file){
+                    if (file_exists($file) && (unlink($file) === false)){
+                        error_log('Error ['.__FILE__.':'.__LINE__.'] cant delete file '.$file);
+                    }
+                }
+                if (unlink($name) === false)
+                    error_log('Error ['.__FILE__.':'.__LINE__.'] cant delete file '.$file);
+            }
+                       
+        } catch (\Exception $e) {
+            error_log('Exception ['.__FILE__.':'.__LINE__.'] '.$e->getMessage());
+        };
+    }
+    /** сохранение списка обернутых копий */
+    public static function lazyStoryWrappedDev($lazy=[]){
+        global $Application;
+        try {
+            $var = LAZY_STORY_VAR;
+            $name = APP::slash($Application->PATH,false,true).$var.'.php';
+            
+            $files = $lazy;
+            if (file_exists($name)){
+                include $name;
+                $files = array_merge($files,$$var);
+            };
+
+            $code = '<?php $'.$var.'='.ARR::to_php_code($files).';?>';
+            if (file_put_contents($name,$code) === false)
+                throw new Exception("can save to file ".$name);
+                
+
+        } catch (\Exception $e) {
+            error_log('Exception ['.__FILE__.':'.__LINE__.'] '.$e->getMessage());
+        };
     }
 }
 

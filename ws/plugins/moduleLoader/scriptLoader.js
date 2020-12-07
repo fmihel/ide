@@ -27,10 +27,7 @@ class ScriptLoader {
     get(i) {
         return this.list[i];
     }
-    /** маршрут корректируется  */
-    lazyLoad(){
-
-    }
+   
     /** динамическая загрузка js скрипта
      * @param {string|object} string = "addr" object = {url:"addr"}
      * @param {string} - имя глобальной переменной в загружаемом скрипте, которая будет возвращена в случае удачи
@@ -80,6 +77,17 @@ class ScriptLoader {
                 ok(p.returnVar ? window[p.returnVar] : p.url);
             }
         });
+    }
+    
+    /** перезаписывает имя загруженного скрипта (для нужд moduleLoader)*/
+    _replaceUrl(from,to){
+        for(let i = 0;i<this.list.length;i++){
+            if (this.list[i] === from){
+                this.list[i] = to;
+                return true;
+            }
+        }
+        return false;
     }
 }
 

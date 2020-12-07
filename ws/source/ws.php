@@ -30,8 +30,8 @@ RESOURCE('plugins','common/ut.js');
 RESOURCE('plugins','common/jhandler.js');
 RESOURCE('plugins','jx/jx.js');
 RESOURCE('plugins','common/dvc.js');
-RESOURCE('plugins','common/scriptLoader.js');
-RESOURCE('plugins','common/moduleLoader.js');
+RESOURCE('plugins','moduleLoader/scriptLoader.js');
+RESOURCE('plugins','moduleLoader/moduleLoader.js');
 
 RESOURCE('ws','ws.js');
 RESOURCE('ws','dcss.js');
@@ -112,6 +112,13 @@ class WS extends WS_CONTENT{
             
             $dcss['res'] = 1;
             $response = $dcss;
+        }elseif ($REQUEST->ID =='MODULELOADER_INIT_DEV'){
+            $response = $this->moduleLoaderDevInit($REQUEST->VALUE);
+        }elseif ($REQUEST->ID =='MODULELOADER_FREE_DEV'){
+            $response = $this->moduleLoaderDevFree($REQUEST->VALUE);
+        }elseif ($REQUEST->ID =='MODULELOADER_CLEAR_WRAPPED_DEV'){
+            WS_UTILS::lazyClearWrappedDev();
+            $response = ['res'=>1];    
         }else{
             if (!$this->AJAX($response))
                 MODULES::AJAX($response);
@@ -222,24 +229,30 @@ class WS extends WS_CONTENT{
             if (!$this->buildRunLock()){
                 $js_build = $this->builder('js',$version,(WS_CONF::GET('bildFrameJS')==1?$this->main_js($dcss,$styles,$version):''));
             }
-        }
+        };
         //--------------------------------------------
         if ($this->mode === 'assembly'){
             // посторение сборки для последующей компиляции ( сам проект будет отображаться в режиме development) 
             $this->assembly($version,$this->main_js($dcss,$styles,$version));
-        }
-
+        };
         //--------------------------------------------
-        if ($js_build!==false)
+        if ($this->mode === 'development'){
+            WS_UTILS::lazyClearWrappedDev();// запуск очистки обернутых не линивых фалов (только для developmenmt)
+        };
+        //--------------------------------------------
+        if ($js_build!==false){
             $res.='<script type="text/javascript" src="'.$js_build.'"></script>'.DCR;
-        
-        
+        };
+
+
         if (isset($Application->EXTENSION['JS'])){
             $lazy_reg = '';
+            $lazy_dev_clear = []; // файлы к удалению после полной загрузке(только в режиме dev)
             for($i=0;$i<count($Application->EXTENSION['JS']);$i++){
                 $item = $Application->EXTENSION['JS'][$i];
                 if ((($js_build===false)||($item['local']==''))){
-                    if (!$item['lazy_load']){
+                    
+                    if (!$item['lazy_load']){ // модуль не в линивой загрузке
                         $js_script_file = $item['remote'];
                         if ($this->loadOptimizedResources === true){
                     
@@ -255,12 +268,22 @@ class WS extends WS_CONTENT{
                         $url_params  = $item['params'];
         
                         $res.='<script type="text/javascript" src="';
-                        $res.=$js_script_file.$url_params;
                         
-                        $res.=($version!==''?($url_params!==''?'&':'?').$version:'');
+                        $url = $js_script_file.$url_params.($version!==''?($url_params!==''?'&':'?').$version:''); 
+                        //--------------------------------------------
+                        if (WS_UTILS::lazyNeedWrapper($url)){
+                            $createWrapper = $this->moduleLoaderDevInit(['name'=>$url]);
+                            if ($createWrapper['res'] === 1){
+                                $url = $createWrapper['data']['name'];
+                                $lazy_dev_clear[]=$createWrapper['data']['local'];
+                            }
+                        }
+                        //--------------------------------------------
+                        //$res.=$js_script_file.$url_params;
+                        //$res.=($version!==''?($url_params!==''?'&':'?').$version:'');
                     
-                        $res.='"></script>'.DCR;
-                    }else{
+                        $res.=$url.'"></script>'.DCR;
+                    }else{ // модуль в ленивой загрузке
                         $file = $item['local'];
                         $opt = array_merge([],(isset($item['opt'])?$item['opt']:[]));
                         if (isset($opt['alias'])){
@@ -277,14 +300,27 @@ class WS extends WS_CONTENT{
                 
             };
             
-            if (($this->mode === 'development') && ($lazy_reg !== '')){
-                $res.=DCR.'<script type="text/javascript">'.DCR;
-                $res.="moduleLoader.registered(".$lazy_reg.");".DCR; 
-                $res.='moduleLoader.cache = "'.$this->version.'";'.DCR;
-                $res.='</script>'.DCR;
+            if ($this->mode === 'development'){
+                WS_UTILS::lazyStoryWrappedDev($lazy_dev_clear); // сохраним имена файлов обернутых (но которые не ленивые)
+                if ($lazy_reg !== ''){
+                    $res.=DCR.'<script type="text/javascript">'.DCR;
+                    $res.="moduleLoader.registered(".$lazy_reg.");".DCR; 
+                    $res.='moduleLoader.cache = "'.$this->version.'";'.DCR;
 
+                    $asmw = WS_CONF::GET('assemblyModuleWrapper',false);
+                    if ($asmw!==false){
+                        if (gettype($asmw) === 'array' && count($asmw)>0){
+                            $res.='moduleLoader.dev = '.ARR::to_json($asmw).DCR;
+                        }elseif ($asmw === true){
+                            $res.='moduleLoader.dev = true;'.DCR;
+                        }
+                    }
+                
+                    $res.='</script>'.DCR;
+
+                }
             }
-        }
+        };
         
         
         //---------------------------------------------
@@ -329,6 +365,14 @@ class WS extends WS_CONTENT{
             $res.= $this->main_js($dcss,$styles,$version);
             $res.='</script>'.DCR;
         }; 
+
+        
+        //---------------------------------------------
+        // вызвать код очистки обернутых нелинивых файлов
+        if ($this->mode === 'development'){
+            $res.='<script type='.'"text/javascript"'.'>(()=>Ws.get({id:"MODULELOADER_CLEAR_WRAPPED_DEV"}))()'.DCR.'</script>'.DCR;
+        };
+        
         //---------------------------------------------
         $res.='</head>'.DCR;
         //---------------------------------------------
@@ -546,6 +590,17 @@ class WS extends WS_CONTENT{
         return false;
         
     }
+    
+    /** возвращает код локального файла $filename и если нужно оборачивает его в модульную оберку wrapper*/
+    private function _getCodeJs($filename,$param=[]){
+        $p = array_merge([],$param);
+        $code_js = file_get_contents($filename);
+
+        if (WS_UTILS::lazyNeedWrapper($filename))
+            $code_js = WS_UTILS::lazyWrapper($code_js,$p);
+        
+        return $code_js;
+    }
     /** 
      * получаем сборку для дальнейшей обработки внешними средствами
     */
@@ -580,6 +635,7 @@ class WS extends WS_CONTENT{
             $lazy_reg  = '';
             $lazy_path = $pBuild.'lazy/';
             $lazy_count = 0;
+
             if (!is_dir($lazy_path)) mkdir($lazy_path);
 
             for($i=0;$i<$cntJS;$i++){
@@ -622,8 +678,9 @@ class WS extends WS_CONTENT{
                         }
                     
                     }
-                    
-                    $code_js = file_get_contents($file);
+
+                    $code_js = $this->_getCodeJs($file);
+                    //$code_js = file_get_contents($file);
 
                     if (!$exclude){
                         if (!$item['lazy_load']){ 
@@ -644,8 +701,8 @@ class WS extends WS_CONTENT{
                                 $dest = $lazy_path.$info['filename'].$indexDest.$info['extension'];
                             } 
                             
-
-                            if (!@copy($file,$dest)){
+                            if (file_put_contents($dest,$code_js) === false){
+                            //if (!@copy($file,$dest)){
                                 error_log("ERROR copy [$file] to [$dest]"); 
                             }else{
                                 $opt = array_merge([],(isset($item['opt'])?$item['opt']:[]));
@@ -663,9 +720,9 @@ class WS extends WS_CONTENT{
                                 error_log("lazy_load  [$file] -> [$dest] ok"); 
                             }
                         }
-                    }else{
+                    }else{ // if (!$exclude){
                         // файл исключен из сборки и добавляется в отдельную папку
-                        $code_js = file_get_contents($file);
+                        //$code_js = file_get_contents($file);
                         $to = $excludePath.'/'.basename($file);
                         file_put_contents($to,$code_js);
                         error_log("$i: assembly exclude [$file] ok");    
@@ -715,9 +772,21 @@ class WS extends WS_CONTENT{
             name:'text',
             ...o
         };
+        
+        this.afunc()
+        .then(()=>{
+            console.log('do');
+        });
     }
-    _func(p,...a){
-        consloe.info(p,...a);
+    _func(){ return new Promise((ok,err)=>{
+        setTimout(()=>{
+            ok('morgen');
+        },100);
+    });}
+
+    async afunc(){
+        const caption  = await this._func();
+        return caption;   
     }
 }";
     }    
@@ -758,7 +827,47 @@ class WS extends WS_CONTENT{
     public function CONTENT(){
             
     }
-    
+    /** обработка файла js в режиме development */
+    private function moduleLoaderDevInit($data){
+        global $Application;
+        //error_log(print_r($data,true));
+        //$Info = $Application->debug_info("\n");
+        //error_log(print_r($Info,true));
+        // получим имя локального файла
+        try {
+            $parse = WS_UTILS::lazyUrlToLocal($data['name']);
+            
+            if (!file_exists($parse['local']))
+                throw new Exception("file not exists '".$parse['local']."' (url:'".$data['name']."')");
+            
+            $rename = WS_UTILS::lazyGetWrapperName($parse['local']);    
+            
+            $code = file_get_contents($parse['local']);
+            $code = WS_UTILS::lazyWrapper($code);
+            file_put_contents($rename['local'],$code);           
+
+            return ['res'=>1,'data'=>['name'=>$parse['httpPath'].$rename['short'].$parse['version'],'local'=>$rename['local']]];
+               
+        } catch (\Exception $e) {
+            error_log('Exception ['.__FILE__.':'.__LINE__.'] '.$e->getMessage());
+        };
+        return ['res'=>0];
+        
+    }
+    /** обработка файла js в режиме development  */
+    private function moduleLoaderDevFree($data){
+        //error_log(print_r($data,true));
+        try {
+
+            if (file_exists($data['local']))
+                unlink($data['local']);
+
+        } catch (\Exception $e) {
+            error_log('Exception ['.__FILE__.':'.__LINE__.'] '.$e->getMessage());
+        };
+        return ['res'=>1 ];
+    }
+
     public function debug_info($cr='<br>'){
         //S: Вывод отладочной информации
         return 'WS: ok'.$cr;

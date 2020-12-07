@@ -14,6 +14,7 @@ class ModuleLoader {
         this.vars = {};
         this.cache = false;
         this.onInitList = {};
+        this.dev = false; // признак, что модули подгружаются в режиме development
     }
     /** загрузка молуля 
      * @param {string|object} - относительный путь к модулю
@@ -24,9 +25,23 @@ class ModuleLoader {
         let item = this._item(p) || p;
         let varName = p.varName?p.varName:item.varName;
         let name = this._getRealName(item);
-        
+        let storyName = name;
+        let dev = false;
+
         const is_first_load = !scriptLoader.exist(name);
+        
+        if (is_first_load && this.dev) {
+            dev  = await this._devInit(name);
+            name = dev?dev.name:name;
+        }
+        
         const load =  await scriptLoader.load(name);
+        
+        if (is_first_load && this.dev && dev) {
+            await this._devFree(dev);
+            scriptLoader._replaceUrl(name,storyName);
+            name = storyName;
+        }
 
         // при первой загрузке генерируем событие onInit
         if (is_first_load && item.alias && item.alias in this.onInitList){
@@ -58,6 +73,32 @@ class ModuleLoader {
             return load;
 
     }
+    /**  преобразовние имени и подмена файла*/ 
+    async _devInit(name){
+        let find = ()=>{
+            for (let i = 0;i<this.dev.length;i++){
+                if (name.indexOf(this.dev[i])>-1){
+                    return true;
+                }
+            }
+            return false
+        }
+        if (this.dev === true || find()){
+            return await Ws.get({
+                id:'MODULELOADER_INIT_DEV',
+                value:{name},
+            });
+        }
+        return undefined;
+           
+    }
+    async _devFree(dev){
+        return await Ws.get({
+            id:'MODULELOADER_FREE_DEV',
+            value:dev,
+        });
+    }
+
     _getRealName(item){
         if(item!==undefined){
             if (item.path)
@@ -128,6 +169,23 @@ class ModuleLoader {
                 this.vars[name] = o[name];
             }
         })
+    }
+    /** экспорт глобальных переменных ( клон add) */
+    export(o){
+        this.add(o);
+    }
+    /** импорт глобальных (не тоже самое что load) переменных добавленных export 
+     *  если переменная не существует, то будет Exception
+    */
+    import(name){
+        if (name in this.vars)
+            return this.vars[name];
+        else{
+            const msg = 'import not exists var "'+name+'"';
+            console.error(msg);
+            throw msg;
+        }    
+            
     }
     /** 
      * onInit({mod1(){

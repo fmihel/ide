@@ -921,7 +921,7 @@ class TApplication{
         }
 
         foreach($_REQUEST as $k=>$v){
-            $res.='$_REQUEST['.$k.']=['.$v.']'.$cr;
+            $res.='$_REQUEST['.$k.']=['.print_r($v,true).']'.$cr;
         }
         
         return $res;
