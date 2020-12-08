@@ -451,8 +451,12 @@ class WS extends WS_CONTENT{
         return false;
     }
 
-    /** запуск/остановка/проверка на то, что процесс компиляции запущен другим процессом */
+    /** запуск/остановка/проверка на то, что процесс компиляции запущен другим процессом 
+     *  @deprecated
+    */
     private function buildRunLock($start = ''){
+        //return false;
+         
         $pBuild = WS_CONF::GET('renderPath','_render');
         $file = $pBuild.'build.start';
         
@@ -468,10 +472,33 @@ class WS extends WS_CONTENT{
         }
 
         return file_exists($file);
+        
     }
-
-    /** создание сборки */
+    /**
+     * на замену builder_deprecated
+     * @deprecated
+     */
     private function builder($type,$version,$right = ''){
+        global $Application;
+        
+        if ($type==='js'){
+            
+            if (isset($Application->EXTENSION['JS'])){
+                // определяем build - уникальное имя сборки
+                $build = $Application->getExtHash('JS',$version);
+                $pBuild = WS_CONF::GET('renderPath','_render');
+                $nBuild = $pBuild.$build.'.js';
+
+                if (file_exists($nBuild))
+                    return $nBuild;
+            }
+        }
+        return false;
+    }
+    /** создание сборки 
+     * @deprecated
+    */
+    private function builder_deprecated($type,$version,$right = ''){
         global $Application;
         
         if ($type==='js'){
