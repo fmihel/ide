@@ -124,7 +124,7 @@ class WS_UTILS{
     /** проверка необходимости обернуть файл в модульную обертку */
     public static function lazyNeedWrapper($filename){
         $wrapper = WS_CONF::GET('assemblyModuleWrapper',[]);
-        
+    
         if ($wrapper===true){
             return true;
         }else{ 
@@ -158,7 +158,7 @@ class WS_UTILS{
             $rename = $info['dirname'].'/'.$short_name;
             $idx++;
         }
-        return ['local'=>$rename,'short'=>$short_name];
+        return ['local'=>self::lazyLocallyPath($rename),'short'=>$short_name];
     }
     /** преобразует url в его локальный эквивалент 
      * @return {array} ['local'=>string,'version'=>string,'httpPath'=>string]
@@ -166,15 +166,21 @@ class WS_UTILS{
     public static function lazyUrlToLocal($url){
         global $Application;
         $parse = parse_url($url);
-        $httpPath = $parse['scheme'].":"."/".APP::slash($parse['host'],true,true).APP::slash(APP::get_path($parse['path']),false,true);
+        $httpPath = $parse['scheme'].":"."/".self::lazySlash($parse['host'],true,true).self::lazySlash(APP::get_path($parse['path']),false,true);
         $local = str_replace($Application->HTTP,$Application->PATH,$url);
-        
         $pos = strpos($local,"?");
         $version = '';
         if ($pos !== false){
             $version=substr($local,$pos);
             $local=substr($local,0,$pos);
         }
+        
+        // для серверных имен
+        $local = self::lazyLocallyPath($local);
+        
+        if (strpos($local,':')===false)
+            $local = self::lazySlash($local,true,false);
+            
         return ['local'=>$local,'version'=>$version,'httpPath'=>$httpPath];        
     }
     /** очистка предыдущих созданных обернутых копий */
@@ -182,7 +188,9 @@ class WS_UTILS{
         global $Application;
         try {
             $var = LAZY_STORY_VAR;
-            $name = APP::slash($Application->PATH,false,true).$var.'.php';
+            $name = self::lazySlash($Application->PATH,false,true).$var.'.php';
+            $name = self::lazyLocallyPath($name);
+            
             if (file_exists($name)){
                 include $name;
                 $files = $$var;
@@ -204,7 +212,8 @@ class WS_UTILS{
         global $Application;
         try {
             $var = LAZY_STORY_VAR;
-            $name = APP::slash($Application->PATH,false,true).$var.'.php';
+            $name = self::lazySlash($Application->PATH,false,true).$var.'.php';
+            $name = self::lazyLocallyPath($name);
             
             $files = $lazy;
             if (file_exists($name)){
@@ -220,6 +229,41 @@ class WS_UTILS{
         } catch (\Exception $e) {
             error_log('Exception ['.__FILE__.':'.__LINE__.'] '.$e->getMessage());
         };
+    }
+    /** добавляет слеш спереди в маршруты  НЕ для DOS систем */
+    private static function lazyLocallyPath($path){
+        if (strpos($path,':')===false)
+            return APP::slash($path,true,false);
+        return $path;
+    }
+    private static function lazySlash($str,$left,$right){
+        $slash    = _DIRECTORY_SEPARATOR;
+        
+
+        $str      = trim($str);
+        $str      = str_replace(['/','\\'],$slash,$str);
+
+        
+        $leftPos  =  mb_strpos($str,$slash);
+        $rightPos =  mb_strrpos($str,$slash);
+        $leftBool = ($leftPos === 0);
+        $rightBool  = ($rightPos === (mb_strlen($str)-1));
+        
+        if ($left && ($leftBool === false)){
+            $str = $slash.$str;    
+        };
+
+        if (!$left && ($leftBool !==false)){
+            $str = mb_substr($str,1);
+        };
+        if ($right && ($rightBool === false)){
+            $str.=$slash; 
+        };
+        if (!$right && ($rightBool !==false)){
+            $str = mb_substr($str,0,mb_strlen($str)-1);
+        };
+
+        return $str;
     }
 }
 
