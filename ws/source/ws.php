@@ -805,6 +805,13 @@ class WS extends WS_CONTENT{
             console.log('do');
         });
     }
+    run(t){
+        if (typeof t === 'object'){
+            console.log('is object');
+            return false;
+        }
+        return this._func();
+    }
     _func(){ return new Promise((ok,err)=>{
         setTimout(()=>{
             ok('morgen');
@@ -815,7 +822,10 @@ class WS extends WS_CONTENT{
         const caption  = await this._func();
         return caption;   
     }
-}";
+}
+const a$name = new $name();
+a$name.run();
+";
     }    
     /**
      * Минификация, а также приведения к стандарту ES5
