@@ -13,7 +13,8 @@ class ModuleLoader {
         this.hrefPath = ut.hrefPath();
         this.vars = {};
         this.cache = false;
-        this.onInitList = {};
+        this.onInitList = {}; // список callback привязаных к алиасу ( вызовы по конкретным модулям)
+        this.onInitFunc = []; // список callback не привязанных к алиасу (вызовы при init в любом модуле)
         this.dev = false; // признак, что модули подгружаются в режиме development
     }
     /** загрузка молуля 
@@ -44,12 +45,22 @@ class ModuleLoader {
         }
 
         // при первой загрузке генерируем событие onInit
-        if (is_first_load && item.alias && item.alias in this.onInitList){
+        if (is_first_load){
             
-            this.onInitList[item.alias].map((f)=>{
-                try{    
+            if (item.alias && item.alias in this.onInitList){
+                this.onInitList[item.alias].map((f)=>{
+                    try{    
+                        f(item);
+                    }catch(e){
+                        console.warn(e);
+                    }
+                });
+            };
+            
+            this.onInitFunc.map((f)=>{
+                try {   
                     f(item);
-                }catch(e){
+                } catch (error) {
                     console.warn(e);
                 }
             })
@@ -190,15 +201,24 @@ class ModuleLoader {
     /** 
      * onInit({mod1(){
      * }}
+     * or 
+     * onInit(()=>{
+     * })
     */
     onInit(o){
-        let aliases = Object.keys(o);
-        aliases.map(alias=>{
-            let evs = Object.keys(this.onInitList);
-            if (evs.indexOf(alias)===-1)
-                this.onInitList[alias] = [];
-            this.onInitList[alias].push(o[alias]);
-        });
+        let type = typeof(o);
+        if (type === 'object'){
+            let aliases = Object.keys(o);
+            aliases.map(alias=>{
+                let evs = Object.keys(this.onInitList);
+                if (evs.indexOf(alias)===-1)
+                    this.onInitList[alias] = [];
+                this.onInitList[alias].push(o[alias]);
+            });
+        }else
+        if (type === 'function'){
+            this.onInitFunc.push(o);
+        }
     }
     exist(o){
         try{
