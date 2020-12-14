@@ -143,7 +143,7 @@ class WS_UTILS{
     /** возвращает свободное имя файла, для обернутого 
      * @return {array} ['local'=>string,'short'=">string]
      * Ex: lazyGetWrapperName('C:\work\ppp\test.js')
-     * ['local'=>'C:\work\ppp\test-dev-02.js','short'=>'test-dec-02.js']
+     * ['local'=>'C:\work\ppp\test-03-dev.js','short'=>'test-03-dev.js']
     */
     public static function lazyGetWrapperName($local,$param=[]){
         $p = array_merge([
@@ -154,7 +154,7 @@ class WS_UTILS{
         $short_name = $info['filename'].'-'.$p['postfix'].'.'.$info['extension'];
         $rename = $info['dirname'].'/'.$short_name;
         while(file_exists($rename)){
-            $short_name = $info['filename'].'-'.$p['postfix'].'-'.$idx.'.'.$info['extension'];
+            $short_name = $info['filename'].'-'.$idx.'-'.$p['postfix'].'.'.$info['extension'];
             $rename = $info['dirname'].'/'.$short_name;
             $idx++;
         }
