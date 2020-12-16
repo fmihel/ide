@@ -72,6 +72,11 @@ class WS extends WS_CONTENT{
         // тип сборки production | development | assembly
         $this->mode         = WS_CONF::GET('mode');
         $this->renderPath   = WS_CONF::GET('renderPath');
+        
+        if (($this->mode === 'assembly') && (file_exists(WS_CONF::GET('assemblyPath')))){
+            $this->mode = 'development';
+            WS_CONF::SET('mode','development');
+        }
     } 
     
     public function RUN(){
@@ -559,7 +564,7 @@ class WS extends WS_CONTENT{
             $build = $Application->getExtHash('JS',$version);
             
             //$pBuild = '_assembly/';
-            $pBuild = APP::slash(WS_CONF::GET('assemblyPath','_assembly'),false,true);
+            $pBuild = APP::slash(WS_CONF::GET('assemblyPath'),false,true);
             $excludes = WS_CONF::GET('assemblyExclude',[]);
             $excludePath = APP::slash(WS_CONF::GET('assemblyExcludePath',$pBuild.'exclude'),false,true);
 
