@@ -259,8 +259,10 @@ class ModuleLoader {
     func(o,name,args=[],defalt=false){
         let param = this.param(o,name);
         if (typeof(param) === 'function'){
+
             try {
-                return param(...args);
+                const item = this._item(o);
+                return param.call(this.vars[item.varName],...args);
             } catch (error) {
                 console.info(error);    
             }
