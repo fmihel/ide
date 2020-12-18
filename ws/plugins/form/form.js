@@ -104,8 +104,8 @@ mform.prototype.init = function(o){
         
         needCloseBtn:true, /*отображаете кнопку закрытия*/
         shadowAsClose:true,/*нажатие вне формы аналогичное вызову close*/
-        shadowOpacity:0.2,/** прозрачность подложки */
-        shadowSpeed:200, /* скорость анимации тени */
+        shadowOpacity:0.5,/** прозрачность подложки */
+        shadowSpeed:0, /* скорость анимации тени */
         placeCloseOnTopRight:false, /*отображает кнопку закрытия вынесенной на угол*/
         bumpClose:3,/*max or [2..8]  коэф - на сколько вынесена кнопка закрытия */ 
         showHeader:false,/*отображать или нет заголовок*/
