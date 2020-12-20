@@ -53,8 +53,8 @@ if (isset($_REQUEST['-assembly'])){
     $ASSEMBLY_CLI = true;
     WS_CONF::SET('mode','assembly');
     
-    $path = $Application->PATH.APP::slash(WS_CONF::GET('assemblyPath'),false,true);
-    
+    //$path = $Application->PATH.APP::slash(WS_CONF::GET('assemblyPath'),false,true);
+    $path = APP::slash(WS_CONF::GET('assemblyPath'),false,true);
     if (file_exists($path)){
         DIR::clear($path);
         rmdir($path);
