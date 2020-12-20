@@ -11,6 +11,7 @@ define('DCR',"\n");
 
 require_once UNIT('utils','common.php');
 require_once UNIT('utils','git.php');
+require_once UNIT('utils','dir.php');
 
 require_once UNIT('ws','ws_conf.php');
 require_once UNIT('ws','ws_conf_def.php');
@@ -44,6 +45,21 @@ RESOURCE('ws','dcss.js');
 */
 
 require_once UNIT('utils','encoding.php');
+
+// ---------------------------------------------------------------
+$ASSEMBLY_CLI = false;
+if (isset($_REQUEST['-assembly'])){
+
+    $ASSEMBLY_CLI = true;
+    WS_CONF::SET('mode','assembly');
+    
+    $path = $Application->PATH.APP::slash(WS_CONF::GET('assemblyPath'),false,true);
+    
+    if (file_exists($path)){
+        DIR::clear($path);
+        rmdir($path);
+    }
+}
 
 // ---------------------------------------------------------------
 
@@ -138,7 +154,7 @@ class WS extends WS_CONTENT{
         global $CODING;
         global $Application;
         global $REQUEST;
-        
+        global $ASSEMBLY_CLI;
         //---------------------------------------------
         if ($this->version !== ''){
             if ($this->version ==='nocache')
@@ -385,7 +401,11 @@ class WS extends WS_CONTENT{
         //---------------------------------------------
         $res.='</html>'.DCR;
         
-        ENCODING::OUT($res);
+        if ($ASSEMBLY_CLI){
+            echo 'assembly:ok';
+        }else
+            ENCODING::OUT($res);
+            
         
     }
     /** генерация JS кода  из FRAME */
