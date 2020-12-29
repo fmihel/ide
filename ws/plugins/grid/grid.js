@@ -1239,7 +1239,7 @@ Tgrid.prototype._createHeader=function(){
     for(i=0;i<f.length;i++){
         usr = {event:'header_td',id:f[i].name,value:f[i].caption,style:"overflow:hidden;",css:css.header_td}; 
         t.doCreate(usr);
-        c+= ut.tag({tag:'td',id:usr.id,style:usr.style,value:usr.value,css:usr.css,attr:{title:f[i].name}});
+        c+= ut.tag({tag:'td',id:usr.id,style:usr.style,value:usr.value,css:usr.css,attr:{title:(f[i].title?f[i].title:f[i].name)}});
         
         //c+= ut.tag({tag:'td',id:f[i].name,style:"overflow:hidden",value:f[i].caption,css:css.header_td});
     }    
