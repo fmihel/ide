@@ -317,22 +317,27 @@ delPref:function(o,pref,left){
  *   c = ut.get(s,"user","data",0,false);
  * 
 */
-get:function(){
-    if (arguments.length<2) return false;
-    var a=arguments,i,t,m,
-        v = a[0],d = a[a.length-1];
-            
-    if (v===undefined) return d;
-            
-    for(i=1;i<a.length-1;i++){
-        m = v[a[i]];
-        if (m === undefined)
-            return d;
-        v=m;
+get:function(...args){
+    if (args.length<=2)
+    return false;
+    
+    const len  = args.length;
+    let defalt = args[len-1];
+
+    try{
+        let value = args[0];
+    
+        for(let i=1;i<len-1;i++){
+            const m = value[args[i]];
+            if (m === undefined) 
+                return defalt;
+            value = m;
+        }
+    
+        return value;
+    }catch(e){
+        return defalt;
     }
-            
-    return v;
-            
 },
 tag:function(/**/){
     /*global $*/
