@@ -1505,8 +1505,15 @@ class base{
     public static function typePerform($value,$type){
         
         
-        if (($type==='string')||($type==='date')){
+        if ($type==='string'){
             return '"'.self::esc($value).'"';
+        }
+        if ($type==='date'){
+            if (strtoupper(trim($value))!=='CURRENT_TIMESTAMP'){
+                return '"'.self::esc($value).'"';
+            }else{
+                return 'CURRENT_TIMESTAMP';
+            }
         }
         return $value;
         
