@@ -117,6 +117,20 @@ mform.prototype.init = function(o){
         resizable:true,/*можно изменять размеры формы */
         showPin:false,/** показывать или нет кноку фиксации формы */
         autoPin:true, /** если showPin, и пользователь сместил форму, то pin включается */
+        headerButtons:{ /** дополнительные кнопки в заголовке */
+            /*Ex:
+            id:{
+                visible:true, 
+                disabled:false,
+                caption:"",
+                css:"",
+                title:"",
+                click(){
+                    
+                }
+            }
+            */ 
+        },
         stretch:"custom",/* указывает как будет отрисовываться окно "custom" "horiz"  "fullscreen"  */
         fullscreen:false, /* deprecated, use  stretch=="fullscreen" */
         margin:0,
@@ -157,6 +171,7 @@ mform.prototype.init = function(o){
             footer:'mfr_footer',
             content:'mfr_content',
             caption:'mfr_caption',
+            headerButtons:'mfr_header_buttons',
             
             close_frame:'mfr_close_frame',
             close:'mfr_close',
@@ -229,7 +244,7 @@ mform.prototype._create=function(){
         close:ut.id('cls'),
         pin:ut.id('pin'),
         close_frame:ut.id('clf'),
-        resize:ut.id('rs')
+        resize:ut.id('rs'),
     };
     
     c+=ut.tag('<',{id:p.id.frame,css:css.frame,style:'position:absolute'});
@@ -258,6 +273,7 @@ mform.prototype._create=function(){
     p.jq.footer    = p.jq.parent.find('#'+p.id.footer);
 
     p.jq.caption        = p.jq.parent.find('#'+p.id.caption);
+    p.jq.headerButtons = [];
     p.jq.close          = p.jq.parent.find('#'+p.id.close);
     p.jq.pin            = p.jq.parent.find('#'+p.id.pin);
     p.jq.close_frame    = p.jq.parent.find('#'+p.id.close_frame);
@@ -399,6 +415,32 @@ mform.prototype.pinDown=function(bool){
     
 };
 
+mform.prototype._headerButtonUpdate=function(){
+    var t=this,p=t.param;
+    
+    p.jq.headerButtons.map($item=>$item.remove());
+    p.jq.headerButtons = [];
+    $.each(p.headerButtons,((id,item)=>{
+        
+        const code = ut.tag({
+            id:id, 
+            css:item.css?item.css:'',
+            value:item.caption?item.caption:'',  
+            style:'position:absolute'+( item.visible===false ? ';display:none' : '' ),
+            attr:{title:item.title?item.title:''},
+        });
+        
+        p.jq.header.append(code);
+        const $q = p.jq.header.find('#'+id);
+        p.jq.headerButtons.push($q);
+        $q.on('click',()=>{
+            if ((item.click)&&(item.disabled!==true))
+                item.click({id:id});
+        });
+    }));
+    
+    
+}
 
 
 mform.prototype._css = function(css){
@@ -746,6 +788,15 @@ mform.prototype.attr = function(n/*v*/){
         }    
     }
     /*-----------------------------------*/    
+    if (n==='headerButtons'){
+        if (r) 
+            return p.headerButtons;
+        else {
+            p.headerButtons = $.extend(true,p.headerButtons,v);
+            t._headerButtonUpdate();
+        }    
+    }
+    /*-----------------------------------*/
     
     
     t.align();
@@ -990,9 +1041,9 @@ mform.prototype._align=function(){
         
         JX.visible(p.jq.close_frame,false);
         if (p.stretch === 'horiz')
-            JX.arrange([p.jq.caption,p.jq.close],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:hPadding});
+            JX.arrange([p.jq.caption,...p.jq.headerButtons,p.jq.close],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:hPadding});
         else
-            JX.arrange([p.jq.caption,p.jq.pin,p.jq.close],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:{left:p.padding.left,right:p.padding.right}});
+            JX.arrange([p.jq.caption,...p.jq.headerButtons,p.jq.pin,p.jq.close],{direct:"horiz",type:"stretch",align:"center",stretch:[{idx:0}],margin:{left:p.padding.left,right:p.padding.right}});
         
     }    
     

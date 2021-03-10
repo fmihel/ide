@@ -968,6 +968,68 @@ class TWS extends WS{
             '
         );        
     
+        /*c:headerButtons */
+        $this->item(
+            'headerButtons',
+            /*------------caption---------------*/
+            'headerButtons',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.mform({
+                headerButtons:{
+                    first:{
+                        caption:"P",
+                        click(){
+                            console.log("ppp");
+                        }
+                    },
+                    second:{
+                        caption:"S",
+                        visible:false,
+                        click(){
+                            console.log("sss");
+                        }
+                    },
+                    third:{
+                        caption:"W",
+                        disabled:true,
+                        click(){
+                            console.log("www");
+                        }
+                    }                    
+                }
+            });
+            
+            ',
+            /*------------event-----------------*/
+            '
+            {$plugin}.mform({
+                headerButtons:{
+                    first:{
+                        caption:"P",
+                        click(){
+                            console.log("ppp");
+                        }
+                    },
+                    second:{
+                        caption:"S",
+                        visible:false,
+                        click(){
+                            console.log("sss");
+                        }
+                    },
+                    third:{
+                        caption:"W",
+                        disabled:true,
+                        click(){
+                            console.log("www");
+                        }
+                    }
+                }
+            });
+        
+            '
+        );        
 
 
     
