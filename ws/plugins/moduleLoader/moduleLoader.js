@@ -16,12 +16,15 @@ class ModuleLoader {
         this.onInitList = {}; // список callback привязаных к алиасу ( вызовы по конкретным модулям)
         this.onInitFunc = []; // список callback не привязанных к алиасу (вызовы при init в любом модуле)
         this.dev = false; // признак, что модули подгружаются в режиме development
+        this._lock_load = [];
     }
     /** загрузка молуля 
      * @param {string|object} - относительный путь к модулю
      * @returns {Promise}
     */
     async load(p) {
+         if (this._isLockLoad(p))
+            throw "module "+p+"in loading process " ;
       
         let item = this._item(p) || p;
         let varName = p.varName?p.varName:item.varName;
@@ -31,6 +34,10 @@ class ModuleLoader {
 
         const is_first_load = !scriptLoader.exist(name);
         
+        if (is_first_load){
+            this._LockLoad(p);
+        }
+
         if (is_first_load && this.dev) {
             dev  = await this._devInit(name);
             name = dev?dev.name:name;
@@ -42,6 +49,9 @@ class ModuleLoader {
             await this._devFree(dev);
             scriptLoader._replaceUrl(name,storyName);
             name = storyName;
+        }
+        if (is_first_load){
+            this._unLockLoad(p);
         }
 
         // при первой загрузке генерируем событие onInit
@@ -169,6 +179,33 @@ class ModuleLoader {
         }
         return undefined;
     }
+    /** проверка, что модуль блокирован на загрузку */
+    _isLockLoad(p) {
+        const t = this;
+        const test = (typeof p === 'string' ? p : p.alias);
+        return (t._lock_load.indexOf(test) >= 0);
+    }
+    
+    /** блокировка модуля на загрузку */
+    _LockLoad(p) {
+        const t = this;
+        const test = (typeof p === 'string' ? p : p.alias);
+        if (t._lock_load.indexOf(test) >= 0) {
+            return false;
+        }
+        t._lock_load.push(test);
+        return true;
+    }
+    
+    /** разблокировка модуля на загрузку */
+    _unLockLoad(p) {
+        const t = this;
+        const test = (typeof p === 'string' ? p : p.alias);
+        const index = t._lock_load.indexOf(test);
+        if (index >= 0) {
+            t._lock_load.splice(index, 1);
+        }
+    }    
     /** добавляет ссылку на модуль, для поиска */
     add(o){
         let names = Object.keys(this.vars);
