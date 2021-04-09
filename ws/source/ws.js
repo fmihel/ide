@@ -17,7 +17,7 @@ class CWs {
 
 
     ajax(o) {
-        const p = $.extend(false, {
+        const p = {
             id: -1,
             value: '',
             url: this.url,
@@ -28,7 +28,8 @@ class CWs {
             before(...a) { this.before_ajax(...a); },
             noAsync: false, /** запрещает выполнять запрос если не обработан запрос с таким же id */
             repeat: 1,
-        }, o);
+            ...o
+    };
 
 
         let { repeat } = p;
@@ -42,9 +43,13 @@ class CWs {
         const noAsync = (id, bool) => {
             if (bool === undefined) { return (this._noAsync.indexOf(id) >= 0); }
 
-            if (bool) { this._noAsync.push(id); } else {
+            if (bool) {
+                this._noAsync.push(id); 
+            } else {
                 const idx = this._noAsync.indexOf(id);
-                if (idx >= 0) { this._noAsync.splice(idx, 1); }
+                if (idx >= 0) { 
+                    this._noAsync.splice(idx, 1); 
+                }
             }
         };
 
@@ -70,7 +75,7 @@ class CWs {
                 p.context = request;
             }
 
-            request.done((_data) => {
+            request.done(function (_data){
                 noAsync(this.recvId, false);
 
                 const data = this.ajax_response(_data);
@@ -89,7 +94,7 @@ class CWs {
                 }
             });
 
-            request.fail((jqXHR, textStatus) => {
+            request.fail(function(jqXHR, textStatus) {
                 // eslint-disable-next-line no-plusplus
                 repeat--;
                 if (repeat < 0) {
@@ -191,7 +196,7 @@ class CWs {
 
             if (!('context' in p)) { p.context = request; }
 
-            request.done((_data) => {
+            request.done(function(_data){
                 noAsync(this.recvId, false);
 
                 const data = this.ajax_response(_data);
@@ -220,7 +225,7 @@ class CWs {
                 }
             });
 
-            request.fail((jqXHR, textStatus) => {
+            request.fail(function(jqXHR, textStatus) {
                 noAsync(this.recvId, false);
                 // eslint-disable-next-line prefer-promise-reject-errors
                 err({ res: -1, msg: `system error: [${textStatus} ]`, data: jqXHR });
