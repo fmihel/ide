@@ -1119,10 +1119,10 @@ class TWS extends WS{
 
         FRAME('left',$middle)->CLASSES('layout');
 
-        FRAME('splitter_lc',$middle)
-            ->STYLE('position:absolute;width:10px;cursor:ew-resize')
-            ->CLASSES('splitter splitter_vert')
-            ->READY('{$}.splitter({horiz:true})');
+        //FRAME('splitter_lc',$middle)
+        //    ->STYLE('position:absolute;width:10px;cursor:ew-resize')
+        //    ->CLASSES('splitter splitter_vert');
+            //->READY('{$}.splitter({horiz:true})');
             
         $center = FRAME('center',$middle)->CLASSES('layout')
         ->SCRIPT('var centerAlignFirst = true')

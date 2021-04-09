@@ -288,7 +288,7 @@ Tjedit.prototype.init = function(o){
         width:0,
         /** установка ширины внутренних компонентов*/
         widths:{
-            label:110,
+            //label:110,
         },
         /** отступ лейбла от поля со значением value*/
         gapLabel:0,
@@ -779,7 +779,7 @@ Tjedit.prototype._event = function(){
         t.put({tip:{show:true}});
     });
 };
-
+  
 Tjedit.prototype.changed = function(bool){
     var t = this,p=t.param,jq=p.jq;
     
@@ -1976,17 +1976,22 @@ Tjedit.prototype._align_tip=function(){
     
 };
 Tjedit.prototype._align=function(){
-    var t=this,p=t.param,ar=p.arrange,pos,jq=p.jq,sy=0,i,chrome=false,a,b,c,chrm=0,css=p.css;
+    let t=this,p=t.param,arrange=p.arrange,pos,jq=p.jq,sy=0,i,chrome=false,a,b,c,chrm=0,css=p.css;
     
-    if ((p._alignFirst===undefined)&&(!JX.visiblex(p.plugin))) 
+    if (!p._alignFirst){
+        p._alignFirst = true;    
         return;
+    }
+
+    if (!JX.visiblex(p.plugin))
+        return;
+        
     let plgn = JX.pos(p.plugin);    
-    p._alignFirst = false;
     
 
     t.widths('update');
 
-    JX.arrange(ar._obj,{direct:"horiz",type:(ar._stretch?'stretch':'left'),align:p.type!=='memo'?p.align:'top',stretch:ar._stretch,margin:p.margin});
+    JX.arrange(arrange._obj,{direct:"horiz",type:(arrange._stretch?'stretch':'left'),align:p.type!=='memo'?p.align:'top',stretch:arrange._stretch,margin:p.margin});
     
     if (!p.disables.label){
         
@@ -1999,7 +2004,10 @@ Tjedit.prototype._align=function(){
 
         }else{
             
-            pos = {w:pos.w-p.gapLabel,x:pos.x+(ar._gapLabel==='right'?p.gapLabel:0)};
+            //pos = {w:pos.w-p.gapLabel,x:pos.x+(arrange._gapLabel==='right'?p.gapLabel:0)};
+            pos = {x:pos.x+(arrange._gapLabel==='right'?p.gapLabel:0)};
+            if ('label' in p.widths)
+                pos.w = pos.w-p.gapLabel;
             JX.pos(jq.label,pos);
             
         }    

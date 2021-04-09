@@ -12,7 +12,7 @@ $jeFoneCombo    = #FFF8E5;
 $jeFoneEdit     = #F3F3F3;
 $jeFoneText     = white;
 
-$jeWidthCaption = 100;
+$jeWidthCaption = 125;
 $jeWidthEdit    = 100;
 $jeHeight       = 23;
 $jeBtnSize      = $jeHeight;
