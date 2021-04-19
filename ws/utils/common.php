@@ -656,7 +656,7 @@ class ARR{
         
     }
     
-    public static function to_json($arr,$refactoring=false,$level = 0){
+    public static function to_json($arr,$refactoring=false,$level = 0,$param=[]){
         //SHORT:Преобразует PHP массив в строку, которую можно парсить JSON
         /*DOC: Преобразует PHP массив в строку, для возможности парсить ее JSON на стороне клиента. При этом строки будут кодироваться посредством JUTILS::JSON_CODE.
         Для правильной раскодировки используйте ф-цию javascript [code]JUTILS.JSON_DECODE(str)[/code] Так же bool значения, после парсинга,правильней проверять с помощью ф-ции [code]JUTILS.AsBool(mean)[/code]
@@ -664,9 +664,14 @@ class ARR{
         $left = '';
         $cr = '';
         if ($refactoring){
-            $left = str_repeat('    ',$level);
-            $cr = chr(13).chr(10); 
-        }
+            $param = array_merge([
+                'left'=>'    ',
+                'cr'=>chr(13).chr(10)
+            ],$param);
+            
+            $left = str_repeat($param['left'],$level);
+            $cr =$param['cr']; 
+        };
 
         if (TYPE::is_assoc($arr)){
             $res = '{';
@@ -677,7 +682,7 @@ class ARR{
                 $res.=$cr.$left;            
 
                 if (is_array($Value))
-                    $res.= '"'.$Name.'":'.ARR::to_json($Value,$refactoring,$level+1).'';          
+                    $res.= '"'.$Name.'":'.ARR::to_json($Value,$refactoring,$level+1,$param).'';          
                 else
                 {
                     if (is_bool($Value))
@@ -714,7 +719,7 @@ class ARR{
                     $res.=$cr.$left;            
        
                     if (is_array($arr[$i]))
-                        $res.= ARR::to_json($arr[$i],$refactoring,$level+1);
+                        $res.= ARR::to_json($arr[$i],$refactoring,$level+1,$param);
                     else{                    
                         if (is_bool($arr[$i])){
                             if ($arr[$i])
