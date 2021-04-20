@@ -336,6 +336,11 @@ hideGroup:function(param,hide){
     }else
         return o.hideGroup(param,hide,false);
 },
+/** проверка, что tr принадлежит строке группы */
+notGroup:function(tr){
+    var o = m.obj(this);
+    return o.not_group(tr);
+},
 /** 
  * помечает запись/записи
  * или возвращает признак помечена ли запись 
@@ -1552,7 +1557,7 @@ Tgrid.prototype.group=function(o){
     return false;    
 };
 
-
+/** проеврка, что tr есть принадлежит группа */
 Tgrid.prototype.not_group=function(tr){
     var t=this,p=t.param,css=p.css;
 
