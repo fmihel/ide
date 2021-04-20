@@ -1470,7 +1470,7 @@ class EMAIL{
             $subject    = $p['subject'];
             $fromMail   = $p["fromMail"];
             $fromName   = $p["fromName"];
-            $replyTo    = $p['replayTo'];
+            $replyTo    = $p['replyTo'];
             $filePath   = $p['filePath'];
         
             $LE  = "\r\n";
