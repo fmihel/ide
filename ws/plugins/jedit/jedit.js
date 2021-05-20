@@ -1292,7 +1292,7 @@ Tjedit.prototype.attr = function(n/*v*/){
                 var key = p.combo.valueKey!==''?p.combo.valueKey:p.combo.key;
 
                 var tr = jq.combo.grid('find',function(d){
-                    return $D(d.tr)[key]==v;
+                    return ut.eq($D(d.tr)[key],v);
                 });
                     
                 if (tr.length){

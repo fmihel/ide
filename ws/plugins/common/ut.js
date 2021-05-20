@@ -781,6 +781,44 @@ scroll:function(o){
     
         
     
-}    
+},
+/** сравнение двух значений,
+ *  если типы совпадают, то строгое сравнение
+ *  если нет, то для строки и числа делается привидение (для null и undefined тоже)
+ *  пустая строка НЕ равна 0 !
+ *  в остальных случаях false
+*/
+eq:function(a,b){
+    let typeA = typeof(a);
+    let typeB = typeof(b);
+    
+    if (a === null)
+        typeA = 'null';
+    if (b === null)
+        typeB = 'null';
+        
+    if (typeA === typeB){
+        return a === b;
+    }else{
+        let ts=(type1,type2)=>{
+            return ( (typeA === type1 && typeB === type2) || (typeA === type2 && typeB === type1) );
+        };
+        let haveEmpty=()=>{
+            if ((typeA==='string') && (a.trim() === '')) return true;
+            if ((typeB==='string') && (b.trim() === '')) return true;
+        };
+        
+        if (ts('string','number')){
+
+            return ( !haveEmpty() ? (a == b): false ) ;
+
+        }
+        
+        if (ts('null','undefined'))
+            return (a == b);
+        
+    }
+    return false;
+},
 
 };
