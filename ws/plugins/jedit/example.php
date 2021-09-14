@@ -34,6 +34,8 @@ RESOURCE('plugins','grid/grid.dcss');
 RESOURCE('plugins','grid/grid.js');
 RESOURCE('plugins','shadow/jshadow.js');
 
+RESOURCE('plugins','form/form.js');
+RESOURCE('plugins','form/form.dcss');
 
 //RESOURCE('jedit.js');
 
@@ -91,6 +93,34 @@ class TWS extends WS{
         );        
         
         
+        /*c:dialogShow*/
+        $this->item(
+            'dialogShow',
+            /*------------caption---------------*/
+            'dialogShow',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.jedit("dialog","show");
+            ',
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit("dialog","show");
+            '
+        );        
+        /*c:dialogHide */
+        $this->item(
+            'dialogHide',
+            /*------------caption---------------*/
+            'dialogHide',                  
+            /*------------code------------------*/
+            '
+            {$plugin}.jedit("dialog","hide");
+            ',
+            /*------------event-----------------*/
+            '
+            {$plugin}.jedit("dialog","hide");
+            '
+        );        
         
         /*c:width */
         $this->item(

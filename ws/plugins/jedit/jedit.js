@@ -91,6 +91,10 @@ combo:function(event,param){
     var o = m.obj(this);
     return o.combo(event,param);
 },
+dialog:function(event,param=[]){
+    var o = m.obj(this);
+    return o.dialog(event,param);  
+},
 begin:function(event){
     var o = m.obj(this);
     return o.begin(event);
@@ -234,6 +238,7 @@ Tjedit.prototype.init = function(o){
             memo:ut.id('jemm'),
             tip:ut.id('jetip'),
             icon_tip:ut.id('jeitip'),
+            dialog:ut.id('jedlg'),
         },
         /** имя поля для запитки из data */
         field:undefined,
@@ -271,7 +276,7 @@ Tjedit.prototype.init = function(o){
         caption:'',
         /** значение для установки */
         value:'',
-        /** сохраненное начение для проверки состояния изменения данных */
+        /** сохраненное значение для проверки состояния изменения данных */
         _storyValue:'',
         /** значение хинта */
         hint:false, // false - не отображать, true - отображать значение компонента, string - отображать строку string
@@ -317,7 +322,16 @@ Tjedit.prototype.init = function(o){
             
         },
         comboShadow:0.01,
-        
+        dialog:{ // включает режим отображения модального диалога, при начале ввода в поле
+            enable:false,
+            story:{},
+            footerHeight:52,// высота подвала
+            addWidth:12,// добавить к ширине с лева и справа
+            offX:0,// сместить по x
+            offY:-4,// сместить по y
+            onOpen:undefined,
+            onClose:undefined
+        }, 
         lock:new jlock(),
         handler:new jhandler(),
 
@@ -342,8 +356,12 @@ Tjedit.prototype.init = function(o){
         },
         /** признак, что edit находится в состоянии ошибки */
         _error:false,
-        /** изменение наcтупает на потерю фокуса или на нажатие enter */
+        /** изменение наcтупает на потерю фокуса или на нажатие enter (устаревшее см changesEvents)*/
         changeOnKeyEnter:true,
+        changeEvents:{
+            enter:true,
+            focus:true,
+        },
         /** задержка на выполнение реакции "change"*/
         changeDelay:1000,
         _changeTimer:undefined,
@@ -389,7 +407,10 @@ Tjedit.prototype.init = function(o){
             tipArrow:   'je_tipArrow',
             tipBorder:  'je_tipBorder',
             tipUp:      'je_tipUp',
-            tipText:    'je_tipText'
+            tipText:    'je_tipText',
+
+            dialog:     'je_dialog mfr_frame',
+
         }
         
     },o);
@@ -435,7 +456,7 @@ Tjedit.prototype.ungroup=function(group){
 
 Tjedit.prototype.done=function(){
     var t = this,p=t.param;
-    
+    t.dialog('hide');
     t.ungroup(-1);
     p.events=[];
     Ws.removeAlign(p._alignName);
@@ -569,7 +590,7 @@ Tjedit.prototype._event = function(){
     });
     
     jq.memo.on('focusout',()=>{
-        if ((t.param.changeOnKeyEnter)&&(t.changed())){
+        if ((t.param.changeEvents.focus)&&(t.changed())){
             t.do("change",{enableChange:true});
         }
     });
@@ -597,7 +618,7 @@ Tjedit.prototype._event = function(){
 
     
     jq.input.on('focusout',()=>{
-        if ((t.param.changeOnKeyEnter)&&(t.changed())){
+        if ((t.param.changeEvents.focus)&&(t.changed())){
             t.do("change",{enableChange:true});
         }
     });
@@ -605,6 +626,13 @@ Tjedit.prototype._event = function(){
     jq.input.on('keyup',( e ) => {
         if (p.readOnly) return;
         
+        if (p.dialog.enable){
+            if (p.dialog.show){
+                if (e.which === 27) t.dialog('hide',{res:'cancel'});
+            }else
+                t.dialog('show');
+        };
+
         t.begin('draw');
         t.put({value:jq.input.val()});
         t.end('draw');
@@ -690,7 +718,10 @@ Tjedit.prototype._event = function(){
     
     jq.input.on('keydown',e=>{
         if (p.readOnly) return;
-        
+        // ---------------
+        if (p.dialog.enable){
+            t.dialog('storyValue');
+        }
         // ---------------
         let oe = fixOriginalEvent(e.originalEvent);
         
@@ -710,16 +741,22 @@ Tjedit.prototype._event = function(){
         // ---------------
 
         if(e.which == 13){
-            if (t.param.changeOnKeyEnter){
+
+            if (p.dialog.enable){
+                t.dialog('hide', { res:'ok' });
+            }else{
+            
+            if (t.param.changeEvents.enter){
                 t.do("change",{enableChange:true});
                 t.changed(false);
             }
-
+            
             if (t.eventDefined('keyEnter')){
                 t.do('keyEnter')
                 e.preventDefault();
                 return;
             }    
+        }
         };
         
         if(e.which == 38){
@@ -749,7 +786,6 @@ Tjedit.prototype._event = function(){
         t.do('keyDown');
         
     });
-
 
     jq.label.on('click',()=>{
         if (p.readOnly) return;
@@ -1012,6 +1048,162 @@ Tjedit.prototype.disable = function(bool){
         arr[i].mbtn('disable',bool);
         
 };
+/** обработка диалога*/
+Tjedit.prototype.dialog = function(event,param={}){
+    var t=this,p=t.param,jq=p.jq,id=p.id;
+    const h_footer = p.dialog.footerHeight;
+    const w_add = p.dialog.addWidth; 
+    if ((event === 'show') || (event === 'open')){
+
+        if (!p.dialog.show){
+            
+            t.dialog('story');
+            p.dialog.show = true;
+            p.dialog.story.plugin = p.plugin;
+            p.dialog.res = 'cancel';
+
+            let pos = JX.abs(p.plugin);
+
+            Qs.body.append(`<div id=${id.dialog} style="position:absolute" ></div>`);
+            jq.dialog = Qs.body.find(`#${id.dialog}`);
+
+            jq.dialog.mform({
+                width:pos.w+w_add*2,
+                height:pos.h+h_footer,
+                position:{
+                    type:"custom",
+                    x:pos.x-w_add+p.dialog.offX,
+                    y:pos.y+p.dialog.offY,
+                },
+                modal:true,
+                showFooter:true,
+                resizable:false,
+                css:{
+                    frame:p.css.dialog
+                },
+                onOpen(){
+                    if (p.dialog.onOpen)
+                        p.dialog.onOpen({sender:t});
+                },
+                onAlign(){
+                    t.dialog('align');
+                },
+                onClose(o){
+                    t.dialog('hide')
+                },
+                onAfterClose(){
+                    if (p.dialog.onClose)
+                        p.dialog.onClose({sender:t});
+                },
+                buttons:{
+                    cancel:{
+                        caption:'Cancel',
+                        click(){
+                            jq.dialog.mform('close');
+                        },
+                    },
+                    ok:{
+                        caption:'Ok',
+                        click(){
+                            p.dialog.res = 'ok';
+                            jq.dialog.mform('close');
+                        },
+                    },
+                }
+            });
+            
+            jq.dialog.mform('open');
+            // переносим edit на форму
+            let child = p.plugin.children();
+            child.detach().appendTo(jq.dialog)
+            
+            // подмена текущего plugin на dialog
+            p.plugin = jq.dialog;
+            t.focus();
+        };
+    };
+
+    if ( (event === 'hide') || (event === 'close') ){
+        
+        if (p.dialog.show){
+            p.dialog = {...p.dialog,...param}
+            p.dialog.show = false;
+            p.plugin = p.dialog.story.plugin;
+            if (jq.dialog){
+                // возвращаем edit на plugin
+                let child = jq.dialog.children();
+                child.detach().appendTo(p.plugin);
+                
+                jq.dialog.mform('close');
+                jq.dialog.remove();
+                jq.dialog = undefined;
+            }
+
+            t.dialog('restory');
+            
+            if (p.dialog.res === 'cancel'){
+                t.put({value:p.dialog.story.value})
+            }else{
+                t.do("change",{enableChange:true});
+                t.changed(false);
+                t.align();
+            }
+
+            setTimeout(()=>{t.focus();},100);
+   
+        }
+    };
+
+    if (event === 'story'){
+        p.dialog.story.changeEvents = t.attr('changeEvents');
+        p.dialog.story.hint = t.attr('hint');
+        p.dialog.story.tip = t.attr('tip');
+        p.dialog.story.icon_tip = p.disables.icon_tip;
+        t.put({ 
+            changeEvents:{enter:true,focus:false},
+            tip:{
+                show:false,
+            },
+            disables:{
+                icon_tip:true,
+            },
+        });
+    };
+
+    if (event === 'restory'){
+        t.put({ 
+            changeEvents:p.dialog.story.changeEvents ,
+            hint:p.dialog.story.hint,
+            tip:p.dialog.story.tip,
+            disables:{
+                icon_tip:p.dialog.story.icon_tip
+            },
+        });
+    };
+
+    if (event === 'storyValue'){
+        if (!p.dialog.show){
+            p.dialog.story.value = t.attr('value');
+            //console.log('story',p.dialog.story.value)
+        }
+    };
+    if (event === 'align'){
+        if (p.dialog.show){
+            let pos = JX.abs(p.dialog.story.plugin);
+        
+            jq.dialog.mform({
+                width:pos.w+w_add*2,
+                height:pos.h+h_footer,
+                position:{
+                    type:"custom",
+                    x:pos.x-w_add+p.dialog.offX,
+                    y:pos.y+p.dialog.offY,
+                }
+            });
+            t.align();
+        };
+    }
+};
 /** установка ширин внутренних компонентов
  * widths() - возвращает текущие ширины объктов
  * widths('update') - обновляет ширины по сохраненным данным
@@ -1225,9 +1417,20 @@ Tjedit.prototype.attr = function(n/*v*/){
     /*-----------------------------------*/
     if (n==='changeOnKeyEnter'){
         if (r) 
-            return p.changeOnKeyEnter;
-        else    
-           p.changeOnKeyEnter =  v?true:false;
+            return p.changeEvents.enter && p.changeEvents.focus
+        else{    
+           p.changeOnKeyEnter =  v ? true : false;
+           p.changeEvents.enter = p.changeOnKeyEnter;
+           p.changeEvents.focus = p.changeOnKeyEnter;
+        }
+    }
+    /*-----------------------------------*/
+    if (n==='changeEvents'){
+        if (r) 
+            return p.changeEvents;
+        else{    
+           p.changeEvents =  {...p.changeEvents,...v};
+        }
     }
     /*-----------------------------------*/
     if (n==='tip'){
@@ -1614,7 +1817,13 @@ Tjedit.prototype.attr = function(n/*v*/){
             return jq.btn_add
     }
     /*-----------------------------------*/
-
+    if (n==='dialog'){
+        if (r) 
+            return p.dialog;
+        else    
+           p.dialog = {...p.dialog,...v};
+    }
+    /*-----------------------------------*/
     t.align();
 };
 
@@ -1717,8 +1926,10 @@ Tjedit.prototype.do=function(event,param){
         param['plugin'] = p.plugin;
     if (!('event' in param))
         param['event'] = event;
+    //if (!('enableChange' in param))                
+    //    param['enableChange'] = (!p.changeOnKeyEnter);
     if (!('enableChange' in param))                
-        param['enableChange'] = (!p.changeOnKeyEnter);
+        param['enableChange'] = (!(p.changeEvents.enter || p.changeEvents.focus));
         
     /*
     prm = $.extend(false,{
