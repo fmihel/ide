@@ -327,6 +327,7 @@ Tjedit.prototype.init = function(o){
             story:{},
             footerHeight:52,// высота подвала
             addWidth:12,// добавить к ширине с лева и справа
+            addHeadHeight:20,//добавить к высоте
             offX:0,// сместить по x
             offY:-4,// сместить по y
             onOpen:undefined,
@@ -1053,6 +1054,8 @@ Tjedit.prototype.dialog = function(event,param={}){
     var t=this,p=t.param,jq=p.jq,id=p.id;
     const h_footer = p.dialog.footerHeight;
     const w_add = p.dialog.addWidth; 
+    const h_head = p.dialog.addHeadHeight;
+
     if ((event === 'show') || (event === 'open')){
 
         if (!p.dialog.show){
@@ -1069,11 +1072,11 @@ Tjedit.prototype.dialog = function(event,param={}){
 
             jq.dialog.mform({
                 width:pos.w+w_add*2,
-                height:pos.h+h_footer,
+                height:pos.h+h_footer+h_head,
                 position:{
                     type:"custom",
                     x:pos.x-w_add+p.dialog.offX,
-                    y:pos.y+p.dialog.offY,
+                    y:pos.y+p.dialog.offY-h_head/2,
                 },
                 modal:true,
                 showFooter:true,
@@ -1193,11 +1196,11 @@ Tjedit.prototype.dialog = function(event,param={}){
         
             jq.dialog.mform({
                 width:pos.w+w_add*2,
-                height:pos.h+h_footer,
+                height:pos.h+h_footer+h_head,
                 position:{
                     type:"custom",
                     x:pos.x-w_add+p.dialog.offX,
-                    y:pos.y+p.dialog.offY,
+                    y:pos.y+p.dialog.offY-h_head/2,
                 }
             });
             t.align();
