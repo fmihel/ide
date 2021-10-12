@@ -1100,7 +1100,7 @@ Tjedit.prototype.dialog = function(event,param={}){
                 },
                 buttons:{
                     cancel:{
-                        caption:'Cancel',
+                        caption:'Отмена',
                         click(){
                             jq.dialog.mform('close');
                         },
