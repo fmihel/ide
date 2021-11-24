@@ -1239,30 +1239,42 @@ class base{
         return $ds->fetch_assoc();
     }
     
-    public static function rows($sqlOrDs,$base=null,$coding=null){
+    public static function rows($sqlOrDs,$base=null,$coding=null,$filter=null){
 
         $ds = gettype($sqlOrDs)==='string'?self::ds($sqlOrDs,$base,$coding):$sqlOrDs;
 
         if ($ds){
-            $out = array();
-            while(self::by($ds,$row))
-                array_push($out,$row);
-
+            $out = [];
+            $i = 0;
+            while($row = self::read($ds)){
+                if ($filter){
+                    $row = $filter($row,$i);
+                    $i++;
+                };        
+                if ($row)
+                    $out[]=$row;
+            };
             return $out;
         }
         
         return array();    
     
     }
-    public static function rowsE($sqlOrDs,$base=null,$coding=null,$error_msg=''){
+    public static function rowsE($sqlOrDs,$base=null,$coding=null,$error_msg='',$filter=null){
 
         $ds = gettype($sqlOrDs)==='string'?self::dsE($sqlOrDs,$base,$coding,$error_msg):$sqlOrDs;
 
         if ($ds){
-            $out = array();
-            while(self::by($ds,$row))
-                array_push($out,$row);
-
+            $out = [];
+            $i = 0;
+            while($row = self::read($ds)){
+                if ($filter){
+                    $row = $filter($row,$i);
+                    $i++;
+                };        
+                if ($row)
+                    $out[]=$row;
+            };
             return $out;
         }else
             self::doThrow($sqlOrDs,$base,$error_msg);
