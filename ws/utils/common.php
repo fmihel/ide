@@ -1352,7 +1352,30 @@ class ARR{
             
         }
     }
-        
+    
+    /** поиск в списке объектов объекта где все поля из fields имеет соотвествующие значения */
+    public static function findIndex(array $list,array $fields){
+        for($i = 0;$i<count($list);$i++){
+            $find = true;
+            foreach($fields as $name=>$val){
+                if (!isset($list[$i][$name]) || $list[$i][$name]!=$val){
+                    $find = false;
+                    break;
+                }
+            }
+            if ($find)
+                return $i;
+        }   
+        return -1;
+    }
+    /** возыращает найденный элемент из $list по условию $fields, если не найден, то возвращает $default */
+    public static function find(array $list,array $fields,$default=false){
+        $index = self::findIndex($list,$fields);
+        if ($index>-1)
+            return $list[$index];
+        else
+            return $default;    
+    }    
         
 };
     
