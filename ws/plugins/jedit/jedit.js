@@ -2277,8 +2277,21 @@ Tjedit.prototype._align=function(){
         jq.combo.grid("align");
         
         b = JX.abs(jq.combo);
-        if (b.y+b.h>JX.screen().h)
-            JX.abs(jq.combo,{y:a.y-b.h});
+        let screen = JX.screen();
+        if (b.y+b.h>screen.h){
+            let y =  a.y-b.h < 0 ? 5 : a.y-b.h;
+        
+            let h = b.h;
+            if (y+h>screen.h){
+                h = screen.h-y;
+                jq.combo.css('overflow-y','auto');
+            }else{
+                jq.combo.css('overflow-y','hidden');
+            }
+            JX.abs(jq.combo,{ y,h } );
+            
+        }
+        
         
     };
 
