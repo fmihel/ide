@@ -58,6 +58,20 @@ class WS_CONF{
         global $_ws_conf;
         $_ws_conf->loadFromFile($__DIR__,$file,$reopen);
     }
+    
+    private static function js_value($value){
+        $type = gettype($value);
+        if ($type === 'array'){ 
+            $out = '{';
+            foreach($value as $name=>$val){
+                $out.='"'.$name.'":'.self::js_value($val); 
+            }
+            $out.='},';
+            return $out;
+        }else{
+            return '"'.$value.'",';
+        }
+    }
     /**
      * преобразует массив параметров конфигурации 
      * в javascript объект.
@@ -67,7 +81,8 @@ class WS_CONF{
         $code = '';
         foreach($_ws_conf->param as $name=>$value){
             if (($list === 'all') || array_search($name,$list)!==false){
-                $code.='"'.$name.'":"'.$value.'",'; 
+                //$code.='"'.$name.'":"'.$value.'",'; 
+                $code.='"'.$name.'":'.self::js_value($value); 
             }
         }
         return '{'.$code.'}';
