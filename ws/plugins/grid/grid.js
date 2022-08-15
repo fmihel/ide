@@ -641,7 +641,7 @@ Tgrid.prototype.init = function(o){
     
     if (!('flyParent' in t.param))
         t.param.flyParent = t.param.plugin.parent()    
-        
+    t._alignFlyingHeader = t._alignFlyingHeader.bind(t);        
     t.param.flyParent.on('scroll',{grid:t},t._alignFlyingHeader);
     
 };
@@ -3091,11 +3091,10 @@ Tgrid.prototype._alignOld=function(){
 };
 
 Tgrid.prototype._alignFlyingHeader=function(ev){
-    var t=ev.data.grid,
-        p=t.param;
-    if (!p.flyingHeader) return;
-
-    var jq=p.jq,
+    const t=ev?ev.data.grid:this;
+    const p=t.param;
+    if (p.flyingHeader && p.flyParent) {
+        let jq=p.jq,
         flyParent = p.flyParent,
         //flyParent=p.plugin.parent(),
         dy = flyParent.scrollTop(),
@@ -3105,15 +3104,15 @@ Tgrid.prototype._alignFlyingHeader=function(ev){
         pPos.x-=dx;
         pPos.y-=dy;
     
-    //определить находится ли таблица в области видимости
-    if (JX.iscrossr(fpPos,pPos)){
-        // заголовок выше верхней границы
-        if (pPos.y<fpPos.y)
-            JX.pos(jq.header,{y:fpPos.y-pPos.y});
-        else
-            JX.pos(jq.header,{y:0});
-    }    
-    
+        //определить находится ли таблица в области видимости
+        if (JX.iscrossr(fpPos,pPos)){
+            // заголовок выше верхней границы
+            if (pPos.y<fpPos.y)
+                JX.pos(jq.header,{y:fpPos.y-pPos.y});
+            else
+                JX.pos(jq.header,{y:0});
+        };  
+    };
     t._alignHeader(t);
 };
 
@@ -3214,9 +3213,10 @@ Tgrid.prototype._align=function(){
     if (p.visibleHeader)
         t._alignCols();
 
-    t._alignGroups(bound);    
-    
-    t._alignHeader();
+    t._alignGroups(bound); 
+
+    t._alignFlyingHeader();
+    //t._alignHeader();
     
     t._alignFlyingPanel();
     
