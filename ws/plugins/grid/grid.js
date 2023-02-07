@@ -208,6 +208,17 @@ scroll:function(param){
     o.scroll(param);
     return this;
 },
+/** признак что проскролили до конца, delta - небольшой порог от конца, когда начинаем считать что конец */
+isScrollBottom:function(delta=32){
+    var o = m.obj(this);
+    return o.isScrollBottom(delta);
+},
+/** признак что есть скроллбар */
+haveScroll:function(delta=5){
+    var o = m.obj(this);
+    return o.haveScroll(delta);
+},
+
 inViewPort:function(tr,strong){
     if (strong===undefined) strong = false;
     var o = m.obj(this);
@@ -2280,6 +2291,30 @@ Tgrid.prototype.inViewPort=function(tr,strong){
     
     return strong?JX.insider(a,b):JX.iscrossr(a,b);
 };
+
+Tgrid.prototype.isScrollBottom=function(delta = 32){
+    const t = this;
+    const p = t.param;
+    const trs = p.jq.trs;
+    if (trs.length>0){
+        const $frame = p.jq.frameCells;
+        const max = $frame[0].scrollHeight - $frame.outerHeight();
+        const current = $frame.scrollTop();
+        return max>0 && (max-current<=delta);
+    }
+
+    return false;
+};
+
+Tgrid.prototype.haveScroll=function(delta = 5){
+    const t = this;
+    const p = t.param;
+    const $frame = p.jq.frameCells;
+    
+    return ($frame[0].scrollHeight - $frame.outerHeight()) > Math.abs(delta);
+};
+
+
 
 /**
  * Scrolling the table depending on the value of the parameter

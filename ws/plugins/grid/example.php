@@ -257,6 +257,30 @@ class TWS extends WS{
             '    //onclick event
             
         );
+
+        /*c:add5 */
+        $this->item(
+            'add100',                   //id
+            'add100',                  //caption
+            '$("#plugin").grid({
+                data:[...]
+            });',//sample code
+            '
+            {$plugin}.grid("begin");
+            
+            var s = {$plugin}.grid("selected");
+            if (s.length>0)
+                {$plugin}.grid({data:getData(100),insertTo:{after:s[0]}});
+            else    
+                {$plugin}.grid({data:getData(100)});
+
+
+            {$plugin}.grid("end");    
+        
+            '    //onclick event
+            
+        );
+
         
         /*c:add_group_5 */
      $this->item(
@@ -716,6 +740,28 @@ class TWS extends WS{
             '
         );        
 
+        /*c:scrollToGroup */
+        $this->item(
+            'isScrollBottom',
+            /*------------caption---------------*/
+            'isScrollBottom',                  
+            /*------------code------------------*/
+            '
+            
+            var bool = {$plugin}.grid("isScrollBottom",32);
+            console.log("isScrollBottom",bool);
+            console.log("haveScroll",{$plugin}.grid("haveScroll"));
+            
+            ',
+            /*------------event-----------------*/
+            '
+            var bool = {$plugin}.grid("isScrollBottom",32);
+            var have = {$plugin}.grid("haveScroll");
+            console.log("isScrollBottom",bool);
+            console.log("haveScroll",have);
+            
+            '
+        );        
 
     
     
