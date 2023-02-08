@@ -145,7 +145,9 @@ class TWS extends WS{
         })')
         ->INIT('
             let state = false;
-            {$}.grid("scroll",()=>{
+            {$}.grid("scroll",({sender,down})=>{
+                
+                console.log("down",down);
                 
                 if (!state && {$}.grid("isScrollBottom")){
                     state = true;

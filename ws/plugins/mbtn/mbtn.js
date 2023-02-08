@@ -101,6 +101,9 @@ function mbtn(o){
             hover:"mb_hover",
             active:"mb_active",
             disable:"mb_disable"
+        },
+        style:{
+
         }        
     },o);
     
@@ -265,6 +268,15 @@ mbtn.prototype.attr = function(n/*v*/){
         if (!r)
             t.ungroup(v);
     }
+    /*-----------------------------------*/    
+    if (n==='style'){
+        if (r) 
+            return {...p.style};
+        else{    
+            p.style = {...p.style,...v};
+            p.own.css(p.style);
+        }    
+    }    
     /*-----------------------------------*/    
 };
 

@@ -628,7 +628,9 @@ Tgrid.prototype.init = function(o){
             headerFrame_bottom:'grid_header_frame_bottom',
             flyingPanel:'grid_flying_panel',
 
-        }
+        },
+        /**используется для проверки  какую сторону скролим, см scroll() */
+        _lastScrollTop: 0,
         
     },o);
     
@@ -2326,8 +2328,13 @@ Tgrid.prototype.scroll=function(o){
     var t=this,p=t.param,tr,trs = p.jq.trs;
     
     if (typeof o === 'function'){
+        
+
         const callback = ()=>{
-            o({sender:this});
+            let scrollTop = p.jq.frameCells.scrollTop();
+            let down = t._lastScrollTop<scrollTop;
+            t._lastScrollTop = scrollTop;
+            o({sender:this,down});
         }
         p.jq.frameCells.on('scroll',callback);
         return ()=>{ p.jq.frameCells.off(callback);};
