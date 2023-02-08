@@ -142,7 +142,22 @@ class TWS extends WS{
                 
             }
             
-        })'); // place code for plugin init
+        })')
+        ->INIT('
+            let state = false;
+            {$}.grid("scroll",()=>{
+                
+                if (!state && {$}.grid("isScrollBottom")){
+                    state = true;
+                    console.log("bottom");
+                }else if (state && !{$}.grid("isScrollBottom")){
+                    state = false;
+                    console.log("no bottom");
+                }
+
+            });
+
+        '); // place code for plugin init
 
     }
 
@@ -169,8 +184,6 @@ class TWS extends WS{
             return data;
         }
         ');
-        
-        
         /*c:clear */
         $this->item(
             'clear',
@@ -178,16 +191,10 @@ class TWS extends WS{
             'clear',                  
             /*------------code------------------*/
             '
-            
             {$plugin}.grid("clear");
-            
             ',
             /*------------event-----------------*/
-            '
-            
-            {$plugin}.grid("clear");
-            
-            '
+            '{$plugin}.grid("clear");'
         );        
         
         /*c:free */
@@ -210,7 +217,7 @@ class TWS extends WS{
         );        
 
 
-    
+
         
         
         /*c:delete */
@@ -704,9 +711,22 @@ class TWS extends WS{
             '
             
             var s = {$plugin}.grid("selected");
-            
             {$plugin}.grid("scroll",s);
+
+            {$plugin}.grid("scroll",tr);
+            {$plugin}.grid("scroll","top");
+            {$plugin}.grid("scroll",{to:"top"});
+            {$plugin}.grid("scroll","bottom");
             
+            // scroll event
+            let off = {$plugin}).grid("scroll",()=>{ ...on scroll...  });
+            off();// remove secroll event
+            
+            // is scrool on bottom 
+            let bool = {$plugin}.grid("isScrollBottom");
+            
+            // have scrollbar 
+            let bool = {$plugin}.grid("haveScroll");
             ',
             /*------------event-----------------*/
             '
@@ -740,40 +760,7 @@ class TWS extends WS{
             '
         );        
 
-        /*c:scrollToGroup */
-        $this->item(
-            'isScrollBottom',
-            /*------------caption---------------*/
-            'isScrollBottom',                  
-            /*------------code------------------*/
-            '
-            
-            var bool = {$plugin}.grid("isScrollBottom",32);
-            console.log("isScrollBottom",bool);
-            console.log("haveScroll",{$plugin}.grid("haveScroll"));
-            
-            ',
-            /*------------event-----------------*/
-            '
-            var bool = {$plugin}.grid("isScrollBottom",32);
-            var have = {$plugin}.grid("haveScroll");
-            console.log("isScrollBottom",bool);
-            console.log("haveScroll",have);
-            
-            '
-        );        
 
-    
-    
-    
-        
-            
-
-
-    
-    
-
-    
     }
     private function css(){
         FRAME()->CSS('
@@ -994,8 +981,8 @@ class TWS extends WS{
         $own = FRAME('left');
         $code = $this->refactoring($code);
 
-        $code = str_replace(array("\n",'"',"'"),array('<#enter#>','<#quot#>','<#apos#>'),$code);
-
+        $code = str_replace(array("\r\n","\n",'"',"'"),array('<#enter#>','<#enter#>','<#quot#>','<#apos#>'),$code);
+        
         $item = FRAME($id,$own)
             ->CLASSES('menu')
             ->STYLE('position:absolute')

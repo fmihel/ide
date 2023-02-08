@@ -201,12 +201,14 @@ unselect:function(tr){
  * $('#div').grid('scroll',{to:"top"});
  * @example 
  * $('#div').grid('scroll',"bottom");
+ * @example 
+ * let off = $('#div').grid('scroll',()=>{ ...on scroll...  });
+ * off();// remove secroll event
  *   
 */
 scroll:function(param){
     var o = m.obj(this);
-    o.scroll(param);
-    return this;
+    return o.scroll(param) || this;
 },
 /** признак что проскролили до конца, delta - небольшой порог от конца, когда начинаем считать что конец */
 isScrollBottom:function(delta=32){
@@ -2323,7 +2325,14 @@ Tgrid.prototype.haveScroll=function(delta = 5){
 Tgrid.prototype.scroll=function(o){
     var t=this,p=t.param,tr,trs = p.jq.trs;
     
-    if ((typeof(o)==='string')||(o instanceof jQuery))
+    if (typeof o === 'function'){
+        const callback = ()=>{
+            o({sender:this});
+        }
+        p.jq.frameCells.on('scroll',callback);
+        return ()=>{ p.jq.frameCells.off(callback);};
+
+    }else if ((typeof(o)==='string')||(o instanceof jQuery))
         o = {to:o};
     else if ((typeof o === 'object') && ('up' in o))
         o = {to:o};
